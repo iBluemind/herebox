@@ -63,7 +63,7 @@ def internal_error(message=u'점검 중이거나 내부 문제가 발생했습�
 
 
 # API 컨트롤러 모듈
-from hereboxweb.landing.views import landing
-app.register_blueprint(landing)
+from hereboxweb.reserve.views import reserve
+app.register_blueprint(reserve)
 
 # database.create_all()
