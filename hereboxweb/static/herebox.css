@@ -1,0 +1,450 @@
+body {
+  font-family: 'Nanum Barun Gothic', sans-serif;
+  overflow-x: hidden;
+}
+
+body,
+.navbar-static-top,
+.navbar-static-bottom {
+  min-width: 1200px;
+}
+
+.container {
+  width: 1200px;
+  max-width: none !important;
+}
+
+.container .navbar-header,
+.container .navbar-collapse {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+/* Always float the navbar header */
+.navbar-header {
+  float: left;
+}
+
+/* Undo the collapsing navbar */
+.navbar-collapse {
+  display: block !important;
+  height: auto !important;
+  padding-bottom: 0;
+  overflow: visible !important;
+  visibility: visible !important;
+}
+
+.navbar-toggle {
+  display: none;
+}
+.navbar-collapse {
+  border-top: 0;
+}
+
+/* Always apply the floated nav */
+.navbar-nav {
+  float: left;
+  margin: 0;
+}
+.navbar-nav > li {
+  float: left;
+}
+.navbar-nav > li > a {
+  padding: 15px;
+}
+
+/* Redeclare since we override the float above */
+.navbar-nav.navbar-right {
+  float: right;
+}
+
+/* Undo form expansion */
+.navbar-form {
+  float: left;
+  width: auto;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-right: 0;
+  margin-left: 0;
+  border: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+}
+
+/* Copy-pasted from forms.less since we mixin the .form-inline styles. */
+.navbar-form .form-group {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-form .form-control {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
+
+.navbar-form .form-control-static {
+  display: inline-block;
+}
+
+.navbar-form .input-group {
+  display: inline-table;
+  vertical-align: middle;
+}
+
+.navbar-form .input-group .input-group-addon,
+.navbar-form .input-group .input-group-btn,
+.navbar-form .input-group .form-control {
+  width: auto;
+}
+
+.navbar-form .input-group > .form-control {
+  width: 100%;
+}
+
+.navbar-form .control-label {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-form .radio,
+.navbar-form .checkbox {
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.navbar-form .radio label,
+.navbar-form .checkbox label {
+  padding-left: 0;
+}
+
+.navbar-form .radio input[type="radio"],
+.navbar-form .checkbox input[type="checkbox"] {
+  position: relative;
+  margin-left: 0;
+}
+
+.navbar-form .has-feedback .form-control-feedback {
+  top: 0;
+}
+
+/* Undo inline form compaction on small screens */
+.form-inline .form-group {
+  display: inline-block;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.form-inline .form-control {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+}
+
+.form-inline .form-control-static {
+  display: inline-block;
+}
+
+.form-inline .input-group {
+  display: inline-table;
+  vertical-align: middle;
+}
+.form-inline .input-group .input-group-addon,
+.form-inline .input-group .input-group-btn,
+.form-inline .input-group .form-control {
+  width: auto;
+}
+
+.form-inline .input-group > .form-control {
+  width: 100%;
+}
+
+.form-inline .control-label {
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.form-inline .radio,
+.form-inline .checkbox {
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+.form-inline .radio label,
+.form-inline .checkbox label {
+  padding-left: 0;
+}
+
+.form-inline .radio input[type="radio"],
+.form-inline .checkbox input[type="checkbox"] {
+  position: relative;
+  margin-left: 0;
+}
+
+.form-inline .has-feedback .form-control-feedback {
+  top: 0;
+}
+
+a {
+  color: #727272;
+}
+
+dl, ul, ol, menu, li {
+  list-style: none;
+}
+
+.navbar-static-top {
+  margin-top: 19px;
+  margin-bottom: 19px;
+}
+
+.navbar-nav > .active > a {
+  color: #ffa000;
+}
+
+.section {
+  text-align: center;
+  min-height: 360px;
+  padding: 60px 0;
+  font-family: 'Nanum Barun Gothic Light', sans-serif;
+}
+
+.main-index {
+  height: 640px; padding-top: 120px;
+  background: #fff url('assets/img/bg.png') no-repeat center center;
+  background-size: 1200px;
+  color: #727272;
+}
+
+.main-index h1 {
+  font-size: 48px;
+}
+
+.main-index p {
+  font-size: 22px;
+}
+
+.main-index button {
+  margin-top: 40px;
+}
+
+.main-easy {
+  color: #212121;
+}
+
+.main-easy h1 {
+  font-size: 32px;
+}
+
+.main-easy h2 {
+  font-size: 20px;
+  display: inline;
+}
+
+.main-easy p {
+  font-size: 20px;
+}
+
+.main-easy .row .title {
+  font-size: 20px;
+}
+
+.main-easy .row p {
+  font-size: 14px;
+}
+
+.main-easy .row .item {
+  padding: 30px;
+}
+
+.main-reason {
+  background-color: #fafafa;
+  margin: 0 auto;
+}
+
+.main-reason h1 {
+  font-size: 32px;
+}
+
+.main-reason p {
+  font-size: 20px;
+}
+
+.main-reason h2 {
+  font-size: 20px;
+}
+
+.main-reason .reason-items {
+  display: inline-block;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.main-reason .reason-items .item {
+  float: left;
+  width: 306px;
+  height: 430px;
+  margin: 30px 20px;
+  padding: 26px;
+  border: solid 1px #c4c4c4;
+}
+
+.main-reason .reason-items .item {
+  background-color: #fff;
+}
+
+.main-reason .reason-items .item p {
+  font-size: 14px;
+  text-align: left;
+}
+
+.main-reason .reason-items .item .price {
+  font-size: 14px;
+  text-align: center;
+}
+
+.main-available h1 {
+  font-size: 32px;
+}
+
+.main-available p {
+  font-size: 20px;
+}
+
+.main-available .try {
+  font-size: 14px;
+  margin-bottom: 60px;
+  color: #ffa000;
+}
+
+.main-feature {
+  background-color: #fafafa;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.main-feature .feature-items {
+  display: inline-block;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.main-feature .feature-items .item {
+  float: left;
+  width: 306px;
+  margin: 30px 20px;
+}
+
+.main-feature .feature-items .item h2 {
+  font-size: 20px;
+  color: #212121;
+}
+
+.main-feature .feature-items .item p {
+  font-size: 14px;
+  color: #212121;
+}
+
+.main-review {
+  background: #E39129 url('assets/img/img-review.png') no-repeat left top;
+  background-size: auto;
+  height: 500px;
+}
+
+.main-review .review {
+  position: relative;
+  top: 30%;
+}
+
+.main-review .review .content {
+  font-family: "Nanum Barun Gothic Light", sans-serif;
+  color: #fff;
+  font-size: 26px;
+}
+
+.main-review .review .author {
+  font-family: "Nanum Barun Gothic Light", sans-serif;
+  color: #fff;
+  font-size: 18px;
+}
+
+.main-try .try {
+  position: relative;
+  top: 50px;
+}
+
+.main-try .try p {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #5e5c5c;
+}
+
+.footer {
+  padding: 80px;
+  background-color: #fafafa;
+  width: 100%;
+  display: block;
+  color: #727272;
+}
+
+.footer-title {
+  font-family: "Nanum Barun Gothic Bold", sans-serif;
+  color: #ffc107;
+  font-size: 20px;
+}
+
+.footer-contact {
+  font-size: 20px;
+  padding-bottom: 41px;
+  border-bottom: solid 1px #727272;
+}
+
+.footer-contact .contact-title {
+  float: left;
+  width: 600px;
+}
+
+.footer-contact ul {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.footer-contact ul li {
+  float: left;
+}
+
+.footer .footer-menu {
+  font-size: 18px;
+}
+
+.footer .footer-bottom {
+  padding-top: 50px;
+}
+
+.footer-time .title {
+  font-size: 18px;
+  color: #727272;
+}
+
+.footer-time .time {
+  font-size: 18px;
+  color: #727272;
+  font-family: "Nanum Barun Gothic Light", sans-serif;
+}
+
+.footer-time .rest {
+  font-size: 14px;
+  font-family: "Nanum Barun Gothic Light", sans-serif;
+}
+
+.copyright {
+  margin-top: 18px;
+  font-family: "Nanum Barun Gothic Light", sans-serif;
+  font-size: 14px;
+  color: #727272;
+}

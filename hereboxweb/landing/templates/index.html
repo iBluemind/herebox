@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container section main-index">
+        <h1>당신의 공간을 더 넓게</h1>
+        <p>원하는 시간에 픽업하여 보관하고 필요할 때 다시 배송해드립니다</p>
+
+        <button class="btn btn-lg btn-primary">지금 예약하기</button>
+    </div>
+
+    <div class="container section main-easy">
+        <h1>정말로 간편한 이용</h1>
+        <p>보관 과정의 불편함은 해결하고 편의만을 제공합니다</p>
+
+        <div class="row">
+            <div class="item col-xs-6">
+                <div class="col-xs-6">
+                    <img src="{{ url_for('static', filename='assets/img/icon-book.png') }}">
+                </div>
+                <div class="col-xs-6" style="padding: 0; text-align: left;">
+                    <h2>1. 간편한 신청</h2>
+                    <p>PC와 모바일 어디서든 몇번의 클릭만으로 쉽게 픽업 신청하세요</p>
+                </div>
+            </div>
+            <div class="item col-xs-6">
+                <div class="col-xs-6">
+                    <img src="{{ url_for('static', filename='assets/img/icon-pickup.png') }}">
+                </div>
+                <div class="col-xs-6" style="padding: 0; text-align: left;">
+                    <h2>2. 픽업맨 방문</h2>
+                    <p>원하는 날짜와 시간에 픽업맨이 방문하여 보관할 물건을 수거합니다</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="item col-xs-6">
+                <div class="col-xs-6">
+                    <img src="{{ url_for('static', filename='assets/img/icon-store.png') }}">
+                </div>
+                <div class="col-xs-6" style="padding: 0; text-align: left;">
+                    <h2>3. 최적의 환경에서 보관</h2>
+                    <p>온습도 관리 시설을 갖춘 히어박스 창고에서 안전하게 보관합니다</p>
+                </div>
+            </div>
+            <div class="item col-xs-6">
+                <div class="col-xs-6">
+                    <img src="{{ url_for('static', filename='assets/img/icon-deliv.png') }}">
+                </div>
+                <div class="col-xs-6" style="padding: 0; text-align: left;">
+                    <h2>4. 친절한 배송</h2>
+                    <p>언제든 다시 필요할 때 회수 신청을 하면 배송해드립니다</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid section main-reason">
+        <div class="row">
+            <h1>필요한 만큼만 합리적인 가격으로</h1>
+            <p>물품수거를 위해 방문하는 픽업 비용은 무료입니다</p>
+        </div>
+
+        <div class="reason-items">
+            <div class="item">
+                <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
+                <h2>규격박스</h2>
+                <p>
+                    튼튼한 플라스틱 박스로 안전합니다.
+                    <br>
+                    가로 60cm x 세로 40cm x 높이 37cm
+                    <br>
+                    최대 무게 25kg
+                    <br><br>
+                    <a style="color: #ffa000;">박스 크기 영상으로 보기 ></a>
+                </p>
+
+                <p class="price">
+                    7,500원 / 월
+                </p>
+            </div>
+            <div class="item">
+                <img src="{{ url_for('static', filename='assets/img/img-un.png') }}">
+                <h2>비규격 물품</h2>
+                <p>
+                    박스에 들어가지않는 큰 물건도 걱정마세요
+                    <br>
+                    자전거, 캐리어, 골프백, 스키 등 한 명이 옮길
+                    수 있는 물품이라면 가능합니다
+                </p>
+
+                <br><br>
+
+                <p class="price">
+                    10,900원 / 월
+                </p>
+            </div>
+            <div class="item">
+                <img src="{{ url_for('static', filename='assets/img/img-biz.png') }}">
+                <h2>기업 및 이사고객</h2>
+                <p>
+                    회사 물품이나 이삿짐을 대량 보관하시나요?
+                    별도문의를 통해 최적의 견적을 받아보세요
+                    히어박스가 친절히 상담해드립니다
+                </p>
+
+                <br><br>
+
+                <p class="price">
+                    별도 문의
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <button class="btn btn-lg btn-primary">실시간 견적 보기</button>
+        </div>
+    </div>
+
+    <div class="container section main-available">
+        <div class="row">
+            <h1>서비스 지역</h1>
+            <p>현재 서울시 전 지역 서비스 가능합니다</p>
+            <div class="try">우리 동네 신청하기 ></div>
+        </div>
+
+        <img src="{{ url_for('static', filename='assets/img/img-seoul.png') }}">
+    </div>
+
+    <div class="container-fluid section main-feature">
+        <div class="row">
+            <h1>최적의 환경을 갖춘 보관 시설</h1>
+            <p>걱정하지 마세요. 히어박스가 안전하게 보관합니다</p>
+        </div>
+
+        <div class="row feature-items">
+            <div class="item">
+                <img src="{{ url_for('static', filename='assets/img/icon-cctv.png') }}">
+                <h2>CCTV 작동</h2>
+                <p>365일 24시간 CCTV가 작동하여 안전합니다</p>
+            </div>
+            <div class="item">
+                <img src="{{ url_for('static', filename='assets/img/icon-tem.png') }}">
+                <h2>온습도 조절</h2>
+                <p>창고 내부를 최적의 온습도로 조절하여 유지합니다</p>
+            </div>
+            <div class="item">
+                <img src="{{ url_for('static', filename='assets/img/icon-chk-mobi.png') }}">
+                <h2>보관 물품 확인</h2>
+                <p>보관 중인 물품을 사진과 함께 확인할 수 있습니다</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid section main-review">
+        <div class="review">
+            <p class="content">"직장 생활 때문에 자취를 시작하여 8평짜리 방에 살고 있습니다.<br>
+                물건이 너무 많아 공간이 좁은 게 늘 문제였는데 히어박스를 통해<br>
+                자주 사용하지 않는 물건을 맡기고 나서 어느 정도 여유가 생겼습니다."</p>
+            <p class="author">- vrgk*****@naver.com -</p>
+        </div>
+    </div>
+
+    <div class="container section main-try">
+        <div class="try">
+            <button class="btn btn-lg btn-primary">지금 예약하기</button>
+            <p>이제 자주 사용하지 않는 물품은 히어박스에 맡기고 공간을 더 넓게 사용하세요!</p>
+        </div>
+    </div>
+
+{% endblock %}

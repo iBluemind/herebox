@@ -1,0 +1,17 @@
+{
+  "name": "herebox",
+  "authors": [
+    "Han Manjong <han@manjong.org>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "static/libs",
+    "test",
+    "tests"
+  ]
+}
