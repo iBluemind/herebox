@@ -2,7 +2,6 @@
 
 from flask import request, render_template
 from hereboxweb import database, response_template
-from hereboxweb.landing import landing
 
 
 # @landing.route('/available', methods=['GET'])
