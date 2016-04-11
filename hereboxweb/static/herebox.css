@@ -384,11 +384,16 @@ dl, ul, ol, menu, li {
 }
 
 .footer {
-  padding: 80px;
   background-color: #fafafa;
   width: 100%;
   display: block;
   color: #727272;
+  padding-bottom: 20px;
+}
+
+.footer-top {
+  margin-top: 80px;
+  width: 1200px;
 }
 
 .footer-title {
@@ -422,7 +427,7 @@ dl, ul, ol, menu, li {
   font-size: 18px;
 }
 
-.footer .footer-bottom {
+.footer-bottom {
   padding-top: 50px;
 }
 
