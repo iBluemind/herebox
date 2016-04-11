@@ -62,8 +62,18 @@ def internal_error(message=u'점검 중이거나 내부 문제가 발생했습�
     return response_template(message, 500)
 
 
+from hereboxweb import views
+
 # API 컨트롤러 모듈
-from hereboxweb.reserve.views import reserve
-app.register_blueprint(reserve)
+from hereboxweb.schedule.views import schedule
+from hereboxweb.auth.views import auth
+from hereboxweb.admin.views import admin
+from hereboxweb.book.views import book
+from hereboxweb.payment.views import payment
+
+app.register_blueprint(schedule)
+app.register_blueprint(auth)
+app.register_blueprint(admin)
+app.register_blueprint(payment)
 
 # database.create_all()

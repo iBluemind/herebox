@@ -2,9 +2,9 @@
 
 from flask import request, render_template
 from hereboxweb import database, response_template
-from hereboxweb.reserve import reserve
+from hereboxweb.schedule import schedule
 
 
-@reserve.route('/', methods=['GET'])
+@schedule.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
