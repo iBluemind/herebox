@@ -431,6 +431,13 @@ dl, ul, ol, menu, li {
   padding-top: 50px;
 }
 
+.footer-time {
+  float: right;
+  display: inline-block;
+  margin: 0;
+  padding: 0 20px 0 0;
+}
+
 .footer-time .title {
   font-size: 18px;
   color: #727272;
