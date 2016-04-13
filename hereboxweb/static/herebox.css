@@ -378,6 +378,55 @@ fieldset[disabled] .btn-hb.active {
   background-color: #FFC107;
 }
 
+.btn-hbfb {
+  color: #ffffff;
+  background-color: #3B5999;
+  border-color: #3B5999;
+
+  font-size: 14px;
+  padding: 12px 160px 12px 160px;
+}
+
+.btn-hbfb:hover,
+.btn-hbfb:focus,
+.btn-hbfb:active,
+.btn-hbfb.active,
+.open .dropdown-toggle.btn-hbfb {
+  color: #ffffff;
+  background-color: #344F89;
+  border-color: #3B5999;
+}
+
+.btn-hbfb:active,
+.btn-hbfb.active,
+.open .dropdown-toggle.btn-hbfb {
+  background-image: none;
+}
+
+.btn-hbfb.disabled,
+.btn-hbfb[disabled],
+fieldset[disabled] .btn-hbfb,
+.btn-hbfb.disabled:hover,
+.btn-hbfb[disabled]:hover,
+fieldset[disabled] .btn-hbfb:hover,
+.btn-hbfb.disabled:focus,
+.btn-hbfb[disabled]:focus,
+fieldset[disabled] .btn-hbfb:focus,
+.btn-hbfb.disabled:active,
+.btn-hbfb[disabled]:active,
+fieldset[disabled] .btn-hbfb:active,
+.btn-hbfb.disabled.active,
+.btn-hbfb[disabled].active,
+fieldset[disabled] .btn-hbfb.active {
+  background-color: #3B5999;
+  border-color: #3B5999;
+}
+
+.btn-hbfb .badge {
+  color: #3B5999;
+  background-color: #ffffff;
+}
+
 a {
   color: #727272;
 }

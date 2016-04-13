@@ -20,3 +20,8 @@ def introduce():
 @app.route('/faq', methods=['GET'])
 def faq():
     return render_template('faq.html')
+
+
+@app.route('/event', methods=['GET'])
+def event():
+    return render_template('event.html')
