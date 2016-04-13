@@ -1,6 +1,124 @@
 # -*- coding: utf-8 -*-
 
+
+import base64
+from Crypto.Cipher import PKCS1_OAEP
+from Crypto.PublicKey import RSA
 from flask import request, render_template
-from hereboxweb import database, response_template
+from flask.ext.wtf import Form
+from wtforms import TextField, StringField, PasswordField
+from wtforms.validators import Required, DataRequired, Length, EqualTo, Email
+
+from flask.ext.login import login_required, login_user, logout_user, current_user
+from sqlalchemy.exc import IntegrityError
+from flask import request, url_for, redirect, flash
+from hereboxweb import database, response_template, bad_request, unauthorized, login_manager
 from hereboxweb.auth import auth
+from hereboxweb.auth.crypto import AESCipher
+from hereboxweb.auth.models import User
+from config import RSA_PUBLIC_KEY_BASE64
+from config import RSA_PRIVATE_KEY_BASE64
+
+
+class LoginForm(Form):
+    email = StringField(u'이메일 주소', validators=[DataRequired(message=u'반드시 입력해야 합니다')])
+    password = PasswordField(u'비밀번호', validators=[DataRequired(message=u'반드시 입력해야 합니다')])
+
+
+class SignupForm(Form):
+    email = StringField(u'이메일 주소', validators=[DataRequired(message=u'반드시 입력해야 합니다'), Email(message=
+                                                                                            u'올바른 이메일 주소를 입력해주세요')])
+    name = StringField(u'이름', validators=[DataRequired(message=u'반드시 입력해야 합니다'), Length(
+                                min=2, max=6, message=u'최소 2자, 최대 6자 입력 가능합니다'
+                        )])
+    password = PasswordField(u'비밀번호', validators=[DataRequired(message=u'반드시 입력해야 합니다'), Length(
+                                min=6, max=16, message=u'최소 6자, 최대 16자 입력 가능합니다'
+                            )])
+    password_check = PasswordField(u'비밀번호 확인', validators=[DataRequired(message=u'반드시 입력해야 합니다'),
+                                                                EqualTo('password',
+                                                                        message=u'비밀번호를 확인해주세요')])
+
+
+@auth.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = LoginForm()
+    rsa_public_key = RSA_PUBLIC_KEY_BASE64
+
+    if form.validate_on_submit():
+        encoded_email = form.email.data
+        encoded_password = form.password.data
+        encoded_aes_key = request.form['decryptKey']
+        encoded_aes_iv = request.form['iv']
+
+        encrypted_email = base64.b64decode(encoded_email)
+        encrypted_password = base64.b64decode(encoded_password)
+        encrypted_aes_key = base64.b64decode(encoded_aes_key)
+        aes_iv = base64.b64decode(encoded_aes_iv)
+
+        decoded_private_key = base64.b64decode(RSA_PRIVATE_KEY_BASE64)
+        private_key = PKCS1_OAEP.new(RSA.importKey(decoded_private_key))
+
+        decrypted_aes_key = private_key.decrypt(encrypted_aes_key)
+        aes_cipher = AESCipher(decrypted_aes_key)
+
+        decrypted_email = aes_cipher.decrypt(encrypted_email, aes_iv)
+        decrypted_password = aes_cipher.decrypt(encrypted_password, aes_iv)
+
+        query = database.session.query(User).filter(User.email == decrypted_email)
+        user = query.first()
+
+        if not user:
+            return unauthorized(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
+
+        if user.check_password(decrypted_password):
+            flash(u'환영합니다')
+            login_user(user)
+            return redirect(request.args.get('next') or url_for('index'))
+    return render_template('login.html', form=form, jsessionid=rsa_public_key)
+
+
+@auth.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
+    form = SignupForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        password = form.password.data
+        email = form.email.data
+
+        new_user = User(name=name, password=password, email=email)
+
+        try:
+            database.session.add(new_user)
+            database.session.commit()
+        except IntegrityError, e:
+            if '1062' in e.message:
+                return response_template(u'이미 가입된 회원입니다.', 400)
+        return redirect(url_for('index'))
+    return render_template('signup.html', form=form)
+
+
+@auth.route('/findpw', methods=['GET'])
+def find_pw():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    return render_template('findpw.html')
+
+
+# 로그아웃
+@auth.route('/logout', methods=['GET'])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
+@login_manager.unauthorized_handler
+def unauthorized_login():
+    return redirect(url_for('login'))
 

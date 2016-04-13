@@ -17,6 +17,8 @@
   "dependencies": {
     "jquery": "^2.2.2",
     "bootstrap": "^3.3.6",
-    "NanumBarunGothic": "^1.0.0"
+    "NanumBarunGothic": "^1.0.0",
+    "jquery-form": "^3.46.0",
+    "forge": "^0.6.39"
   }
 }

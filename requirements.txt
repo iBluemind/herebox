@@ -12,3 +12,5 @@ redis==2.10.3
 SQLAlchemy==0.9.8
 git+https://bitbucket.org/iBluemind/sphinxalchemy.git
 fabric==1.10.2
+Flask-Login==0.3.2
+Flask-WTF==0.12

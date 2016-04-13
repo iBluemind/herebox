@@ -1,20 +1,32 @@
 # -*- coding: utf-8 -*-
-import logging
 
+
+import logging
 from flask import Flask
+from flask.ext.login import LoginManager
+
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType
     # RedisConnectHelper, RedisType
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = '/login'
+
+
+app.config['CSRF_ENABLED'] = True
+app.config['SECRET_KEY'] = 'hEREboXiSthEBeST'
 
 # SQLAlchemy URI 설정
 from config import SQLALCHEMY_ECHO, SQLALCHEMY_POOL_RECYCLE, \
-    SQLALCHEMY_POOL_SIZE, response_template
-    # REDIS_PASSWORD, REDIS_PORT,REDIS_HOST,
+    SQLALCHEMY_POOL_SIZE, response_template, SQLALCHEMY_TRACK_MODIFICATIONS
+
+# REDIS_PASSWORD, REDIS_PORT,REDIS_HOST,
 
 app.config['SQLALCHEMY_ECHO'] = SQLALCHEMY_ECHO
 app.config['SQLALCHEMY_POOL_RECYCLE'] = SQLALCHEMY_POOL_RECYCLE
 app.config['SQLALCHEMY_POOL_SIZE'] = SQLALCHEMY_POOL_SIZE
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 
 db_helper = DBConnectHelper(app)
 database = db_helper.get_db(DBConnectorType.USE_SQLALCHEMY, DBType.MAIN_DB)
@@ -76,4 +88,4 @@ app.register_blueprint(auth)
 app.register_blueprint(admin)
 app.register_blueprint(payment)
 
-# database.create_all()
+database.create_all()

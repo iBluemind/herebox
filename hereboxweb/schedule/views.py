@@ -3,8 +3,4 @@
 from flask import request, render_template
 from hereboxweb import database, response_template
 from hereboxweb.schedule import schedule
-
-
-@schedule.route('/', methods=['GET'])
-def index():
-    return render_template('index.html')
+from hereboxweb.schedule.models import *
