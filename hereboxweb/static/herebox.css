@@ -1,6 +1,5 @@
 body {
   font-family: 'Nanum Barun Gothic', sans-serif;
-  overflow-x: hidden;
 }
 
 body,
@@ -41,6 +40,10 @@ body,
   border-top: 0;
 }
 
+.navbar-brand {
+  margin-left: -15px;
+}
+
 /* Always apply the floated nav */
 .navbar-nav {
   float: left;
@@ -53,9 +56,47 @@ body,
   padding: 15px;
 }
 
+.nav > li > a:focus, .nav > li > a:hover {
+  background-color: #ffffff;
+  color: #ffa000;
+}
+
 /* Redeclare since we override the float above */
 .navbar-nav.navbar-right {
   float: right;
+  font-size: 18px;
+  color: #727272;
+}
+
+
+/* Undo custom dropdowns */
+.navbar .navbar-nav .open .dropdown-menu {
+  position: absolute;
+  float: left;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-width: 0 1px 1px;
+  border-radius: 0 0 4px 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+.navbar-default .navbar-nav .open .dropdown-menu > li > a {
+  color: #333;
+}
+.navbar .navbar-nav .open .dropdown-menu > li > a:hover,
+.navbar .navbar-nav .open .dropdown-menu > li > a:focus,
+.navbar .navbar-nav .open .dropdown-menu > .active > a,
+.navbar .navbar-nav .open .dropdown-menu > .active > a:hover,
+.navbar .navbar-nav .open .dropdown-menu > .active > a:focus {
+  color: #fff !important;
+  background-color: #428bca !important;
+}
+.navbar .navbar-nav .open .dropdown-menu > .disabled > a,
+.navbar .navbar-nav .open .dropdown-menu > .disabled > a:hover,
+.navbar .navbar-nav .open .dropdown-menu > .disabled > a:focus {
+  color: #999 !important;
+  background-color: transparent !important;
 }
 
 /* Undo form expansion */
@@ -189,6 +230,154 @@ body,
   top: 0;
 }
 
+.btn-hbprimary {
+  color: #FFFFFF;
+  background-color: #FFC107;
+  border-color: #FFC107;
+
+  font-size: 14px;
+  padding: 12px 160px 12px 160px;
+}
+
+.btn-hbprimary:hover,
+.btn-hbprimary:focus,
+.btn-hbprimary:active,
+.btn-hbprimary.active,
+.open .dropdown-toggle.btn-hbprimary {
+  color: #FFFFFF;
+  background-color: #E5AD06;
+  border-color: #FFC107;
+}
+
+.btn-hbprimary:active,
+.btn-hbprimary.active,
+.open .dropdown-toggle.btn-hbprimary {
+  background-image: none;
+}
+
+.btn-hbprimary.disabled,
+.btn-hbprimary[disabled],
+fieldset[disabled] .btn-hbprimary,
+.btn-hbprimary.disabled:hover,
+.btn-hbprimary[disabled]:hover,
+fieldset[disabled] .btn-hbprimary:hover,
+.btn-hbprimary.disabled:focus,
+.btn-hbprimary[disabled]:focus,
+fieldset[disabled] .btn-hbprimary:focus,
+.btn-hbprimary.disabled:active,
+.btn-hbprimary[disabled]:active,
+fieldset[disabled] .btn-hbprimary:active,
+.btn-hbprimary.disabled.active,
+.btn-hbprimary[disabled].active,
+fieldset[disabled] .btn-hbprimary.active {
+  background-color: #FFC107;
+  border-color: #FFC107;
+}
+
+.btn-hbprimary .badge {
+  color: #FFC107;
+  background-color: #FFFFFF;
+}
+
+.btn-hbsub {
+  color: #FFFFFF;
+  background-color: #C4C4C4;
+  border-color: #C4C4C4;
+
+  font-size: 14px;
+  padding: 12px 160px 12px 160px;
+}
+
+.btn-hbsub:hover,
+.btn-hbsub:focus,
+.btn-hbsub:active,
+.btn-hbsub.active,
+.open .dropdown-toggle.btn-hbsub {
+  color: #FFFFFF;
+  background-color: #B0B0B0;
+  border-color: #C4C4C4;
+}
+
+.btn-hbsub:active,
+.btn-hbsub.active,
+.open .dropdown-toggle.btn-hbsub {
+  background-image: none;
+}
+
+.btn-hbsub.disabled,
+.btn-hbsub[disabled],
+fieldset[disabled] .btn-hbsub,
+.btn-hbsub.disabled:hover,
+.btn-hbsub[disabled]:hover,
+fieldset[disabled] .btn-hbsub:hover,
+.btn-hbsub.disabled:focus,
+.btn-hbsub[disabled]:focus,
+fieldset[disabled] .btn-hbsub:focus,
+.btn-hbsub.disabled:active,
+.btn-hbsub[disabled]:active,
+fieldset[disabled] .btn-hbsub:active,
+.btn-hbsub.disabled.active,
+.btn-hbsub[disabled].active,
+fieldset[disabled] .btn-hbsub.active {
+  background-color: #C4C4C4;
+  border-color: #C4C4C4;
+}
+
+.btn-hbsub .badge {
+  color: #C4C4C4;
+  background-color: #FFFFFF;
+}
+
+.btn-hb {
+  color: #FFC107;
+  background-color: #FFFFFF;
+  border-color: #FFC107;
+
+  font-size: 18px;
+  padding: 16px 49px 16px 49px;
+  border-radius: 25px;
+}
+
+.btn-hb:hover,
+.btn-hb:focus,
+.btn-hb:active,
+.btn-hb.active,
+.open .dropdown-toggle.btn-hb {
+  color: #FFC107;
+  background-color: #FFECB3;
+  border-color: #FFC107;
+}
+
+.btn-hb:active,
+.btn-hb.active,
+.open .dropdown-toggle.btn-hb {
+  background-image: none;
+}
+
+.btn-hb.disabled,
+.btn-hb[disabled],
+fieldset[disabled] .btn-hb,
+.btn-hb.disabled:hover,
+.btn-hb[disabled]:hover,
+fieldset[disabled] .btn-hb:hover,
+.btn-hb.disabled:focus,
+.btn-hb[disabled]:focus,
+fieldset[disabled] .btn-hb:focus,
+.btn-hb.disabled:active,
+.btn-hb[disabled]:active,
+fieldset[disabled] .btn-hb:active,
+.btn-hb.disabled.active,
+.btn-hb[disabled].active,
+fieldset[disabled] .btn-hb.active {
+  background-color: #FFFFFF;
+  border-color: #FFC107;
+}
+
+.btn-hb .badge {
+  color: #FFFFFF;
+  background-color: #FFC107;
+}
+
 a {
   color: #727272;
 }
@@ -204,6 +393,11 @@ dl, ul, ol, menu, li {
 
 .navbar-nav > .active > a {
   color: #ffa000;
+}
+
+.navbar-brand {
+  padding: 10px;
+  vertical-align: middle;
 }
 
 .section {
@@ -470,18 +664,27 @@ dl, ul, ol, menu, li {
 
 .my-index-menu {
   margin: 50px 0 60px;
-  font-size: 18px;
-  color: #c4c4c4;
 }
 
 .my-index-menu > div {
   padding: 15px 0 15px;
 }
 
+.my-index-menu > div > a {
+  font-size: 18px;
+  color: #c4c4c4;
+}
+
 .my-index-menu > .active {
+  border-bottom: solid 2px #ffc107;
+}
+
+.my-index-menu > .active > a,
+.my-index-menu > div > a:hover,
+.my-index-menu > div > a:focus {
   font-size: 18px;
   color: #ffc107;
-  border-bottom: solid 2px #ffc107;
+  text-decoration: none;
 }
 
 .my-stuff-title {
@@ -557,8 +760,67 @@ dl, ul, ol, menu, li {
   margin-right: 10px;
 }
 
+.my-schedule {
+  text-align: center;
+}
 
+.my-schedule-table {
+  display: table;
+  text-align: center;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  margin-top: 20px;
+}
 
+.my-schedule-table-row {
+  display: table-row;
+}
 
+.my-schedule-table > .field {
+  background-color: #ffecb3;
+}
+
+.my-schedule-table > .content {
+  background-color: #fafafa;
+}
+
+.my-schedule-table-cell {
+  display: table-cell;
+  padding: 12px;
+  font-family: "Nanum Barun Gothic Light", "sans-serif";
+  font-size: 14px;
+  color: #212121;
+}
+
+.my-schedule-title {
+  text-align: left;
+  font-family: "Nanum Barun Gothic Light", "sans-serif";
+  font-size: 20px;
+  color: #212121;
+}
+
+.my-schedule-warning {
+  text-align: left;
+  margin: 30px auto 80px;
+  display: inline-block;
+  overflow: hidden;
+  font-family: "Nanum Barun Gothic Light", "sans-serif";
+  font-size: 14px;
+  color: #212121;
+}
+
+.my-info-form {
+  width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.my-info-form > div > .control-label {
+  text-align: left;
+  font-family: "Nanum Barun Gothic Light", "sans-serif";
+  font-size: 20px;
+  color: #212121;
+}
 
 

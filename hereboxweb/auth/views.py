@@ -118,6 +118,12 @@ def logout():
     return redirect(url_for('index'))
 
 
+@auth.route('/my_info', methods=['GET'])
+@login_required
+def my_info():
+    return render_template('my_info.html', active_my_index='my_info')
+
+
 @login_manager.unauthorized_handler
 def unauthorized_login():
     return redirect(url_for('login'))
