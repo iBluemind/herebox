@@ -49,18 +49,17 @@ class Box(database.Model, JsonSerializable):
     __tablename__ = 'box'
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    box_id = database.Column(database.String)
+    box_id = database.Column(database.String(5))
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     status = database.Column(database.SmallInteger)     # 박스의 사용여부
     expired_at = database.Column(database.DateTime)
     created_at = database.Column(database.DateTime)
 
-    def __init__(self, book_id, user_id, status, receipt_date, school_id):
-        self.book_id = book_id
-        self.user_id = user_id
+    def __init__(self, box_id, in_store, status, expired_at):
+        self.box_id = box_id
+        self.in_store = in_store
         self.status = status
-        self.receipt_date = receipt_date
-        self.school_id = school_id
+        self.expired_at = expired_at
         self.created_at = datetime.datetime.utcnow()
         self.updated_at = datetime.datetime.utcnow()
 
@@ -75,9 +74,9 @@ class Goods(database.Model, JsonSerializable):
     __tablename__ = 'goods'
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    goods_id = database.Column(database.String)
+    goods_id = database.Column(database.String(11))
     goods_type = database.Column(database.SmallInteger)
-    memo = database.Column(database.String)
+    memo = database.Column(database.Text)
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     box_id = database.Column(database.Integer, database.ForeignKey('box.id'), nullable=True)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
@@ -85,9 +84,14 @@ class Goods(database.Model, JsonSerializable):
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
 
-    def __init__(self, goods_type, ):
+    def __init__(self, goods_type, memo, in_store, box_id, user_id, expired_at):
         self.goods_id = self._generate_goods_id(goods_type)
         self.goods_type = goods_type
+        self.memo = memo
+        self.in_store = in_store
+        self.box_id = box_id
+        self.user_id = user_id
+        self.expired_at = expired_at
         self.created_at = datetime.datetime.utcnow()
         self.updated_at = datetime.datetime.utcnow()
 

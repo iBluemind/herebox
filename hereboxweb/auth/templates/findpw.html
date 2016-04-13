@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div style="text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/mark-findpw.png') }}">
+            <span style="display: block; font-size: 20px; margin-top: 20px;">비밀번호 찾기</span>
+        </div>
+
+        <div style="margin: 30px 400px 100px;">
+            <form>
+                <div class="form-group">
+                    <input type="text" class="form-control input-lg" placeholder="이메일 주소">
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="btnSubmit">입력하신 이메일로 임시 비밀번호를 보내드립니다</label>
+                    <button id="btnSubmit" type="submit" class="btn btn-lg btn-warning btn-block">임시 비밀번호 받기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

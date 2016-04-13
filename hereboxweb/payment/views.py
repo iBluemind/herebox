@@ -3,3 +3,4 @@
 from flask import request, render_template
 from hereboxweb import database, response_template
 from hereboxweb.payment import payment
+from hereboxweb.payment.models import *

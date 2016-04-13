@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div style="text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/mark-login.png') }}">
+            <span style="display: block; font-size: 20px; margin-top: 20px;">로그인</span>
+        </div>
+
+        <div style="margin: 30px 400px 40px;">
+            {% for field in form.errors %}
+                <div class="alert alert-danger" role="alert">
+                  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                  <span class="sr-only">오류:</span>
+                    {% for error in form.errors[field] %}
+                        {{ form[field].label }}: {{ error }}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <form id="frmLogin" action="{{url_for('auth.login')}}" method="POST">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.email(placeholder="이메일 주소", class="form-control input-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password(placeholder="비밀번호", class="form-control input-lg") }}
+                </div>
+                <input type="hidden" name="decryptKey">
+                <input type="hidden" name="iv">
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-lg btn-warning btn-block">로그인</button>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-lg btn-primary btn-block">페이스북으로 로그인</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row" style="margin-bottom: 100px;">
+            <div class="center-block text-center">
+                <span><a href="/findpw">비밀번호를 잊으셨나요?</a></span>
+            </div>
+            <div class="center-block text-center" style="margin-top: 16px;">
+                <span><a href="/signup">처음 오셨나요? 회원가입하기</a></span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+    <script src="{{ url_for('static', filename='libs/jquery-form/jquery.form.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/forge/js/forge.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            var userEmail = '';
+            $('#frmLogin').ajaxForm({
+                beforeSubmit: function(formData, jqForm, options) {
+                    var key = forge.random.getBytesSync(16);
+                    var iv = forge.random.getBytesSync(16);
+                    var cipher = forge.cipher.createCipher('AES-CBC', key);
+                    var jsessionid = "{{ jsessionid }}";
+
+                    for (var index in formData) {
+                        if (formData.hasOwnProperty(index)) {
+                            if (formData[index].name === 'email') {
+                                userEmail = formData[index].value;
+                                if (userEmail != '') {
+                                    cipher.start({iv: iv});
+                                    cipher.update(forge.util.createBuffer(userEmail));
+                                    cipher.finish();
+                                    var encryptedEmail = cipher.output.toHex();
+                                    formData[index].value = forge.util.encode64(forge.util.hexToBytes(encryptedEmail));
+                                }
+                            }
+
+                            if (formData[index].name === 'password') {
+                                var password = formData[index].value;
+                                if (password != '') {
+                                    cipher.start({iv: iv});
+                                    cipher.update(forge.util.createBuffer(password));
+                                    cipher.finish();
+                                    var encryptedPassword = cipher.output.toHex();
+                                    formData[index].value = forge.util.encode64(forge.util.hexToBytes(encryptedPassword));
+                                }
+                            }
+
+                            if (formData[index].name === 'decryptKey') {
+                                var decoded = forge.util.decode64(jsessionid);
+                                var obj = forge.asn1.fromDer(decoded);
+                                var publicKey = forge.pki.publicKeyFromAsn1(obj);
+                                var encrypted = publicKey.encrypt(key, 'RSA-OAEP');
+                                formData[index].value = forge.util.encode64(encrypted);
+                            }
+
+                            if (formData[index].name === 'iv') {
+                                formData[index].value = forge.util.encode64(iv);
+                            }
+                        }
+                    }
+                    return true;
+                },
+                success: function(data, status, xhr) {
+                    var html = $.parseHTML(data);
+                    $(html).find('#email').val(userEmail);
+                    $(html).find('#password').val('');
+                    $(document.body).html(html);
+                },
+                error: function(xhr, status, error) {
+                    var parsedBody = $.parseJSON(xhr.responseText);
+                    alert(parsedBody['message']);
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -31,8 +31,8 @@ class Reservation(database.Model, JsonSerializable):
     __tablename__ = 'reservation'
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    reservation_id = database.Column(database.VARCHAR, unique=True)
-    reservation_type = database.Column(database.CHAR)                   # 예약 종류
+    reservation_id = database.Column(database.String(11), unique=True)
+    reservation_type = database.Column(database.String(1))                   # 예약 종류
     status = database.Column(database.SmallInteger)                     # 예약 접수 상태
     standard_box_count = database.Column(database.SmallInteger)         # 규격박스 갯수
     nonstandard_goods_count = database.Column(database.SmallInteger)    # 비규격물품 갯수
@@ -41,12 +41,12 @@ class Reservation(database.Model, JsonSerializable):
     purchase_type = database.Column(database.SmallInteger)              # 결제 방법
     fixed_rate = database.Column(database.SmallInteger)                 # 자동결제 여부
     promotion = database.Column(database.SmallInteger)                  # 프로모션 여부
-    binding_products = database.Column(database.String)                 # 포장용품
-    contact = database.Column(database.String)                          # 연락처
-    address = database.Column(database.String)                          # 방문주소
+    binding_products = database.Column(database.Text)                 # 포장용품
+    contact = database.Column(database.Text)                          # 연락처
+    address = database.Column(database.Text)                          # 방문주소
     delivery_date = database.Column(database.DateTime)                  # 방문일시(배달)
     recovery_date = database.Column(database.DateTime)                  # 방문일시(회수)
-    user_memo = database.Column(database.String)                        # 남기실말씀
+    user_memo = database.Column(database.Text)                        # 남기실말씀
     purchase_id = database.Column(database.Integer,
                                   database.ForeignKey('purchase.id'), nullable=True)
     user_id = database.Column(database.Integer,
@@ -167,7 +167,7 @@ class CanceledSchedule(database.Model, JsonSerializable):
     staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
-    reason = database.Column(database.String)
+    reason = database.Column(database.Text)
     reservation_id = database.Column(database.Integer,
                                      database.ForeignKey('reservation.id'), nullable=True)
     scheduled_at = database.Column(database.DateTime)   # 예약된 시간

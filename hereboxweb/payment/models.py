@@ -18,7 +18,7 @@ class Purchase(database.Model, JsonSerializable):
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     status = database.Column(database.SmallInteger)
-    amount = database.Column(database.String)
+    amount = database.Column(database.String(10))
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     created_at = database.Column(database.DateTime)
 

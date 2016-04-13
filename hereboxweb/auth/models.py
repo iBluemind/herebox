@@ -2,35 +2,41 @@
 
 
 import datetime
-from flask import request, render_template
+from flask.ext.login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from hereboxweb import database, response_template
-from hereboxweb.utils import to_json
+from hereboxweb import database, login_manager
+from hereboxweb.utils import JsonSerializable
 
 
-class User(database.Model):
+class UserStatus(object):
+    DEACTIVATED = 0     # 비활성화(탈퇴)
+    NORMAL = 1          # 일반회원
+    STAFF = 2           # 직원
+    ADMIN = 3           # 슈퍼유저
+
+
+
+class User(database.Model, UserMixin, JsonSerializable):
     __tablename__ = 'user'
 
     uid = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    phone = database.Column(database.String(20), unique=True, nullable=False)
+    phone = database.Column(database.String(20), nullable=True)
     name = database.Column(database.String(20), nullable=False)
     email = database.Column(database.String(30), unique=True, nullable=False)
     password = database.Column(database.Text, nullable=False)
-    privilege = database.Column(database.SmallInteger, nullable=False)
+    address = database.Column(database.String(20), nullable=True)
+    status = database.Column(database.SmallInteger, nullable=False)
     created_at = database.Column(database.DateTime)
+    goods = database.relationship('Goods', backref='user', lazy='dynamic')
     reservations = database.relationship('Reservation', backref='user', lazy='dynamic')
-    purchases = database.relationship('Purchase', backref='user', lazy='dynamic')
-    shopping_cart_items = database.relationship('ShoppingCart', backref='user', lazy='dynamic')
-    alerts = database.relationship('Alert', backref='user', lazy='dynamic')
 
-    def __init__(self, phone, email, name, privilege, password=None, school_id=None, gcm_id=None):
+    def __init__(self, email, name, address=None, status=UserStatus.NORMAL, password=None, phone=None):
         self.phone = phone
         self.password = self.encrypt_password(password) if password != None else ''
         self.name = name
         self.email = email
-        self.privilege = privilege
-        self.school_id = school_id
-        self.gcm_id = gcm_id
+        self.status = status
+        self.address = address
         self.created_at = datetime.datetime.utcnow()
 
     @staticmethod
@@ -40,6 +46,15 @@ class User(database.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    def get_id(self):
+        return unicode(self.email)
+
     @property
-    def json(self):
-        return to_json(self, self.__class__)
+    def is_active(self):
+        return True if self.status > UserStatus.DEACTIVATED else False
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return database.session.query(User).filter(User.email == user_id).first()
+

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div style="text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/mark-join.png') }}">
+            <span style="display: block; font-size: 20px; margin-top: 20px;">회원가입</span>
+        </div>
+
+        <div style="margin: 30px 400px 40px;">
+            {% for field in form.errors %}
+                <div class="alert alert-danger" role="alert">
+                  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                  <span class="sr-only">오류:</span>
+                    {% for error in form.errors[field] %}
+                        {{ form[field].label }}: {{ error }}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <form action="{{url_for('auth.signup')}}" method="POST">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.email(placeholder="이메일 주소", class="form-control input-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.name(placeholder="이름", class="form-control input-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password(placeholder="비밀번호", class="form-control input-lg") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password_check(placeholder="비밀번호 확인", class="form-control input-lg") }}
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="btnSignup">가입하기를 누르시면 이용약관과 개인정보취급방침에 동의한 것으로 간주합니다</label>
+                    <button id="btnSignup" type="submit" class="btn btn-lg btn-warning btn-block">가입하기</button>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-lg btn-primary btn-block">페이스북으로 가입하기</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row" style="margin-bottom: 100px;">
+            <div class="center-block text-center">
+                <span><a href="/login">이미 회원이세요? 로그인하기</a></span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
