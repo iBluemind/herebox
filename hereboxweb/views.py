@@ -8,8 +8,8 @@ from hereboxweb import app
 
 @app.route('/', methods=['GET'])
 def index():
-    if current_user.is_authenticated:
-        return render_template('index.html')
+    # if current_user.is_authenticated:
+    #     return render_template('index_logged_in.html')
     return render_template('index.html')
 
 
