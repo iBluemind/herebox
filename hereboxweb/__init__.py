@@ -87,5 +87,6 @@ app.register_blueprint(schedule)
 app.register_blueprint(auth)
 app.register_blueprint(admin)
 app.register_blueprint(payment)
+app.register_blueprint(book)
 
 database.create_all()

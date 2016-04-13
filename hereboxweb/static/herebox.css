@@ -291,6 +291,7 @@ dl, ul, ol, menu, li {
   margin: 30px 20px;
   padding: 26px;
   border: solid 1px #c4c4c4;
+  border-radius: 4px;
 }
 
 .main-reason .reason-items .item {
@@ -460,3 +461,104 @@ dl, ul, ol, menu, li {
   font-size: 14px;
   color: #727272;
 }
+
+.greetings {
+  font-size: 26px;
+  color: #727272;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.my-index-menu {
+  margin: 50px 0 60px;
+  font-size: 18px;
+  color: #c4c4c4;
+}
+
+.my-index-menu > div {
+  padding: 15px 0 15px;
+}
+
+.my-index-menu > .active {
+  font-size: 18px;
+  color: #ffc107;
+  border-bottom: solid 2px #ffc107;
+}
+
+.my-stuff-title {
+  padding: 14px 20px 14px 20px;
+  background-color: #fafafa;
+}
+
+.my-stuff-title > span {
+  font-size: 20px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.my-stuff-btn-group > span {
+  font-size: 20px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.my-stuff-items {
+  display: table;
+  overflow: hidden;
+  margin: 0 auto;
+  border-spacing: 20px;
+}
+
+.my-stuff-items-row {
+  display: table-row;
+}
+
+.my-stuff-items .item {
+  display:table-cell;
+  width: 306px;
+  text-align: center;
+}
+
+.my-stuff-items .item .item-box {
+  width: 306px;
+  height: 430px;
+  padding: 26px;
+  border: solid 1px #c4c4c4;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.my-stuff-items .item .item-box h2 {
+  font-size: 20px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.my-stuff-items .item .item-box p {
+  text-align: left;
+  font-size: 14px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.my-stuff-items .item .item-box .item-btn-group {
+  font-size: 14px;
+  text-align: center;
+}
+
+.my-stuff-btn-group {
+  margin: 40px auto 60px;
+  text-align: center;
+}
+
+.my-stuff-btn-group > span {
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+
+
+
+
+
