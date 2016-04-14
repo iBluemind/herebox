@@ -68,6 +68,10 @@ body,
   color: #727272;
 }
 
+.dropdown-menu > li > a {
+  text-align: center;
+  padding: 10px 20px;
+}
 
 /* Undo custom dropdowns */
 .navbar .navbar-nav .open .dropdown-menu {
@@ -927,8 +931,9 @@ dl, ul, ol, menu, li {
   display: table;
   border-collapse: collapse;
   text-align: center;
-  margin: 20px auto 0;
+  margin: 0;
   overflow: hidden;
+  vertical-align: middle;
 }
 
 .count-row {
@@ -945,7 +950,14 @@ dl, ul, ol, menu, li {
 }
 
 .binding-product-item {
+  margin-top: 23px;
   font-family: "Nanum Barun Gothic Light", sans-serif;
   font-size: 14px;
   color: #212121;
+}
+
+.estimate-month-item-desc {
+  font-family: 'Nanum Barun Gothic Light', sans-serif;
+  font-size: 14px;
+  color: #727272;
 }
