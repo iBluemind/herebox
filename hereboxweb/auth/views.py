@@ -53,30 +53,32 @@ def login():
         encoded_aes_key = request.form['decryptKey']
         encoded_aes_iv = request.form['iv']
 
-        encrypted_email = base64.b64decode(encoded_email)
-        encrypted_password = base64.b64decode(encoded_password)
-        encrypted_aes_key = base64.b64decode(encoded_aes_key)
-        aes_iv = base64.b64decode(encoded_aes_iv)
+        try:
+            encrypted_email = base64.b64decode(encoded_email)
+            encrypted_password = base64.b64decode(encoded_password)
+            encrypted_aes_key = base64.b64decode(encoded_aes_key)
+            aes_iv = base64.b64decode(encoded_aes_iv)
 
-        decoded_private_key = base64.b64decode(RSA_PRIVATE_KEY_BASE64)
-        private_key = PKCS1_OAEP.new(RSA.importKey(decoded_private_key))
+            decoded_private_key = base64.b64decode(RSA_PRIVATE_KEY_BASE64)
+            private_key = PKCS1_OAEP.new(RSA.importKey(decoded_private_key))
 
-        decrypted_aes_key = private_key.decrypt(encrypted_aes_key)
-        aes_cipher = AESCipher(decrypted_aes_key)
+            decrypted_aes_key = private_key.decrypt(encrypted_aes_key)
+            aes_cipher = AESCipher(decrypted_aes_key)
 
-        decrypted_email = aes_cipher.decrypt(encrypted_email, aes_iv)
-        decrypted_password = aes_cipher.decrypt(encrypted_password, aes_iv)
+            decrypted_email = aes_cipher.decrypt(encrypted_email, aes_iv)
+            decrypted_password = aes_cipher.decrypt(encrypted_password, aes_iv)
 
-        query = database.session.query(User).filter(User.email == decrypted_email)
-        user = query.first()
+            query = database.session.query(User).filter(User.email == decrypted_email)
+            user = query.first()
 
-        if not user:
+            if user.check_password(decrypted_password):
+                flash(u'환영합니다')
+                login_user(user)
+                return redirect(request.args.get('next') or url_for('index'))
+            else:
+                raise Exception(u'잘못된 로그인 시도입니다')
+        except:
             return unauthorized(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
-
-        if user.check_password(decrypted_password):
-            flash(u'환영합니다')
-            login_user(user)
-            return redirect(request.args.get('next') or url_for('index'))
     return render_template('login.html', form=form, jsessionid=rsa_public_key)
 
 
@@ -126,5 +128,5 @@ def my_info():
 
 @login_manager.unauthorized_handler
 def unauthorized_login():
-    return redirect(url_for('login'))
+    return redirect(url_for('auth.login'))
 

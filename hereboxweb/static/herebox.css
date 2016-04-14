@@ -90,7 +90,7 @@ body,
 .navbar .navbar-nav .open .dropdown-menu > .active > a:hover,
 .navbar .navbar-nav .open .dropdown-menu > .active > a:focus {
   color: #fff !important;
-  background-color: #428bca !important;
+  background-color: #ffa000 !important;
 }
 .navbar .navbar-nav .open .dropdown-menu > .disabled > a,
 .navbar .navbar-nav .open .dropdown-menu > .disabled > a:hover,
@@ -872,4 +872,80 @@ dl, ul, ol, menu, li {
   color: #212121;
 }
 
+.estimate-title {
+  margin: 80px 0 20px;
+  font-family: 'Nanum Barun Gothic Light', sans-serif;
+  font-size: 20px;
+  color: #212121;
+}
 
+.estimate-goods-items {
+  display: table;
+  overflow: hidden;
+  margin: 0 auto;
+  border-spacing: 10px;
+}
+
+.estimate-goods-items-row {
+  display: table-row;
+}
+
+.estimate-goods-items .item {
+  display:table-cell;
+  width: 306px;
+  text-align: center;
+}
+
+.estimate-goods-items .item .item-box {
+  width: 306px;
+  height: 430px;
+  padding: 26px;
+  border: solid 1px #c4c4c4;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.estimate-goods-items .item .item-box h2 {
+  font-size: 20px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.estimate-goods-items .item .item-box p {
+  text-align: left;
+  font-size: 14px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.estimate-goods-items .item .item-box .price {
+  font-size: 14px;
+  text-align: center;
+}
+
+.count {
+  display: table;
+  border-collapse: collapse;
+  text-align: center;
+  margin: 20px auto 0;
+  overflow: hidden;
+}
+
+.count-row {
+  display: table-row;
+}
+
+.count-item {
+  display: table-cell;
+  border: solid 1px #c4c4c4;
+  padding: 2px 6px;
+  font-family: "Nanum Barun Gothic Bold", "sans-serif";
+  font-size: 18px;
+  color: #c4c4c4;
+}
+
+.binding-product-item {
+  font-family: "Nanum Barun Gothic Light", sans-serif;
+  font-size: 14px;
+  color: #212121;
+}

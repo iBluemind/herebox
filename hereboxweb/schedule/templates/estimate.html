@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container" style="width: 680px;">
+        <div style="margin: 40px 0 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/5step_1.png') }}">
+        </div>
+
+        <div class="estimate-title">무엇을 보관하실 건가요?</div>
+
+        <div class="estimate-goods-items">
+            <div class="estimate-goods-items-row">
+                <div class="item">
+                    <div class="item-box">
+                        <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
+                        <h2>규격박스</h2>
+                        <p>
+                            튼튼한 플라스틱 박스로 안전합니다
+                            <br>
+                            가로 60cm x 세로 40cm x 높이 37cm
+                            <br>
+                            최대 무게 25kg
+                            <br><br>
+                            <a style="color: #ffa000;">박스 크기 영상으로 보기 ></a>
+                        </p>
+
+                        <p class="price">
+                            7,500원 / 월
+                        </p>
+                    </div>
+
+                    <div class="count">
+                        <div class="count-row">
+                            <div class="count-item">-</div>
+                            <div class="count-item" style="color: #ffc107;">2</div>
+                            <div class="count-item">+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item">
+                    <div class="item-box">
+                        <img src="{{ url_for('static', filename='assets/img/img-un.png') }}">
+                        <h2>비규격 물품</h2>
+                        <p>
+                            박스에 들어가지않는 큰 물건도 걱정마세요
+                            <br>
+                            자전거, 캐리어, 골프백, 스키 등 한 명이 옮길
+                            <br>
+                            수 있는 물품이라면 가능합니다
+                            <br><br>
+                        </p>
+
+                        <br>
+
+                        <p class="price">
+                            10,900원 / 월
+                        </p>
+                    </div>
+
+                    <div class="count">
+                        <div class="count-row">
+                            <div class="count-item">-</div>
+                            <div class="count-item" style="color: #ffc107;">2</div>
+                            <div class="count-item">+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="col-xs-6 estimate-title">
+                <div>몇 개월간 보관하실 건가요?</div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                        기간 설정<br>
+                        설정한 기간만큼만 보관료를 결제합니다<br>
+                        * 기간 만료 시 직접 연장 필요
+                    </label>
+                </div>
+                <div class="count">
+                    <div class="count-row">
+                        <div class="count-item">-</div>
+                        <div class="count-item" style="color: #ffc107;">2</div>
+                        <div class="count-item">+</div>
+                    </div>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                        자동 결제<br>
+                        매 달 자동으로 보관료가 결제됩니다
+                    </label>
+                </div>
+            </div>
+            <div class="col-xs-6 estimate-title">
+                <div>필요한 포장 용품을 구매하세요</div>
+                <div>포장 용품 자세히 알아보기 ></div>
+                <div class="binding-product-item">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            포장용 에어캡 1m<br>
+                            500원 / 개
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item">-</div>
+                                    <div class="count-item" style="color: #ffc107;">2</div>
+                                    <div class="count-item">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            실리카겔 (제습제) 50g<br>
+                            500원 / 개
+                        </div>
+                        <div class="col-xs-6 ">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item">-</div>
+                                    <div class="count-item" style="color: #ffc107;">2</div>
+                                    <div class="count-item">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            압축팩 40cm x 60cm<br>
+                            1,500원 / 개
+                        </div>
+                        <div class="col-xs-6 ">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item">-</div>
+                                    <div class="count-item" style="color: #ffc107;">2</div>
+                                    <div class="count-item">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            테이프 48mm x 40m<br>
+                            1,000원 / 개
+                        </div>
+                        <div class="col-xs-6 ">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item">-</div>
+                                    <div class="count-item" style="color: #ffc107;">2</div>
+                                    <div class="count-item">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

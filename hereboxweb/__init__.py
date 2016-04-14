@@ -11,7 +11,6 @@ from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnect
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = '/login'
 
 
 app.config['CSRF_ENABLED'] = True
@@ -89,4 +88,5 @@ app.register_blueprint(admin)
 app.register_blueprint(payment)
 app.register_blueprint(book)
 
+# database.drop_all()
 database.create_all()

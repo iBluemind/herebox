@@ -51,6 +51,8 @@ class Reservation(database.Model, JsonSerializable):
                                   database.ForeignKey('purchase.id'), nullable=True)
     user_id = database.Column(database.Integer,
                               database.ForeignKey('user.uid'), nullable=False)
+    promotion_id = database.Column(database.Integer,
+                                  database.ForeignKey('promotion.id'), nullable=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
 
@@ -181,5 +183,47 @@ class CanceledSchedule(database.Model, JsonSerializable):
         self.reason = reason
         self.reservation_id = reservation_id
         self.scheduled_at = scheduled_at
+        self.created_at = datetime.datetime.utcnow()
+
+
+class PromotionType(object):
+    ALLOW_TO_ALL = 0                # 모두에게 허용
+    USER_SPECIFIC = 1               # 특정인에게만 허용
+
+
+class Promotion(database.Model, JsonSerializable):
+
+    __tablename__ = 'promotion'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    name = database.Column(database.String(15))
+    description = database.Column(database.Text)
+    promotion_type = database.Column(database.SmallInteger)
+    user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
+    codes = database.relationship('PromotionCode', backref='promotion', lazy='dynamic')
+    expired_at = database.Column(database.DateTime)
+    created_at = database.Column(database.DateTime)
+
+    def __init__(self, name, description, promotion_type, user_id, expired_at):
+        self.name = name
+        self.description = description
+        self.promotion_type = promotion_type
+        self.user_id = user_id
+        self.expired_at = expired_at
+        self.created_at = datetime.datetime.utcnow()
+
+
+class PromotionCode(database.Model, JsonSerializable):
+
+    __tablename__ = 'promotion_code'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    code = database.Column(database.String(20))
+    promotion_id = database.Column(database.Integer, database.ForeignKey('promotion.id'), nullable=False)
+    created_at = database.Column(database.DateTime)
+
+    def __init__(self, code, promotion_id):
+        self.code = code
+        self.promotion_id = promotion_id
         self.created_at = datetime.datetime.utcnow()
 
