@@ -53,7 +53,7 @@ body,
   float: left;
 }
 .navbar-nav > li > a {
-  padding: 15px;
+  padding: 20px;
 }
 
 .nav > li > a:focus, .nav > li > a:hover {
@@ -70,10 +70,15 @@ body,
 
 .dropdown-menu > li > a {
   text-align: center;
-  padding: 10px 20px;
+  padding: 10px;
 }
 
 /* Undo custom dropdowns */
+.dropdown-toggle:active, .open .dropdown-toggle {
+  background:#fff !important;
+  color: #727272 !important;
+}
+
 .navbar .navbar-nav .open .dropdown-menu {
   position: absolute;
   float: left;
@@ -85,6 +90,7 @@ body,
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
           box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 }
+
 .navbar-default .navbar-nav .open .dropdown-menu > li > a {
   color: #333;
 }
@@ -232,6 +238,11 @@ body,
 
 .form-inline .has-feedback .form-control-feedback {
   top: 0;
+}
+
+.form-control {
+  height: 40px;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0);
 }
 
 .btn-hbprimary {
@@ -429,6 +440,28 @@ fieldset[disabled] .btn-hbfb.active {
 .btn-hbfb .badge {
   color: #3B5999;
   background-color: #ffffff;
+}
+
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus {
+  border-color: #ffc107;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0) inset, 0 0 8px rgba(0, 0, 0, 0);
+  outline: 0 none;
 }
 
 a {
@@ -877,7 +910,6 @@ dl, ul, ol, menu, li {
 }
 
 .estimate-title {
-  margin: 80px 0 20px;
   font-family: 'Nanum Barun Gothic Light', sans-serif;
   font-size: 20px;
   color: #212121;
@@ -960,4 +992,17 @@ dl, ul, ol, menu, li {
   font-family: 'Nanum Barun Gothic Light', sans-serif;
   font-size: 14px;
   color: #727272;
+}
+
+.vertical-align {
+  display: flex;
+  flex-direction: row;
+}
+
+.vertical-align > [class^="col-"],
+.vertical-align > [class*=" col-"] {
+  display: flex;
+  align-items: center;     /* Align the flex-items vertically */
+  justify-content: center; /* Optional, to align inner flex-items
+                              horizontally within the column  */
 }
