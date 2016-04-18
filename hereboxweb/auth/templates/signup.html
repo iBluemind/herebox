@@ -21,25 +21,25 @@
             <form action="{{url_for('auth.signup')}}" method="POST">
                 {{ form.csrf_token }}
                 <div class="form-group">
-                    {{ form.email(placeholder="이메일 주소", class="form-control input-lg") }}
+                    {{ form.email(placeholder="이메일 주소", class="form-control") }}
                 </div>
                 <div class="form-group">
-                    {{ form.name(placeholder="이름", class="form-control input-lg") }}
+                    {{ form.name(placeholder="이름", class="form-control") }}
                 </div>
                 <div class="form-group">
-                    {{ form.password(placeholder="비밀번호", class="form-control input-lg") }}
+                    {{ form.password(placeholder="비밀번호", class="form-control") }}
                 </div>
                 <div class="form-group">
-                    {{ form.password_check(placeholder="비밀번호 확인", class="form-control input-lg") }}
-                </div>
-
-                <div class="form-group">
-                    <label class="control-label" for="btnSignup">가입하기를 누르시면 이용약관과 개인정보취급방침에 동의한 것으로 간주합니다</label>
-                    <button id="btnSignup" type="submit" class="btn btn-lg btn-hbprimary btn-block">가입하기</button>
+                    {{ form.password_check(placeholder="비밀번호 확인", class="form-control") }}
                 </div>
 
                 <div class="form-group">
-                    <button type="button" class="btn btn-lg btn-hbfb btn-block" style="padding: 12px 0 12px 0;">페이스북으로 가입하기</button>
+                    <label class="control-label" for="btnSignup" style="margin: 10px 20px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">가입하기를 누르시면 <a href="/terms" style="color: #ffc107;">이용약관</a>과 <a href="/privacy" style="color: #ffc107;">개인정보취급방침</a>에 동의한 것으로 간주합니다</label>
+                    <button id="btnSignup" type="submit" class="btn btn-hbprimary btn-block">가입하기</button>
+                </div>
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-hbfb btn-block" style="padding: 12px 0 12px 0;">페이스북으로 가입하기</button>
                 </div>
             </form>
         </div>
