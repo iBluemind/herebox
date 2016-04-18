@@ -14,14 +14,24 @@ def index():
 
 @app.route('/introduce', methods=['GET'])
 def introduce():
-    return render_template('index.html')
+    return render_template('index.html', active_menu='introduce')
 
 
 @app.route('/faq', methods=['GET'])
 def faq():
-    return render_template('faq.html')
+    return render_template('faq.html', active_menu='faq')
 
 
 @app.route('/event', methods=['GET'])
 def event():
-    return render_template('event.html')
+    return render_template('event.html', active_menu='event')
+
+
+@app.route('/privacy', methods=['GET'])
+def privacy():
+    return render_template('privacy.html')
+
+
+@app.route('/terms', methods=['GET'])
+def terms():
+    return render_template('terms.html')

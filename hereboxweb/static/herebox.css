@@ -1006,3 +1006,19 @@ dl, ul, ol, menu, li {
   justify-content: center; /* Optional, to align inner flex-items
                               horizontally within the column  */
 }
+
+.faq-section {
+  padding: 14px 20px 14px 20px;
+  background-color: #fafafa;
+  font-size: 20px;
+  color: #ffc107;
+}
+
+.faq-title {
+  margin: 10px 0 10px 0;
+  padding: 14px 20px 14px 20px;
+  background-color: #fafafa;
+  font-size: 20px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', sans-serif;
+}
