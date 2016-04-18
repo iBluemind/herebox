@@ -24,3 +24,15 @@ def estimate():
 @login_required
 def order():
     return render_template('reservation.html')
+
+
+@schedule.route('/reservation/review', methods=['GET'])
+@login_required
+def review():
+    return render_template('review.html')
+
+
+@schedule.route('/reservation/completion', methods=['GET'])
+@login_required
+def completion():
+    return render_template('completion.html')
