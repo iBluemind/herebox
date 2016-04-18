@@ -17,22 +17,22 @@ def my_schedule():
 @schedule.route('/reservation/estimate', methods=['GET'])
 @login_required
 def estimate():
-    return render_template('estimate.html')
+    return render_template('estimate.html', active_menu='reservation')
 
 
 @schedule.route('/reservation/order', methods=['GET'])
 @login_required
 def order():
-    return render_template('reservation.html')
+    return render_template('reservation.html', active_menu='reservation')
 
 
 @schedule.route('/reservation/review', methods=['GET'])
 @login_required
 def review():
-    return render_template('review.html')
+    return render_template('review.html', active_menu='reservation')
 
 
 @schedule.route('/reservation/completion', methods=['GET'])
 @login_required
 def completion():
-    return render_template('completion.html')
+    return render_template('completion.html', active_menu='reservation')
