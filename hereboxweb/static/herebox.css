@@ -616,8 +616,8 @@ dl, ul, ol, menu, li {
 
 .main-feature .feature-items .item {
   float: left;
-  width: 306px;
-  margin: 30px 20px;
+  width: 226px;
+  margin: 30px 18px;
 }
 
 .main-feature .feature-items .item h2 {
@@ -972,6 +972,11 @@ dl, ul, ol, menu, li {
   display: table-row;
 }
 
+.count-row > .subtract,
+.count-row > .add {
+  cursor: pointer;
+}
+
 .count-item {
   display: table-cell;
   border: solid 1px #c4c4c4;
@@ -1008,8 +1013,7 @@ dl, ul, ol, menu, li {
 }
 
 .faq-section {
-  padding: 14px 20px 14px 20px;
-  background-color: #fafafa;
+  padding: 10px;
   font-size: 20px;
   color: #ffc107;
 }
