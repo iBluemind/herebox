@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-xs-6" style="margin-top: 10px;">
-                <input type="text" class="form-control" id="inputPromotion" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
+                <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
             </div>
         </div>
 
@@ -30,7 +30,7 @@
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">주소</div>
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
                         픽업맨이 방문할 주소를 입력해주세요<br>
-                        *현재 서울시만 서비스 가능
+                        * 현재 서울시만 서비스 가능
                     </div>
                 </div>
             </div>
@@ -61,7 +61,16 @@
             </div>
             <div class="col-xs-6">
                 <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
-                <input style="margin-top: 20px;" type="text" class="form-control" id="inputVisitTime" placeholder="시간을 선택하세요">
+
+                <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                    <option>10:00-12:00</option>
+                    <option>12:00-14:00</option>
+                    <option>14:00-16:00</option>
+                    <option>16:00-18:00</option>
+                    <option>18:00-20:00</option>
+                    <option>18:00-20:00</option>
+                    <option>20:00-22:00</option>
+                </select>
             </div>
         </div>
 
@@ -95,7 +104,15 @@
                 </div>
                 <div id="revisitDatetime">
                     <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)">
-                    <input style="margin-top: 10px;" type="text" class="form-control" id="inputRevisitTime" placeholder="재방문 시간을 선택하세요">
+                    <select id="inputRevisitTime" style="margin-top: 20px;" class="form-control">
+                        <option>10:00-12:00</option>
+                        <option>12:00-14:00</option>
+                        <option>14:00-16:00</option>
+                        <option>16:00-18:00</option>
+                        <option>18:00-20:00</option>
+                        <option>18:00-20:00</option>
+                        <option>20:00-22:00</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -113,13 +130,13 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <textarea class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요"></textarea>
+                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요"></textarea>
             </div>
         </div>
 
         <div style="margin: 80px 0 100px 0; text-align: center;">
-            <button class="btn btn-hbprimary" onclick="window.location='/reservation/review';">다음 단계</button>
-            <button class="btn btn-hbsub"  style="margin-top: 20px;" onclick="window.location='/reservation/estimate';">이전 단계</button>
+            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
         </div>
     </div>
 
@@ -133,42 +150,217 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
 
     <script>
+        var allowUnload = false;
         $(document).ready(function() {
+            allowUnload = false;
+
+            $(window).on('onrefresh', function() {
+                allowUnload = true;
+            });
+
+            $(window).on('beforeunload', function() {
+                if (allowUnload) {
+                    return ;
+                } else {
+                    return '현재 입력된 항목들이 지워집니다!';
+                }
+            });
+
+            $(window).on('unload', function() {
+                if (!allowUnload) {
+                    sessionStorage.clear();
+                }
+            });
+
+            if (!sessionStorage.getItem('startTime')) {
+                allowUnload = true;
+                location.href='/reservation/estimate';
+            }
+
+            var minDate = moment();
+            var todayDateOnly = minDate.format("YYYY-MM-DD");
+            var borderTime1 = moment(todayDateOnly + " 17:00:00");
+            var borderTime2 = moment(todayDateOnly + " 23:59:59");
+            if (minDate >= borderTime1 && minDate <= borderTime2) {
+                minDate = current.day(2);
+            }
+
             $('#inputVisitDate').datetimepicker({
                 format: 'YYYY-MM-DD',
                 dayViewHeaderFormat:'YYYY MMMM',
-                minDate: moment(),
-                maxDate: moment().day(14),
+                minDate: minDate,
+                maxDate: minDate.day(14),
                 locale: 'ko'
             });
             $('#inputRevisitDate').datetimepicker({
                 format: 'YYYY-MM-DD',
                 dayViewHeaderFormat:'YYYY MMMM',
-                minDate: moment(),
-                maxDate: moment().day(14),
+                minDate: minDate,
+                maxDate: minDate.day(14),
                 locale: 'ko'
             });
-
-            switch($(":radio[name='optionsRevisit']").val()) {
-                 case 'immediate':
-                     $('#revisitDatetime').hide();
-                     break;
-                 case 'later':
-                     $('#revisitDatetime').show();
-                     break;
-             }
 
             $(":radio[name='optionsRevisit']").change(function() {
                 switch($(this).val()) {
                      case 'immediate':
                          $('#revisitDatetime').fadeOut();
                          break;
-                     case 'later':
+                    case 'later':
                          $('#revisitDatetime').fadeIn();
                          break;
+                }
+                $(":radio[name='optionsRevisit']").val($(this).val());
+            });
+
+            if ($(':radio[id="optionsImmediate"]:checked').val()) {
+                $('#revisitDatetime').fadeOut();
+            }
+
+            if (sessionStorage.getItem('inputPhoneNumber')) {
+                $('#inputPhoneNumber').val(sessionStorage.getItem('inputPhoneNumber'));
+            }
+            if (sessionStorage.getItem('inputPostCode')) {
+                $('#inputPostCode').val(sessionStorage.getItem('inputPostCode'));
+            }
+            if (sessionStorage.getItem('inputAddress1')) {
+                $('#inputAddress1').val(sessionStorage.getItem('inputAddress1'));
+            }
+            if (sessionStorage.getItem('inputAddress2')) {
+                $('#inputAddress2').val(sessionStorage.getItem('inputAddress2'));
+            }
+            if (sessionStorage.getItem('inputVisitDate')) {
+                $('#inputVisitDate').val(sessionStorage.getItem('inputVisitDate'));
+            }
+            if (sessionStorage.getItem('inputVisitTime')) {
+                $('#inputVisitTime').val(sessionStorage.getItem('inputVisitTime'));
+            }
+            if (sessionStorage.getItem('optionsRevisit')) {
+                var oldOptionsRevisit = sessionStorage.getItem('optionsRevisit');
+                console.log(oldOptionsRevisit);
+                switch (oldOptionsRevisit) {
+                     case 'immediate':
+                         $(":radio[id='optionsImmediate']").attr("checked", true);
+                         $(":radio[id='optionsLater']").attr("checked", false);
+                         break;
+                     case 'later':
+                         $(":radio[id='optionsImmediate']").attr("checked", false);
+                         $(":radio[id='optionsLater']").attr("checked", true);
+                         break;
                  }
+            }
+            if (sessionStorage.getItem('inputRevisitDate')) {
+                $('#inputRevisitDate').val(sessionStorage.getItem('inputRevisitDate'));
+            }
+            if (sessionStorage.getItem('inputRevisitTime')) {
+                $('#inputRevisitTime').val(sessionStorage.getItem('inputRevisitTime'));
+            }
+            if (sessionStorage.getItem('textareaMemo')) {
+                $('#textareaMemo').val(sessionStorage.getItem('textareaMemo'));
+            }
+
+            $('#btnPrevStep').click(function() {
+                allowUnload = true;
+                location.href = '/reservation/estimate';
+            });
+
+            $('#btnNextStep').click(function() {
+                if (errorCheck())
+                    return ;
+                save();
+
+                allowUnload = true;
+                var inputPhoneNumber = $('#inputPhoneNumber').val();
+                var inputPostCode = $('#inputPostCode').val();
+                var inputAddress1 = $('#inputAddress1').val();
+                var inputAddress2 = $('#inputAddress2').val();
+                var inputVisitDate = $('#inputVisitDate').val();
+                var inputVisitTime = $('#inputVisitTime').val();
+                var optionsRevisit = $(":radio[name='optionsRevisit']").val();
+                var inputRevisitDate = $('#inputRevisitDate').val();
+                var inputRevisitTime = $('#inputRevisitTime').val();
+                var textareaMemo = $('#textareaMemo').val();
+                var regularItemNumberCount = sessionStorage.getItem('regularItemNumberCount');
+                var irregularItemNumberCount = sessionStorage.getItem('irregularItemNumberCount');
+                var disposableNumberCount = sessionStorage.getItem('disposableNumberCount');
+                var optionsPeriod = sessionStorage.getItem('optionsPeriod');
+                var bindingProduct0NumberCount = sessionStorage.getItem('bindingProduct0NumberCount');
+                var bindingProduct1NumberCount = sessionStorage.getItem('bindingProduct1NumberCount');
+                var bindingProduct2NumberCount = sessionStorage.getItem('bindingProduct2NumberCount');
+                var bindingProduct3NumberCount = sessionStorage.getItem('bindingProduct3NumberCount');
+                var totalPrice = sessionStorage.getItem('totalPrice');
+                var startTime = sessionStorage.getItem('startTime');
+                $.ajax({
+                     type: "POST",
+                     url: "/reservation/review",
+                     data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
+                        inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputVisitDate: inputVisitDate,
+                         inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
+                         inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo, regularItemNumberCount: regularItemNumberCount,
+                         irregularItemNumberCount: irregularItemNumberCount, disposableNumberCount: disposableNumberCount,
+                         optionsPeriod: optionsPeriod, bindingProduct0NumberCount: bindingProduct0NumberCount,
+                         bindingProduct1NumberCount: bindingProduct1NumberCount, bindingProduct2NumberCount: bindingProduct2NumberCount,
+                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice, startTime: startTime
+                     },
+                     success: function () {
+                        location.href = '/reservation/review'
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                 });
             });
         });
+
+        function save() {
+            var inputPhoneNumber = $('#inputPhoneNumber').val();
+            var inputPostCode = $('#inputPostCode').val();
+            var inputAddress1 = $('#inputAddress1').val();
+            var inputAddress2 = $('#inputAddress2').val();
+            var inputVisitDate = $('#inputVisitDate').val();
+            var inputVisitTime = $('#inputVisitTime').val();
+            var optionsRevisit = $(":radio[name='optionsRevisit']").val();
+            var inputRevisitDate = $('#inputRevisitDate').val();
+            var inputRevisitTime = $('#inputRevisitTime').val();
+            var textareaMemo = $('#textareaMemo').val();
+
+            sessionStorage.setItem('inputPhoneNumber', inputPhoneNumber);
+            sessionStorage.setItem('inputPostCode', inputPostCode);
+            sessionStorage.setItem('inputAddress1', inputAddress1);
+            sessionStorage.setItem('inputAddress2', inputAddress2);
+            sessionStorage.setItem('inputVisitDate', inputVisitDate);
+            sessionStorage.setItem('inputVisitTime', inputVisitTime);
+            sessionStorage.setItem('optionsRevisit', optionsRevisit);
+            sessionStorage.setItem('inputRevisitDate', inputRevisitDate);
+            sessionStorage.setItem('inputRevisitTime', inputRevisitTime);
+            sessionStorage.setItem('textareaMemo', textareaMemo);
+        }
+
+        function errorCheck() {
+            var isError = false;
+            if ($('#inputPhoneNumber').val().length == 0) {
+                $('#inputPhoneNumber').addClass('has-error');
+                isError = true;
+            }
+            if ($('#inputPostCode').val().length == 0) {
+                $('#inputPostCode').addClass('has-error');
+                isError = true;
+            }
+            if ($('#inputAddress1').val().length == 0) {
+                $('#inputAddress1').addClass('has-error');
+                isError = true;
+            }
+            if ($('#inputAddress2').val().length == 0) {
+                $('#inputAddress2').addClass('has-error');
+                isError = true;
+            }
+
+            if (isError) {
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            return isError;
+        }
 
         function execDaumPostcode() {
             new daum.Postcode({

@@ -17,7 +17,7 @@ class Incoming(database.Model, JsonSerializable):
 
     def __init__(self, goods_id):
         self.goods_id = goods_id
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
 
 # 출고
@@ -31,7 +31,7 @@ class Outgoing(database.Model, JsonSerializable):
 
     def __init__(self, goods_id):
         self.goods_id = goods_id
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
 
 class InStoreStatusType(object):
@@ -60,8 +60,8 @@ class Box(database.Model, JsonSerializable):
         self.in_store = in_store
         self.status = status
         self.expired_at = expired_at
-        self.created_at = datetime.datetime.utcnow()
-        self.updated_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
 
 
 class GoodsType(object):
@@ -92,8 +92,8 @@ class Goods(database.Model, JsonSerializable):
         self.box_id = box_id
         self.user_id = user_id
         self.expired_at = expired_at
-        self.created_at = datetime.datetime.utcnow()
-        self.updated_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
 
     def _generate_goods_id(self, first_char):
         today = datetime.date.today()

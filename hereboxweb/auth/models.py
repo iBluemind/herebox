@@ -37,7 +37,7 @@ class User(database.Model, UserMixin, JsonSerializable):
         self.email = email
         self.status = status
         self.address = address
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
     @staticmethod
     def encrypt_password(password):

@@ -25,5 +25,5 @@ class Purchase(database.Model, JsonSerializable):
     def __init__(self, status, user_id, created_at):
         self.user_id = user_id
         self.status = status
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
