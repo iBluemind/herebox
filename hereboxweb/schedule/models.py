@@ -2,6 +2,10 @@
 
 
 import datetime
+import json
+
+from sqlalchemy import and_
+
 from hereboxweb import database
 from hereboxweb.utils import JsonSerializable
 
@@ -15,8 +19,9 @@ class ReservationType(object):
 
 # 예약 상태
 class ReservationStatus(object):
-    WAITING = 0     # 대기
-    ACCEPTED = 1    # 접수
+    DRAFT = 0       # 작성중
+    WAITING = 1     # 대기
+    ACCEPTED = 2    # 접수
 
 
 # 결제 방법
@@ -37,7 +42,6 @@ class Reservation(database.Model, JsonSerializable):
     standard_box_count = database.Column(database.SmallInteger)         # 규격박스 갯수
     nonstandard_goods_count = database.Column(database.SmallInteger)    # 비규격물품 갯수
     period = database.Column(database.SmallInteger)                     # 계약 월수
-    expire_date = database.Column(database.DateTime)                    # 계약 만료날짜
     purchase_type = database.Column(database.SmallInteger)              # 결제 방법
     fixed_rate = database.Column(database.SmallInteger)                 # 자동결제 여부
     promotion = database.Column(database.SmallInteger)                  # 프로모션 여부
@@ -57,20 +61,19 @@ class Reservation(database.Model, JsonSerializable):
     updated_at = database.Column(database.DateTime)
 
     def __init__(self, reservation_type, status, standard_box_count, nonstandard_goods_count,
-                                    period, expire_date, purchase_type, fixed_rate,
-                                    promotion, binding_products, contact, address, delivery_date,
-                                    recovery_date, user_memo, purchase_id, user_id):
+                                    period, fixed_rate, promotion, binding_products, contact,
+                                    address, delivery_date, recovery_date, user_memo, user_id,
+                                    purchase_type=None, purchase_id=None):
         self.reservation_id = self._generate_reservation_id(reservation_type)
         self.reservation_type = reservation_type
         self.status = status
         self.standard_box_count = standard_box_count
         self.nonstandard_goods_count = nonstandard_goods_count
         self.period = period
-        self.expire_date = expire_date
         self.purchase_type = purchase_type
         self.fixed_rate = fixed_rate
         self.promotion = promotion
-        self.binding_products = binding_products
+        self.binding_products = self.parse_binding_products(binding_products)
         self.contact = contact
         self.address = address
         self.delivery_date = delivery_date
@@ -78,14 +81,22 @@ class Reservation(database.Model, JsonSerializable):
         self.user_memo = user_memo
         self.purchase_id = purchase_id
         self.user_id = user_id
-        self.created_at = datetime.datetime.utcnow()
-        self.updated_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
+
+    def parse_binding_products(self, binding_products):
+        return json.dumps(binding_products)
+
+    def _get_today_reservation_count(self):
+        today = datetime.date.today()
+        return Reservation.query.filter(and_(Reservation.created_at >= today.strftime('%Y-%m-%d 00:00:00'),
+                                                               Reservation.created_at <= today.strftime('%Y-%m-%d 23:59:59'))).count()
 
     def _generate_reservation_id(self, first_char):
         today = datetime.date.today()
         day_number = today.strftime('%y%m%d')
         init_number = self._get_reservation_init_number()[first_char]
-        serial_number = init_number + self.id
+        serial_number = init_number + self._get_today_reservation_count()
         return '%c%s00%s' % (first_char, day_number, serial_number)
 
     def _get_reservation_init_number(self):
@@ -130,8 +141,8 @@ class Schedule(database.Model, JsonSerializable):
         self.customer_id = customer_id
         self.schedule_date = schedule_date
         self.reservation_id = reservation_id
-        self.created_at = datetime.datetime.utcnow()
-        self.updated_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
 
 
 class CompletedSchedule(database.Model, JsonSerializable):
@@ -156,7 +167,7 @@ class CompletedSchedule(database.Model, JsonSerializable):
         self.goods_id = goods_id
         self.reservation_id = reservation_id
         self.scheduled_at = scheduled_at
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
 
 class CanceledSchedule(database.Model, JsonSerializable):
@@ -183,7 +194,7 @@ class CanceledSchedule(database.Model, JsonSerializable):
         self.reason = reason
         self.reservation_id = reservation_id
         self.scheduled_at = scheduled_at
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
 
 class PromotionType(object):
@@ -210,7 +221,7 @@ class Promotion(database.Model, JsonSerializable):
         self.promotion_type = promotion_type
         self.user_id = user_id
         self.expired_at = expired_at
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 
 
 class PromotionCode(database.Model, JsonSerializable):
@@ -225,5 +236,5 @@ class PromotionCode(database.Model, JsonSerializable):
     def __init__(self, code, promotion_id):
         self.code = code
         self.promotion_id = promotion_id
-        self.created_at = datetime.datetime.utcnow()
+        self.created_at = datetime.datetime.now()
 

@@ -24,11 +24,11 @@
                     <div style="display: table; width: 100%; font-size: 14px;">
                         <div style="display: table-row;">
                             <div style="display: table-cell;">규격박스</div>
-                            <div style="display: table-cell; text-align: right;">2개</div>
+                            <div style="display: table-cell; text-align: right;"><span>2</span>개</div>
                         </div>
                         <div style="display: table-row;">
                             <div style="display: table-cell;">비규격 물품</div>
-                            <div style="display: table-cell; text-align: right;">1개</div>
+                            <div style="display: table-cell; text-align: right;"><span>2</span>개</div>
                         </div>
                     </div>
                 </div>
@@ -130,7 +130,7 @@
             <div class="checkbox" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">
                 <label>
                     <input type="checkbox" value="">
-                    히어박스의 <a style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
+                    히어박스의 <a href="/terms" style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
                 </label>
             </div>
         </div>
@@ -140,5 +140,12 @@
             <button class="btn btn-hbsub"  style="margin-top: 20px;" onclick="window.location='/reservation/order';">이전 단계</button>
         </div>
     </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script>
+
+    </script>
 
 {% endblock %}

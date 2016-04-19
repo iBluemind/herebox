@@ -3,6 +3,8 @@
 
 import re
 
+from sqlalchemy.sql import ClauseElement
+
 
 class JsonSerializable(object):
     def to_json(inst, cls):
@@ -35,3 +37,14 @@ def convert2escape_character(str):
     str = re.sub(r"([=\(\)|\-!@~\"&/\\\^\$\=])", r"\\\1", str)
     return re.escape(str)
 
+
+def get_or_create(session, model, defaults=None, **kwargs):
+    instance = session.query(model).filter_by(**kwargs).first()
+    if instance:
+        return instance
+    else:
+        params = dict((k, v) for k, v in kwargs.iteritems() if not isinstance(v, ClauseElement))
+        if defaults:
+            params.update(defaults)
+        instance = model(**params)
+        return instance

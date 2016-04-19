@@ -242,14 +242,35 @@
     <script src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
 
     <script>
+        var allowUnload = false;
         $(document).ready(function() {
-            localStorage.setItem('startTime', new Date().toISOString());
+            allowUnload = false;
+
+            $(window).on('onrefresh', function() {
+                allowUnload = true;
+            });
+
+            $(window).on('beforeunload', function() {
+                if (allowUnload) {
+                    return ;
+                } else {
+                    return '현재 입력된 항목들이 지워집니다!';
+                }
+            });
+
+            $(window).on('unload', function() {
+                if (!allowUnload) {
+                    sessionStorage.clear();
+                }
+            });
+
+            sessionStorage.setItem('startTime', new Date().toISOString());
 
             var regularItem = $('#regularItem');
             var regularItemSubtract = regularItem.find('.subtract');
             var regularItemNumber = regularItem.find('.number');
-            if (localStorage.getItem('regularItemNumberCount')) {
-                var oldRegularItemNumberCount = localStorage.getItem('regularItemNumberCount');
+            if (sessionStorage.getItem('regularItemNumberCount')) {
+                var oldRegularItemNumberCount = sessionStorage.getItem('regularItemNumberCount');
                 regularItemNumber.text(oldRegularItemNumberCount);
             }
 
@@ -257,8 +278,8 @@
             var irregularItem = $('#irregularItem');
             var irregularItemSubtract = irregularItem.find('.subtract');
             var irregularItemNumber = irregularItem.find('.number');
-            if (localStorage.getItem('irregularItemNumberCount')) {
-                var oldIrregularItemNumberCount = localStorage.getItem('irregularItemNumberCount');
+            if (sessionStorage.getItem('irregularItemNumberCount')) {
+                var oldIrregularItemNumberCount = sessionStorage.getItem('irregularItemNumberCount');
                 irregularItemNumber.text(oldIrregularItemNumberCount);
             }
 
@@ -266,8 +287,8 @@
             var disposable = $('#disposable');
             var disposableSubtract = disposable.find('.subtract');
             var disposableNumber = disposable.find('.number');
-            if (localStorage.getItem('disposableNumberCount')) {
-                var oldDisposableNumberCount = localStorage.getItem('disposableNumberCount');
+            if (sessionStorage.getItem('disposableNumberCount')) {
+                var oldDisposableNumberCount = sessionStorage.getItem('disposableNumberCount');
                 disposableNumber.text(oldDisposableNumberCount);
             }
 
@@ -275,8 +296,8 @@
             var bindingProduct0 = $('#bindingProduct0');
             var bindingProduct0Subtract = bindingProduct0.find('.subtract');
             var bindingProduct0Number = bindingProduct0.find('.number');
-            if (localStorage.getItem('bindingProduct0NumberCount')) {
-                var oldBindingProduct0NumberCount = localStorage.getItem('bindingProduct0NumberCount');
+            if (sessionStorage.getItem('bindingProduct0NumberCount')) {
+                var oldBindingProduct0NumberCount = sessionStorage.getItem('bindingProduct0NumberCount');
                 bindingProduct0Number.text(oldBindingProduct0NumberCount);
             }
 
@@ -284,8 +305,8 @@
             var bindingProduct1 = $('#bindingProduct1');
             var bindingProduct1Subtract = bindingProduct1.find('.subtract');
             var bindingProduct1Number = bindingProduct1.find('.number');
-            if (localStorage.getItem('bindingProduct1NumberCount')) {
-                var oldBindingProduct1NumberCount = localStorage.getItem('bindingProduct1NumberCount');
+            if (sessionStorage.getItem('bindingProduct1NumberCount')) {
+                var oldBindingProduct1NumberCount = sessionStorage.getItem('bindingProduct1NumberCount');
                 bindingProduct1Number.text(oldBindingProduct1NumberCount);
             }
 
@@ -293,8 +314,8 @@
             var bindingProduct2 = $('#bindingProduct2');
             var bindingProduct2Subtract = bindingProduct2.find('.subtract');
             var bindingProduct2Number = bindingProduct2.find('.number');
-            if (localStorage.getItem('bindingProduct2NumberCount')) {
-                var oldBindingProduct2NumberCount = localStorage.getItem('bindingProduct2NumberCount');
+            if (sessionStorage.getItem('bindingProduct2NumberCount')) {
+                var oldBindingProduct2NumberCount = sessionStorage.getItem('bindingProduct2NumberCount');
                 bindingProduct2Number.text(oldBindingProduct2NumberCount);
             }
 
@@ -302,15 +323,15 @@
             var bindingProduct3 = $('#bindingProduct3');
             var bindingProduct3Subtract = bindingProduct3.find('.subtract');
             var bindingProduct3Number = bindingProduct3.find('.number');
-            if (localStorage.getItem('bindingProduct3NumberCount')) {
-                var oldBindingProduct3NumberCount = localStorage.getItem('bindingProduct3NumberCount');
+            if (sessionStorage.getItem('bindingProduct3NumberCount')) {
+                var oldBindingProduct3NumberCount = sessionStorage.getItem('bindingProduct3NumberCount');
                 bindingProduct3Number.text(oldBindingProduct3NumberCount);
             }
 
             var bindingProduct3Add = bindingProduct3.find('.add');
 
-            if (localStorage.getItem('optionsPeriod')) {
-                var optionsPeriod = localStorage.getItem('optionsPeriod');
+            if (sessionStorage.getItem('optionsPeriod')) {
+                var optionsPeriod = sessionStorage.getItem('optionsPeriod');
                 if (optionsPeriod == 'disposable') {
                     $("input:radio[id='optionsDisposable']").attr("checked", true);
                 } else {
@@ -327,15 +348,15 @@
                 if ($(":radio[id='optionsDisposable']:checked").val()) {
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount * disposableNumberCount);
-                    localStorage.setItem('optionsPeriod', 'disposable');
+                    sessionStorage.setItem('optionsPeriod', 'disposable');
                 } else {
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount);
-                    localStorage.setItem('optionsPeriod', 'subscription');
+                    sessionStorage.setItem('optionsPeriod', 'subscription');
                 }
-                localStorage.setItem('regularItemNumberCount', regularItemNumberCount);
-                localStorage.setItem('irregularItemNumberCount', irregularItemNumberCount);
-                localStorage.setItem('disposableNumberCount', disposableNumberCount);
+                sessionStorage.setItem('regularItemNumberCount', regularItemNumberCount);
+                sessionStorage.setItem('irregularItemNumberCount', irregularItemNumberCount);
+                sessionStorage.setItem('disposableNumberCount', disposableNumberCount);
 
                 $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
                 return totalStoragePrice;
@@ -353,10 +374,10 @@
                 totalBindingProductPrice = totalBindingProductPrice + 1500 * bindingProduct2NumberCount;
                 totalBindingProductPrice = totalBindingProductPrice + 1000 * bindingProduct3NumberCount;
 
-                localStorage.setItem('bindingProduct0NumberCount', bindingProduct0NumberCount);
-                localStorage.setItem('bindingProduct1NumberCount', bindingProduct1NumberCount);
-                localStorage.setItem('bindingProduct2NumberCount', bindingProduct2NumberCount);
-                localStorage.setItem('bindingProduct3NumberCount', bindingProduct3NumberCount);
+                sessionStorage.setItem('bindingProduct0NumberCount', bindingProduct0NumberCount);
+                sessionStorage.setItem('bindingProduct1NumberCount', bindingProduct1NumberCount);
+                sessionStorage.setItem('bindingProduct2NumberCount', bindingProduct2NumberCount);
+                sessionStorage.setItem('bindingProduct3NumberCount', bindingProduct3NumberCount);
 
                 $('#totalBindingProductPrice').text(numeral(totalBindingProductPrice).format('0,0'));
                 return totalBindingProductPrice;
@@ -368,7 +389,7 @@
                     totalPrice = 0;
                 }
 
-                localStorage.setItem('totalPrice', totalPrice);
+                sessionStorage.setItem('totalPrice', totalPrice);
                 $('#totalPrice').text(numeral(totalPrice).format('0,0'));
             };
 
@@ -403,6 +424,7 @@
             });
 
             $('#btnNextStep').click(function() {
+                allowUnload = true;
                 window.location='/reservation/order';
             });
         });
