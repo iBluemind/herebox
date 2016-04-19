@@ -26,7 +26,7 @@ def estimate():
 @schedule.route('/reservation/order', methods=['GET'])
 @login_required
 def order():
-    return render_template('reservation.html', active_menu='reservation')
+    return render_template('reservation.html', active_menu='reservation', phone_number=current_user.phone)
 
 
 @schedule.route('/reservation/review', methods=['GET', 'POST'])
@@ -77,13 +77,19 @@ def review():
         if len(address2) > 200:
             return bad_request(u'address2가 너무 깁니다.')
 
+        if current_user.phone:
+            if current_user.phone != phone_number:
+                return bad_request(u'연락처 정보가 다릅니다.')
+
         if revisit_option == 'immediate':
             revisit_date = visit_date
             revisit_time = visit_time
 
-        converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-        day_standard_time1 = datetime.datetime.strptime(start_time, "%Y-%m-%dT17:00:00.%fZ")    # 저녁 5시 기준
-        day_standard_time2 = datetime.datetime.strptime(start_time, "%Y-%m-%dT23:59:59.%fZ")
+        converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+        day_standard_time1 = converted_start_time.replace(hour=17, minute=0)   # 저녁 5시 기준
+        day_standard_time2 = converted_start_time.replace(hour=23, minute=59, second=59)
+
+        print day_standard_time1.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
         if converted_start_time > day_standard_time1 and converted_start_time <= day_standard_time2:
             converted_visit_date = datetime.datetime.strptime(visit_date, "%Y-%m-%d")
@@ -113,7 +119,9 @@ def review():
         )
 
         try:
-            old_reservation = Reservation.query.filter_by(reservation_id=new_reservation.reservation_id).first()
+            old_reservation = Reservation.query.filter_by(reservation_id=new_reservation.reservation_id,
+                                                          status=ReservationStatus.DRAFT,
+                                                          user_id=current_user.uid).first()
             if old_reservation:
                 old_reservation.standard_box_count = new_reservation.standard_box_count
                 old_reservation.nonstandard_goods_count = new_reservation.nonstandard_goods_count
