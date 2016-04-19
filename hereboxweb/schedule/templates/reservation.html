@@ -19,7 +19,11 @@
                 </div>
             </div>
             <div class="col-xs-6" style="margin-top: 10px;">
-                <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
+                {% if phone_number  %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
+                {% else %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
+                {% endif %}
             </div>
         </div>
 
@@ -177,28 +181,25 @@
                 location.href='/reservation/estimate';
             }
 
-            var minDate = moment();
-            var todayDateOnly = minDate.format("YYYY-MM-DD");
+            var dateTimePickerOptions = {
+                format: 'YYYY-MM-DD',
+                dayViewHeaderFormat:'YYYY MMMM',
+                minDate: moment().add(1, 'd'),
+                maxDate: moment().add(15, 'd'),
+                locale: 'ko'
+            };
+
+            var current = moment();
+            var todayDateOnly = moment().format("YYYY-MM-DD");
             var borderTime1 = moment(todayDateOnly + " 17:00:00");
             var borderTime2 = moment(todayDateOnly + " 23:59:59");
-            if (minDate >= borderTime1 && minDate <= borderTime2) {
-                minDate = current.day(2);
+            if (current > borderTime1 && current <= borderTime2) {
+                dateTimePickerOptions['minDate'] = moment().add(2, 'd');
+                dateTimePickerOptions['minDate'] = moment().add(17, 'd');
             }
 
-            $('#inputVisitDate').datetimepicker({
-                format: 'YYYY-MM-DD',
-                dayViewHeaderFormat:'YYYY MMMM',
-                minDate: minDate,
-                maxDate: minDate.day(14),
-                locale: 'ko'
-            });
-            $('#inputRevisitDate').datetimepicker({
-                format: 'YYYY-MM-DD',
-                dayViewHeaderFormat:'YYYY MMMM',
-                minDate: minDate,
-                maxDate: minDate.day(14),
-                locale: 'ko'
-            });
+            $('#inputVisitDate').datetimepicker(dateTimePickerOptions);
+            $('#inputRevisitDate').datetimepicker(dateTimePickerOptions);
 
             $(":radio[name='optionsRevisit']").change(function() {
                 switch($(this).val()) {

@@ -240,6 +240,7 @@
 
     <script src="{{ url_for('static', filename='assets/js/hbcounter.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
 
     <script>
         var allowUnload = false;
@@ -264,7 +265,7 @@
                 }
             });
 
-            sessionStorage.setItem('startTime', new Date().toISOString());
+            sessionStorage.setItem('startTime', moment().format('YYYY-MM-DD HH:mm:ss'));
 
             var regularItem = $('#regularItem');
             var regularItemSubtract = regularItem.find('.subtract');
