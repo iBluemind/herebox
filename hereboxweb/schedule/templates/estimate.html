@@ -32,7 +32,7 @@
                         <div class="count" style="margin: 20px auto 0;">
                             <div class="count-row">
                                 <div class="count-item subtract">-</div>
-                                <div class="count-item number" style="color: #ffc107;">2</div>
+                                <div class="count-item number" style="color: #ffc107;">{{ regular_item_count or 2 }}</div>
                                 <div class="count-item add">+</div>
                             </div>
                         </div>
@@ -61,7 +61,7 @@
                         <div class="count" style="margin: 20px auto 0;">
                             <div class="count-row">
                                 <div class="count-item subtract">-</div>
-                                <div class="count-item number" style="color: #ffc107;">2</div>
+                                <div class="count-item number" style="color: #ffc107;">{{ irregular_item_count or 2 }}</div>
                                 <div class="count-item add">+</div>
                             </div>
                         </div>
@@ -75,7 +75,7 @@
                 <div>몇 개월간 보관하실 건가요?</div>
                 <div id="optionsPeriod" class="radio">
                     <label>
-                        <input type="radio" name="optionsPeriod" id="optionsDisposable" value="disposable" checked>
+                        <input type="radio" name="optionsPeriod" id="optionsDisposable" value="disposable" {% if not period_option or period_option == 'disposable' %}checked{% endif %}>
                         기간 설정
                         <p class="estimate-month-item-desc">
                             설정한 기간만큼만 보관료를 결제합니다<br>
@@ -84,13 +84,13 @@
                         <div class="count" style="margin: 20px 0;">
                             <div class="count-row">
                                 <div class="count-item subtract">-</div>
-                                <div class="count-item number" style="color: #ffc107;">2</div>
+                                <div class="count-item number" style="color: #ffc107;">{{ period or 2 }}</div>
                                 <div class="count-item add">+</div>
                             </div>
                         </div>
                     </label>
                     <label>
-                        <input type="radio" name="optionsPeriod" id="optionsSubscription" value="subscription">
+                        <input type="radio" name="optionsPeriod" id="optionsSubscription" value="subscription" {% if period_option == 'subscription' %}checked{% endif %}>
                         자동 결제
                         <p class="estimate-month-item-desc">
                             매 달 자동으로 보관료가 결제됩니다
@@ -111,7 +111,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">{{ binding_product0_count or 2 }}</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">{{ binding_product1_count or 2 }}</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -141,7 +141,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">{{ binding_product2_count or 2 }}</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -156,7 +156,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">{{ binding_product3_count or 2 }}</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -184,7 +184,7 @@
             </div>
             <div class="col-xs-6">
                 <div class="col-xs-8" style="padding-right: 5px;">
-                    <input type="text" class="form-control" id="inputPromotion" placeholder="프로모션 코드를 입력하세요">
+                    <input type="text" class="form-control" id="inputPromotion" placeholder="프로모션 코드를 입력하세요" value="{{ promotion if promotion != None }}">
                 </div>
                 <button id="btnCheckPromotion" type="button" class="col-xs-2 btn btn-hbprimary" style="font-size: 14px; padding: 9px 4px;">확인</button>
             </div>
@@ -238,6 +238,8 @@
 {% endblock %}
 {% block jscript %}
 
+    <script src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/hbcounter.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
@@ -247,98 +249,54 @@
         $(document).ready(function() {
             allowUnload = false;
 
-            $(window).on('onrefresh', function() {
-                allowUnload = true;
-            });
-
             $(window).on('beforeunload', function() {
                 if (allowUnload) {
                     return ;
                 } else {
-                    return '현재 입력된 항목들이 지워집니다!';
+                    return '현재 입력된 항목들이 지워집니다! 정말 예약을 취소하시겠습니까?';
                 }
             });
-
             $(window).on('unload', function() {
                 if (!allowUnload) {
-                    sessionStorage.clear();
+                    purchaseCookieClear();
+                    cancelPurchase();
                 }
             });
 
-            sessionStorage.setItem('startTime', moment().format('YYYY-MM-DD HH:mm:ss'));
+            if (Cookies.get('cancel')) {
+                allowUnload = true;
+                location.href = '/my_stuff';
+            }
 
             var regularItem = $('#regularItem');
             var regularItemSubtract = regularItem.find('.subtract');
             var regularItemNumber = regularItem.find('.number');
-            if (sessionStorage.getItem('regularItemNumberCount')) {
-                var oldRegularItemNumberCount = sessionStorage.getItem('regularItemNumberCount');
-                regularItemNumber.text(oldRegularItemNumberCount);
-            }
-
             var regularItemAdd = regularItem.find('.add');
             var irregularItem = $('#irregularItem');
             var irregularItemSubtract = irregularItem.find('.subtract');
             var irregularItemNumber = irregularItem.find('.number');
-            if (sessionStorage.getItem('irregularItemNumberCount')) {
-                var oldIrregularItemNumberCount = sessionStorage.getItem('irregularItemNumberCount');
-                irregularItemNumber.text(oldIrregularItemNumberCount);
-            }
-
             var irregularItemAdd = irregularItem.find('.add');
             var disposable = $('#disposable');
             var disposableSubtract = disposable.find('.subtract');
             var disposableNumber = disposable.find('.number');
-            if (sessionStorage.getItem('disposableNumberCount')) {
-                var oldDisposableNumberCount = sessionStorage.getItem('disposableNumberCount');
-                disposableNumber.text(oldDisposableNumberCount);
-            }
-
             var disposableAdd = disposable.find('.add');
             var bindingProduct0 = $('#bindingProduct0');
             var bindingProduct0Subtract = bindingProduct0.find('.subtract');
             var bindingProduct0Number = bindingProduct0.find('.number');
-            if (sessionStorage.getItem('bindingProduct0NumberCount')) {
-                var oldBindingProduct0NumberCount = sessionStorage.getItem('bindingProduct0NumberCount');
-                bindingProduct0Number.text(oldBindingProduct0NumberCount);
-            }
-
             var bindingProduct0Add = bindingProduct0.find('.add');
             var bindingProduct1 = $('#bindingProduct1');
             var bindingProduct1Subtract = bindingProduct1.find('.subtract');
             var bindingProduct1Number = bindingProduct1.find('.number');
-            if (sessionStorage.getItem('bindingProduct1NumberCount')) {
-                var oldBindingProduct1NumberCount = sessionStorage.getItem('bindingProduct1NumberCount');
-                bindingProduct1Number.text(oldBindingProduct1NumberCount);
-            }
-
             var bindingProduct1Add = bindingProduct1.find('.add');
             var bindingProduct2 = $('#bindingProduct2');
             var bindingProduct2Subtract = bindingProduct2.find('.subtract');
             var bindingProduct2Number = bindingProduct2.find('.number');
-            if (sessionStorage.getItem('bindingProduct2NumberCount')) {
-                var oldBindingProduct2NumberCount = sessionStorage.getItem('bindingProduct2NumberCount');
-                bindingProduct2Number.text(oldBindingProduct2NumberCount);
-            }
-
             var bindingProduct2Add = bindingProduct2.find('.add');
             var bindingProduct3 = $('#bindingProduct3');
             var bindingProduct3Subtract = bindingProduct3.find('.subtract');
             var bindingProduct3Number = bindingProduct3.find('.number');
-            if (sessionStorage.getItem('bindingProduct3NumberCount')) {
-                var oldBindingProduct3NumberCount = sessionStorage.getItem('bindingProduct3NumberCount');
-                bindingProduct3Number.text(oldBindingProduct3NumberCount);
-            }
-
             var bindingProduct3Add = bindingProduct3.find('.add');
-
-            if (sessionStorage.getItem('optionsPeriod')) {
-                var optionsPeriod = sessionStorage.getItem('optionsPeriod');
-                if (optionsPeriod == 'disposable') {
-                    $("input:radio[id='optionsDisposable']").attr("checked", true);
-                } else {
-                    $("input:radio[id='optionsSubscription']").attr("checked", true);
-                }
-            }
+            var startTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
             var calculateStoragePrice = function() {
                 var totalStoragePrice = 0;
@@ -349,16 +307,10 @@
                 if ($(":radio[id='optionsDisposable']:checked").val()) {
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount * disposableNumberCount);
-                    sessionStorage.setItem('optionsPeriod', 'disposable');
                 } else {
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount);
-                    sessionStorage.setItem('optionsPeriod', 'subscription');
                 }
-                sessionStorage.setItem('regularItemNumberCount', regularItemNumberCount);
-                sessionStorage.setItem('irregularItemNumberCount', irregularItemNumberCount);
-                sessionStorage.setItem('disposableNumberCount', disposableNumberCount);
-
                 $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
                 return totalStoragePrice;
             };
@@ -375,11 +327,6 @@
                 totalBindingProductPrice = totalBindingProductPrice + 1500 * bindingProduct2NumberCount;
                 totalBindingProductPrice = totalBindingProductPrice + 1000 * bindingProduct3NumberCount;
 
-                sessionStorage.setItem('bindingProduct0NumberCount', bindingProduct0NumberCount);
-                sessionStorage.setItem('bindingProduct1NumberCount', bindingProduct1NumberCount);
-                sessionStorage.setItem('bindingProduct2NumberCount', bindingProduct2NumberCount);
-                sessionStorage.setItem('bindingProduct3NumberCount', bindingProduct3NumberCount);
-
                 $('#totalBindingProductPrice').text(numeral(totalBindingProductPrice).format('0,0'));
                 return totalBindingProductPrice;
             };
@@ -389,8 +336,6 @@
                 if (totalPrice < 0) {
                     totalPrice = 0;
                 }
-
-                sessionStorage.setItem('totalPrice', totalPrice);
                 $('#totalPrice').text(numeral(totalPrice).format('0,0'));
             };
 
@@ -418,7 +363,14 @@
                 changeTotalPrice
             );
 
-            $(":radio[name='optionsPeriod']").change(changeTotalPrice);
+            $(":radio[name='optionsPeriod']").change(function () {
+                if ($(":radio[name='optionsPeriod']").val() == 'disposable') {
+                    $("input:radio[id='optionsDisposable']").attr("checked", true);
+                } else {
+                    $("input:radio[id='optionsSubscription']").attr("checked", true);
+                }
+                changeTotalPrice();
+            });
 
             $('#btnCheckPromotion').click(function() {
                 alert("해당되는 프로모션이 없습니다.");
@@ -426,7 +378,34 @@
 
             $('#btnNextStep').click(function() {
                 allowUnload = true;
-                window.location='/reservation/order';
+
+                var regularItemNumberCount = regularItemNumber.text();
+                var irregularItemNumberCount = irregularItemNumber.text();
+                var disposableNumberCount = disposableNumber.text();
+                var optionsPeriod = $(":radio[name='optionsPeriod']").val();
+                var bindingProduct0NumberCount = bindingProduct0Number.text();
+                var bindingProduct1NumberCount = bindingProduct1Number.text();
+                var bindingProduct2NumberCount = bindingProduct2Number.text();
+                var bindingProduct3NumberCount = bindingProduct3Number.text();
+                var totalPrice = calculateStoragePrice() + calculateBindingProductPrice();
+
+                $.ajax({
+                     type: "POST",
+                     url: "/reservation/order",
+                     data: {regularItemNumberCount: regularItemNumberCount,
+                         irregularItemNumberCount: irregularItemNumberCount, disposableNumberCount: disposableNumberCount,
+                         optionsPeriod: optionsPeriod, bindingProduct0NumberCount: bindingProduct0NumberCount,
+                         bindingProduct1NumberCount: bindingProduct1NumberCount, bindingProduct2NumberCount: bindingProduct2NumberCount,
+                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice, startTime: startTime
+                     },
+                     success: function () {
+                        location.href = '/reservation/order'
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
             });
         });
     </script>
