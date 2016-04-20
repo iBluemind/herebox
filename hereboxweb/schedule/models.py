@@ -37,20 +37,25 @@ class Reservation(database.Model, JsonSerializable):
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     reservation_id = database.Column(database.String(11), unique=True)
-    reservation_type = database.Column(database.String(1))                   # 예약 종류
-    status = database.Column(database.SmallInteger)                     # 예약 접수 상태
-    standard_box_count = database.Column(database.SmallInteger)         # 규격박스 갯수
-    nonstandard_goods_count = database.Column(database.SmallInteger)    # 비규격물품 갯수
-    period = database.Column(database.SmallInteger)                     # 계약 월수
-    purchase_type = database.Column(database.SmallInteger)              # 결제 방법
-    fixed_rate = database.Column(database.SmallInteger)                 # 자동결제 여부
-    promotion = database.Column(database.SmallInteger)                  # 프로모션 여부
-    binding_products = database.Column(database.Text)                 # 포장용품
-    contact = database.Column(database.Text)                          # 연락처
-    address = database.Column(database.Text)                          # 방문주소
-    delivery_date = database.Column(database.DateTime)                  # 방문일시(배달)
-    recovery_date = database.Column(database.DateTime)                  # 방문일시(회수)
-    user_memo = database.Column(database.Text)                        # 남기실말씀
+    reservation_type = database.Column(database.String(1))                      # 예약 종류
+    status = database.Column(database.SmallInteger)                             # 예약 접수 상태
+    standard_box_count = database.Column(database.SmallInteger)                 # 규격박스 갯수
+    nonstandard_goods_count = database.Column(database.SmallInteger)            # 비규격물품 갯수
+    period = database.Column(database.SmallInteger)                             # 계약 월수
+    purchase_type = database.Column(database.SmallInteger)                      # 결제 방법
+    fixed_rate = database.Column(database.SmallInteger)                         # 자동결제 여부
+    promotion = database.Column(database.SmallInteger)                          # 프로모션 여부
+    binding_products = database.Column(database.Text)                           # 포장용품
+    contact = database.Column(database.Text)                                    # 연락처
+    address = database.Column(database.Text)                                    # 방문주소
+    delivery_date = database.Column(database.Date)                              # 방문일시(배달)
+    delivery_time = database.Column(database.Integer,
+                                    database.ForeignKey('visit_time.id'), nullable=True)
+    recovery_date = database.Column(database.Date)                              # 방문일시(회수)
+    recovery_time = database.Column(database.Integer,
+                                    database.ForeignKey('visit_time.id'), nullable=True)
+    revisit_option = database.Column(database.SmallInteger)                     # 재방문 여부(배달날짜 != 회수날짜)
+    user_memo = database.Column(database.Text)                                  # 남기실말씀
     purchase_id = database.Column(database.Integer,
                                   database.ForeignKey('purchase.id'), nullable=True)
     user_id = database.Column(database.Integer,
@@ -62,8 +67,9 @@ class Reservation(database.Model, JsonSerializable):
 
     def __init__(self, reservation_type, status, standard_box_count, nonstandard_goods_count,
                                     period, fixed_rate, promotion, binding_products, contact,
-                                    address, delivery_date, recovery_date, user_memo, user_id,
-                                    purchase_type=None, purchase_id=None):
+                                    address, delivery_date, delivery_time, recovery_date,
+                                    recovery_time, revisit_option, user_memo,
+                                    user_id, purchase_type=None, purchase_id=None):
         self.reservation_id = self._generate_reservation_id(reservation_type)
         self.reservation_type = reservation_type
         self.status = status
@@ -77,7 +83,10 @@ class Reservation(database.Model, JsonSerializable):
         self.contact = contact
         self.address = address
         self.delivery_date = delivery_date
+        self.delivery_time = delivery_time
         self.recovery_date = recovery_date
+        self.recovery_time = recovery_time
+        self.revisit_option = revisit_option
         self.user_memo = user_memo
         self.purchase_id = purchase_id
         self.user_id = user_id
