@@ -19,15 +19,16 @@ class ReservationType(object):
 
 # 예약 상태
 class ReservationStatus(object):
-    DRAFT = 0       # 작성중
-    WAITING = 1     # 대기
-    ACCEPTED = 2    # 접수
+    WAITING = 0     # 대기
+    ACCEPTED = 1    # 접수
 
 
 # 결제 방법
 class PurchaseType(object):
-    ONLINE = 0
+    CARD = 0
     DIRECT = 1
+    PHONE = 2
+    KAKAOPAY = 3
 
 
 # 예약
@@ -66,10 +67,10 @@ class Reservation(database.Model, JsonSerializable):
     updated_at = database.Column(database.DateTime)
 
     def __init__(self, reservation_type, status, standard_box_count, nonstandard_goods_count,
-                                    period, fixed_rate, promotion, binding_products, contact,
+                                    period, fixed_rate, binding_products, user_id, promotion, contact,
                                     address, delivery_date, delivery_time, recovery_date,
                                     recovery_time, revisit_option, user_memo,
-                                    user_id, purchase_type=None, purchase_id=None):
+                                    purchase_type, purchase_id=None):
         self.reservation_id = self._generate_reservation_id(reservation_type)
         self.reservation_type = reservation_type
         self.status = status

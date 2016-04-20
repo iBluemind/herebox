@@ -19,8 +19,10 @@
                 </div>
             </div>
             <div class="col-xs-6" style="margin-top: 10px;">
-                {% if phone_number  %}
-                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
+                {% if old_phone_number  %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ old_phone_number }}" disabled>
+                {% elif phone_number  %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}">
                 {% else %}
                     <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
                 {% endif %}
@@ -41,15 +43,14 @@
             <div class="col-xs-6">
                 <div>
                     <div style="float: left; width: 68%;">
-                        <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요">
+                        <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요" {% if post_code %}value="{{ post_code }}"{% endif %}>
                     </div>
                     <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">우편번호 찾기</button>
                 </div>
-                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요">
-                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요">
+                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" {% if address1 %}value="{{ address1 }}"{% endif %}>
+                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" {% if address2 %}value="{{ address2 }}"{% endif %}>
             </div>
         </div>
-
 
         <div class="row" style="margin-top: 80px;">
             <div class="col-xs-6">
@@ -64,15 +65,15 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
+                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)" {% if visit_date %}value="{{ visit_date }}" {% endif %}>
 
                 <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
-                    <option value="1">10:00-12:00</option>
-                    <option value="2">12:00-14:00</option>
-                    <option value="3">14:00-16:00</option>
-                    <option value="4">16:00-18:00</option>
-                    <option value="5">18:00-20:00</option>
-                    <option value="6">20:00-22:00</option>
+                    <option value="1" {% if visit_time == '1' %}selected{% endif %}>10:00-12:00</option>
+                    <option value="2" {% if visit_time == '2' %}selected{% endif %}>12:00-14:00</option>
+                    <option value="3" {% if visit_time == '3' %}selected{% endif %}>14:00-16:00</option>
+                    <option value="4" {% if visit_time == '4' %}selected{% endif %}>16:00-18:00</option>
+                    <option value="5" {% if visit_time == '5' %}selected{% endif %}>18:00-20:00</option>
+                    <option value="6" {% if visit_time == '6' %}selected{% endif %}>20:00-22:00</option>
                 </select>
             </div>
         </div>
@@ -91,14 +92,14 @@
             <div class="col-xs-6">
                 <div class="radio" style="float:left; display:inline-block;">
                     <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                        <input type="radio" name="optionsRevisit" id="optionsImmediate" value="immediate" checked>
+                        <input type="radio" name="optionsRevisit" id="optionsImmediate" value="immediate" {% if not optionsRevisit or optionsRevisit == 'immediate' %}checked{% endif %}>
                         바로 가능
                         <p class="estimate-month-item-desc">
                             픽업맨 방문 후 30분 내 준비가 가능할 경우
                         </p>
                     </label>
                     <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                        <input type="radio" name="optionsRevisit" id="optionsLater" value="later">
+                        <input type="radio" name="optionsRevisit" id="optionsLater" value="later" {% if optionsRevisit == 'later' %}checked{% endif %}>
                         재방문 신청
                         <p class="estimate-month-item-desc">
                             재방문 날짜를 선택하면 픽업맨이 다시 방문
@@ -106,14 +107,14 @@
                     </label>
                 </div>
                 <div id="revisitDatetime">
-                    <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)">
+                    <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)" {% if revisit_date %}value="{{ revisit_date }}" {% endif %}>
                     <select id="inputRevisitTime" style="margin-top: 20px;" class="form-control">
-                        <option value="1">10:00-12:00</option>
-                        <option value="2">12:00-14:00</option>
-                        <option value="3">14:00-16:00</option>
-                        <option value="4">16:00-18:00</option>
-                        <option value="5">18:00-20:00</option>
-                        <option value="6">20:00-22:00</option>
+                        <option value="1" {% if visit_time == '1' %}selected{% endif %}>10:00-12:00</option>
+                        <option value="2" {% if visit_time == '2' %}selected{% endif %}>12:00-14:00</option>
+                        <option value="3" {% if visit_time == '3' %}selected{% endif %}>14:00-16:00</option>
+                        <option value="4" {% if visit_time == '4' %}selected{% endif %}>16:00-18:00</option>
+                        <option value="5" {% if visit_time == '5' %}selected{% endif %}>18:00-20:00</option>
+                        <option value="6" {% if visit_time == '6' %}selected{% endif %}>20:00-22:00</option>
                     </select>
                 </div>
             </div>
@@ -132,7 +133,7 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요"></textarea>
+                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요">{{ user_memo if user_memo != None }}</textarea>
             </div>
         </div>
 
@@ -145,6 +146,8 @@
 {% endblock %}
 {% block jscript %}
 
+    <script src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
     <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
@@ -154,30 +157,19 @@
     <script>
         var allowUnload = false;
         $(document).ready(function() {
-            allowUnload = false;
-
-            $(window).on('onrefresh', function() {
-                allowUnload = true;
-            });
-
             $(window).on('beforeunload', function() {
                 if (allowUnload) {
                     return ;
                 } else {
-                    return '현재 입력된 항목들이 지워집니다!';
+                    return '현재 입력된 항목들이 지워집니다! 정말 예약을 취소하시겠습니까?';
                 }
             });
-
             $(window).on('unload', function() {
                 if (!allowUnload) {
-                    sessionStorage.clear();
+                    purchaseCookieClear();
+                    cancelPurchase();
                 }
             });
-
-            if (!sessionStorage.getItem('startTime')) {
-                allowUnload = true;
-                location.href='/reservation/estimate';
-            }
 
             var dateTimePickerOptions = {
                 format: 'YYYY-MM-DD',
@@ -193,7 +185,7 @@
             var borderTime2 = moment(todayDateOnly + " 23:59:59");
             if (current > borderTime1 && current <= borderTime2) {
                 dateTimePickerOptions['minDate'] = moment().add(2, 'd');
-                dateTimePickerOptions['minDate'] = moment().add(17, 'd');
+                dateTimePickerOptions['maxDate'] = moment().add(17, 'd');
             }
 
             $('#inputVisitDate').datetimepicker(dateTimePickerOptions);
@@ -204,7 +196,7 @@
                      case 'immediate':
                          $('#revisitDatetime').fadeOut();
                          break;
-                    case 'later':
+                     case 'later':
                          $('#revisitDatetime').fadeIn();
                          break;
                 }
@@ -215,103 +207,23 @@
                 $('#revisitDatetime').fadeOut();
             }
 
-            if (sessionStorage.getItem('inputPhoneNumber')) {
-                $('#inputPhoneNumber').val(sessionStorage.getItem('inputPhoneNumber'));
-            }
-            if (sessionStorage.getItem('inputPostCode')) {
-                $('#inputPostCode').val(sessionStorage.getItem('inputPostCode'));
-            }
-            if (sessionStorage.getItem('inputAddress1')) {
-                $('#inputAddress1').val(sessionStorage.getItem('inputAddress1'));
-            }
-            if (sessionStorage.getItem('inputAddress2')) {
-                $('#inputAddress2').val(sessionStorage.getItem('inputAddress2'));
-            }
-            if (sessionStorage.getItem('inputVisitDate')) {
-                $('#inputVisitDate').val(sessionStorage.getItem('inputVisitDate'));
-            }
-            if (sessionStorage.getItem('inputVisitTime')) {
-                $('#inputVisitTime').val(sessionStorage.getItem('inputVisitTime'));
-            }
-            if (sessionStorage.getItem('optionsRevisit')) {
-                var oldOptionsRevisit = sessionStorage.getItem('optionsRevisit');
-                console.log(oldOptionsRevisit);
-                switch (oldOptionsRevisit) {
-                     case 'immediate':
-                         $(":radio[id='optionsImmediate']").attr("checked", true);
-                         $(":radio[id='optionsLater']").attr("checked", false);
-                         break;
-                     case 'later':
-                         $(":radio[id='optionsImmediate']").attr("checked", false);
-                         $(":radio[id='optionsLater']").attr("checked", true);
-                         break;
-                 }
-            }
-            if (sessionStorage.getItem('inputRevisitDate')) {
-                $('#inputRevisitDate').val(sessionStorage.getItem('inputRevisitDate'));
-            }
-            if (sessionStorage.getItem('inputRevisitTime')) {
-                $('#inputRevisitTime').val(sessionStorage.getItem('inputRevisitTime'));
-            }
-            if (sessionStorage.getItem('textareaMemo')) {
-                $('#textareaMemo').val(sessionStorage.getItem('textareaMemo'));
-            }
-
             $('#btnPrevStep').click(function() {
+                if (errorCheck())
+                    return ;
                 allowUnload = true;
-                location.href = '/reservation/estimate';
+                go('estimate');
             });
 
             $('#btnNextStep').click(function() {
-                if (errorCheck())
-                    return ;
-                save();
-
+                if (errorCheck()) {
+                    return;
+                }
                 allowUnload = true;
-                var inputPhoneNumber = $('#inputPhoneNumber').val();
-                var inputPostCode = $('#inputPostCode').val();
-                var inputAddress1 = $('#inputAddress1').val();
-                var inputAddress2 = $('#inputAddress2').val();
-                var inputVisitDate = $('#inputVisitDate').val();
-                var inputVisitTime = $('#inputVisitTime').val();
-                var optionsRevisit = $(":radio[name='optionsRevisit']").val();
-                var inputRevisitDate = $('#inputRevisitDate').val();
-                var inputRevisitTime = $('#inputRevisitTime').val();
-                var textareaMemo = $('#textareaMemo').val();
-                var regularItemNumberCount = sessionStorage.getItem('regularItemNumberCount');
-                var irregularItemNumberCount = sessionStorage.getItem('irregularItemNumberCount');
-                var disposableNumberCount = sessionStorage.getItem('disposableNumberCount');
-                var optionsPeriod = sessionStorage.getItem('optionsPeriod');
-                var bindingProduct0NumberCount = sessionStorage.getItem('bindingProduct0NumberCount');
-                var bindingProduct1NumberCount = sessionStorage.getItem('bindingProduct1NumberCount');
-                var bindingProduct2NumberCount = sessionStorage.getItem('bindingProduct2NumberCount');
-                var bindingProduct3NumberCount = sessionStorage.getItem('bindingProduct3NumberCount');
-                var totalPrice = sessionStorage.getItem('totalPrice');
-                var startTime = sessionStorage.getItem('startTime');
-                $.ajax({
-                     type: "POST",
-                     url: "/reservation/review",
-                     data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
-                        inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputVisitDate: inputVisitDate,
-                         inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
-                         inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo, regularItemNumberCount: regularItemNumberCount,
-                         irregularItemNumberCount: irregularItemNumberCount, disposableNumberCount: disposableNumberCount,
-                         optionsPeriod: optionsPeriod, bindingProduct0NumberCount: bindingProduct0NumberCount,
-                         bindingProduct1NumberCount: bindingProduct1NumberCount, bindingProduct2NumberCount: bindingProduct2NumberCount,
-                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice, startTime: startTime
-                     },
-                     success: function () {
-                        location.href = '/reservation/review'
-                     },
-                     error: function(request, status, error) {
-                        var parsedBody = $.parseJSON(request.responseText);
-                        alert(parsedBody['message']);
-                     }
-                 });
+                go('review');
             });
         });
 
-        function save() {
+        function go(dest) {
             var inputPhoneNumber = $('#inputPhoneNumber').val();
             var inputPostCode = $('#inputPostCode').val();
             var inputAddress1 = $('#inputAddress1').val();
@@ -322,17 +234,22 @@
             var inputRevisitDate = $('#inputRevisitDate').val();
             var inputRevisitTime = $('#inputRevisitTime').val();
             var textareaMemo = $('#textareaMemo').val();
-
-            sessionStorage.setItem('inputPhoneNumber', inputPhoneNumber);
-            sessionStorage.setItem('inputPostCode', inputPostCode);
-            sessionStorage.setItem('inputAddress1', inputAddress1);
-            sessionStorage.setItem('inputAddress2', inputAddress2);
-            sessionStorage.setItem('inputVisitDate', inputVisitDate);
-            sessionStorage.setItem('inputVisitTime', inputVisitTime);
-            sessionStorage.setItem('optionsRevisit', optionsRevisit);
-            sessionStorage.setItem('inputRevisitDate', inputRevisitDate);
-            sessionStorage.setItem('inputRevisitTime', inputRevisitTime);
-            sessionStorage.setItem('textareaMemo', textareaMemo);
+            $.ajax({
+                 type: "POST",
+                 url: "/reservation/" + dest,
+                 data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
+                    inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputVisitDate: inputVisitDate,
+                     inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
+                     inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo
+                 },
+                 success: function () {
+                    location.href = '/reservation/' + dest;
+                 },
+                 error: function(request, status, error) {
+                    var parsedBody = $.parseJSON(request.responseText);
+                    alert(parsedBody['message']);
+                 }
+            });
         }
 
         function errorCheck() {
