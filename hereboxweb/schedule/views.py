@@ -7,6 +7,7 @@ from flask.ext.login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
 
 from hereboxweb import database, response_template, bad_request
+from hereboxweb.admin.models import VisitTime
 from hereboxweb.schedule import schedule
 from hereboxweb.schedule.models import *
 
@@ -112,8 +113,11 @@ def review():
                               u'압축팩 40cm x 60cm': binding_product2_count, u'테이프 48mm x 40m': binding_product3_count},
             contact=phone_number,
             address='%s %s' % (address1, address2),
-            delivery_date='%s %s' % (visit_date, visit_time),
-            recovery_date='%s %s' % (revisit_date, revisit_time),
+            delivery_date=visit_date,
+            delivery_time=visit_time,
+            recovery_date=revisit_date,
+            recovery_time=revisit_time,
+            revisit_option=1 if revisit_option == 'later' else 0,
             user_memo=user_memo,
             user_id=current_user.uid,
         )
@@ -132,7 +136,8 @@ def review():
                 old_reservation.contact = new_reservation.contact
                 old_reservation.address = new_reservation.address
                 old_reservation.delivery_date = new_reservation.delivery_date
-                old_reservation.recovery_date = new_reservation.recovery_date
+                old_reservation.delivery_time = new_reservation.delivery_time
+                old_reservation.recovery_time = new_reservation.recovery_time
                 old_reservation.user_memo = new_reservation.user_memo
                 old_reservation.updated_at = datetime.datetime.now()
             else:
@@ -142,9 +147,50 @@ def review():
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
         return response_template(u'정상 처리되었습니다', 200, data={'reservation_id': new_reservation.reservation_id})
 
+    current_reservation = Reservation.query.filter_by(status=ReservationStatus.DRAFT,
+                                                      user_id=current_user.uid).first()
 
+    def calculate_total_price():
+        total_storage_price = 0
+        if current_reservation.fixed_rate:
+            total_storage_price = total_storage_price + (7500 * period * current_reservation.standard_box_count)
+            total_storage_price = total_storage_price + (9900 * period * current_reservation.nonstandard_goods_count)
+        else:
+            total_storage_price = total_storage_price + (7500 * current_reservation.standard_box_count)
+            total_storage_price = total_storage_price + (9900 * current_reservation.nonstandard_goods_count)
 
-    return render_template('review.html', active_menu='reservation')
+        total_binding_products_price = 0
+        binding_products = json.loads(current_reservation.binding_products)
+
+        total_binding_products_price = total_binding_products_price + 500 * binding_products[u'포장용 에어캡 1m']
+        total_binding_products_price = total_binding_products_price + 500 * binding_products[u'실리카겔 (제습제) 50g']
+        total_binding_products_price = total_binding_products_price + 1500 * binding_products[u'압축팩 40cm x 60cm']
+        total_binding_products_price = total_binding_products_price + 1000 * binding_products[u'테이프 48mm x 40m']
+
+        return total_storage_price + total_binding_products_price
+
+    visit_time = VisitTime.query.get(current_reservation.delivery_time)
+    revisit_time = current_reservation.recovery_time
+
+    if revisit_time:
+        revisit_time = VisitTime.query.get(revisit_time)
+
+    return render_template('review.html', active_menu='reservation',
+                           standard_box_count=current_reservation.standard_box_count,
+                           nonstandard_goods_count=current_reservation.nonstandard_goods_count,
+                           period_option=True if current_reservation.fixed_rate == 1 else False,
+                           period=current_reservation.period,
+                           binding_products=json.loads(current_reservation.binding_products),
+                           promotion=current_reservation.promotion,
+                           total_price=u'{:,d}원'.format(calculate_total_price()),
+                           phone=current_reservation.contact,
+                           address=current_reservation.address,
+                           visit_date=current_reservation.delivery_date,
+                           visit_time=visit_time,
+                           revisit_option=True if current_reservation.revisit_option == 1 else False,
+                           revisit_date=current_reservation.recovery_date,
+                           revisit_time=revisit_time,
+                           user_memo=current_reservation.user_memo)
 
 
 @schedule.route('/reservation/completion', methods=['GET'])
