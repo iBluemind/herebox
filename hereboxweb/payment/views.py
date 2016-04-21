@@ -122,10 +122,6 @@ def reservation_payment():
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
         return response_template(u'정상 처리되었습니다', 200)
 
-    if request.cookies.get('cancel'):
-        response = make_response(redirect(url_for('schedule.estimate')))
-        return response
-
     regular_item_count = request.cookies.get('regularItemNumberCount')
     irregular_item_count = request.cookies.get('irregularItemNumberCount')
     period = request.cookies.get('disposableNumberCount')

@@ -164,9 +164,13 @@
             $(window).on('unload', function() {
                 if (!allowUnload) {
                     purchaseCookieClear();
-                    cancelPurchase();
                 }
             });
+
+            if (!Cookies.get('startTime')) {
+                allowUnload = true;
+                location.href = '/reservation/estimate';
+            }
 
             $('#btnPrevStep').click(function() {
                 allowUnload = true;

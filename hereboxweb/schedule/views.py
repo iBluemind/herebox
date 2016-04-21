@@ -157,11 +157,6 @@ def estimate():
     if request.method == 'POST':
         return save_order()
 
-    if request.cookies.get('cancel'):
-        response = make_response(redirect(url_for('schedule.estimate')))
-        response.set_cookie('cancel', '', expires=0, path='/reservation/')
-        return response
-
     regular_item_count = request.cookies.get('regularItemNumberCount')
     irregular_item_count = request.cookies.get('irregularItemNumberCount')
     period = request.cookies.get('disposableNumberCount')
@@ -196,10 +191,6 @@ def estimate():
 def order():
     if request.method == 'POST':
         return save_estimate()
-
-    if request.cookies.get('cancel'):
-        response = make_response(redirect(url_for('schedule.estimate')))
-        return response
 
     try:
         request.cookies['startTime']
@@ -254,10 +245,6 @@ def order():
 def review():
     if request.method == 'POST':
         return save_order()
-
-    if request.cookies.get('cancel'):
-        response = make_response(redirect(url_for('schedule.estimate')))
-        return response
 
     try:
         request.cookies['regularItemNumberCount']

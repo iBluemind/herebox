@@ -22,7 +22,3 @@ function purchaseCookieClear() {
     Cookies.remove('bindingProduct2NumberCount', { path: '/reservation/' });
     Cookies.remove('bindingProduct3NumberCount', { path: '/reservation/' });
 }
-
-function cancelPurchase() {
-    Cookies.set('cancel', moment().format('YYYY-MM-DD HH:mm:ss'), { path: '/reservation/' });
-}

@@ -19,10 +19,8 @@
                 </div>
             </div>
             <div class="col-xs-6" style="margin-top: 10px;">
-                {% if old_phone_number  %}
-                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ old_phone_number }}" disabled>
-                {% elif phone_number  %}
-                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}">
+                {% if phone_number  %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
                 {% else %}
                     <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
                 {% endif %}
@@ -43,14 +41,15 @@
             <div class="col-xs-6">
                 <div>
                     <div style="float: left; width: 68%;">
-                        <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요" {% if post_code %}value="{{ post_code }}"{% endif %}>
+                        <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요">
                     </div>
                     <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">우편번호 찾기</button>
                 </div>
-                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" {% if address1 %}value="{{ address1 }}"{% endif %}>
-                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" {% if address2 %}value="{{ address2 }}"{% endif %}>
+                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요">
+                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요">
             </div>
         </div>
+
 
         <div class="row" style="margin-top: 80px;">
             <div class="col-xs-6">
@@ -65,15 +64,15 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)" {% if visit_date %}value="{{ visit_date }}" {% endif %}>
+                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
 
                 <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
-                    <option value="1" {% if visit_time == '1' %}selected{% endif %}>10:00-12:00</option>
-                    <option value="2" {% if visit_time == '2' %}selected{% endif %}>12:00-14:00</option>
-                    <option value="3" {% if visit_time == '3' %}selected{% endif %}>14:00-16:00</option>
-                    <option value="4" {% if visit_time == '4' %}selected{% endif %}>16:00-18:00</option>
-                    <option value="5" {% if visit_time == '5' %}selected{% endif %}>18:00-20:00</option>
-                    <option value="6" {% if visit_time == '6' %}selected{% endif %}>20:00-22:00</option>
+                    <option value="1">10:00-12:00</option>
+                    <option value="2">12:00-14:00</option>
+                    <option value="3">14:00-16:00</option>
+                    <option value="4">16:00-18:00</option>
+                    <option value="5">18:00-20:00</option>
+                    <option value="6">20:00-22:00</option>
                 </select>
             </div>
         </div>
@@ -92,14 +91,14 @@
             <div class="col-xs-6">
                 <div class="radio" style="float:left; display:inline-block;">
                     <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                        <input type="radio" name="optionsRevisit" id="optionsImmediate" value="immediate" {% if not optionsRevisit or optionsRevisit == 'immediate' %}checked{% endif %}>
+                        <input type="radio" name="optionsRevisit" id="optionsImmediate" value="immediate" checked>
                         바로 가능
                         <p class="estimate-month-item-desc">
                             픽업맨 방문 후 30분 내 준비가 가능할 경우
                         </p>
                     </label>
                     <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                        <input type="radio" name="optionsRevisit" id="optionsLater" value="later" {% if optionsRevisit == 'later' %}checked{% endif %}>
+                        <input type="radio" name="optionsRevisit" id="optionsLater" value="later">
                         재방문 신청
                         <p class="estimate-month-item-desc">
                             재방문 날짜를 선택하면 픽업맨이 다시 방문
@@ -107,14 +106,14 @@
                     </label>
                 </div>
                 <div id="revisitDatetime">
-                    <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)" {% if revisit_date %}value="{{ revisit_date }}" {% endif %}>
+                    <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)">
                     <select id="inputRevisitTime" style="margin-top: 20px;" class="form-control">
-                        <option value="1" {% if visit_time == '1' %}selected{% endif %}>10:00-12:00</option>
-                        <option value="2" {% if visit_time == '2' %}selected{% endif %}>12:00-14:00</option>
-                        <option value="3" {% if visit_time == '3' %}selected{% endif %}>14:00-16:00</option>
-                        <option value="4" {% if visit_time == '4' %}selected{% endif %}>16:00-18:00</option>
-                        <option value="5" {% if visit_time == '5' %}selected{% endif %}>18:00-20:00</option>
-                        <option value="6" {% if visit_time == '6' %}selected{% endif %}>20:00-22:00</option>
+                        <option value="1">10:00-12:00</option>
+                        <option value="2">12:00-14:00</option>
+                        <option value="3">14:00-16:00</option>
+                        <option value="4">16:00-18:00</option>
+                        <option value="5">18:00-20:00</option>
+                        <option value="6">20:00-22:00</option>
                     </select>
                 </div>
             </div>
@@ -133,7 +132,7 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요">{{ user_memo if user_memo != None }}</textarea>
+                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요"></textarea>
             </div>
         </div>
 
@@ -167,7 +166,6 @@
             $(window).on('unload', function() {
                 if (!allowUnload) {
                     purchaseCookieClear();
-                    cancelPurchase();
                 }
             });
 
@@ -222,6 +220,48 @@
                 go('review');
             });
         });
+
+        if (Cookies.get('inputPhoneNumber')) {
+            $('#inputPhoneNumber').val(Cookies.get('inputPhoneNumber'));
+        }
+        if (Cookies.get('inputPostCode')) {
+            $('#inputPostCode').val(Cookies.get('inputPostCode'));
+        }
+        if (Cookies.get('inputAddress1')) {
+            $('#inputAddress1').val(Cookies.get('inputAddress1'));
+        }
+        if (Cookies.get('inputAddress2')) {
+            $('#inputAddress2').val(Cookies.get('inputAddress2'));
+        }
+        if (Cookies.get('inputVisitDate')) {
+            $('#inputVisitDate').val(Cookies.get('inputVisitDate'));
+        }
+        if (Cookies.get('inputVisitTime')) {
+            $('#inputVisitTime').val(Cookies.get('inputVisitTime'));
+        }
+        if (Cookies.get('optionsRevisit')) {
+            var oldOptionsRevisit = Cookies.get('optionsRevisit');
+            console.log(oldOptionsRevisit);
+            switch (oldOptionsRevisit) {
+                 case 'immediate':
+                     $(":radio[id='optionsImmediate']").attr("checked", true);
+                     $(":radio[id='optionsLater']").attr("checked", false);
+                     break;
+                 case 'later':
+                     $(":radio[id='optionsImmediate']").attr("checked", false);
+                     $(":radio[id='optionsLater']").attr("checked", true);
+                     break;
+             }
+        }
+        if (Cookies.get('inputRevisitDate')) {
+            $('#inputRevisitDate').val(Cookies.get('inputRevisitDate'));
+        }
+        if (Cookies.get('inputRevisitTime')) {
+            $('#inputRevisitTime').val(Cookies.get('inputRevisitTime'));
+        }
+        if (Cookies.get('textareaMemo')) {
+            $('#textareaMemo').val(Cookies.get('textareaMemo'));
+        }
 
         function go(dest) {
             var inputPhoneNumber = $('#inputPhoneNumber').val();
