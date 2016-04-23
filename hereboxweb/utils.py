@@ -2,8 +2,8 @@
 
 
 import re
-
 from sqlalchemy.sql import ClauseElement
+
 
 class JsonSerializable(object):
     def to_json(inst, cls):
@@ -66,4 +66,28 @@ def initialize_db():
     database.session.add(User(email='contact@herebox.kr', name='구본준', status=UserStatus.ADMIN,
                               password='akswhddk8', phone='01064849686'))
 
+    from hereboxweb.book.models import Box, BoxStatus, InStoreStatus
+    for i in xrange(1, 1000):
+        database.session.add(Box(box_id='1A%03d' % i, in_store=InStoreStatus.IN_STORE,
+                                                        status=BoxStatus.AVAILABLE))
+
     database.session.commit()
+
+
+def staff_required(func):
+    from functools import wraps
+    from flask import current_app
+    from flask.ext.login import current_user
+    from hereboxweb.auth.models import UserStatus
+
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        if current_app.login_manager._login_disabled:
+            return func(*args, **kwargs)
+        elif not current_user.is_authenticated:
+            return current_app.login_manager.unauthorized()
+        else:
+            if current_user.status < UserStatus.STAFF:
+                return current_app.login_manager.unauthorized()
+        return func(*args, **kwargs)
+    return decorated_view

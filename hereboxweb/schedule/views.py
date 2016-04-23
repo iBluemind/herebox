@@ -18,17 +18,6 @@ from hereboxweb.schedule.models import *
 SCHEDULE_LIST_MAX_COUNT = 10
 
 
-@schedule.route('/schedule', methods=['DELETE'])
-@login_required
-def new_schedule():
-
-    my_schedules = Schedule.query.filter_by(
-
-    ).limit(SCHEDULE_LIST_MAX_COUNT).all()
-
-    return render_template('my_schedule.html', active_my_index='my_schedule')
-
-
 @schedule.route('/my_schedule', methods=['GET'])
 @login_required
 def my_schedule():
