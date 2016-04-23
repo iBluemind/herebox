@@ -37,8 +37,8 @@
                             </p>
                         </div>
 
-                        <div class="checkbox">
-                            <label><input type="checkbox" value=""></label>
+                        <div class="checkbox my-herebox-stuff-checkbox">
+                            <label><input type="checkbox" name="{{ my_stuff.id }}"></label>
                         </div>
                     </div>
                 {% endfor %}
@@ -46,8 +46,8 @@
         </div>
         <div class="my-stuff-btn-group">
             <span>선택한 물품 모두</span>
-            <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
-            <button type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
+            <button id="btnDelivery" type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
+            <button id="btnExtend" type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
         </div>
     </div>
 
@@ -85,7 +85,7 @@
                         </p>
                     </div>
 
-                    <div class="checkbox">
+                    <div class="checkbox my-stuff-checkbox">
                         <label><input type="checkbox" value=""></label>
                     </div>
                 </div>
@@ -93,9 +93,36 @@
         </div>
         <div class="my-stuff-btn-group">
             <span>선택한 물품 모두</span>
-            <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
-            <button type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
+            <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
         </div>
     </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script>
+        $(document).ready(function () {
+            $("#btnExtend").click(function () {
+                var selectedStuffs = [];
+                $('.my-herebox-stuff-checkbox input:checked').each(function() {
+                    selectedStuffs.push($(this).attr('name'));
+                });
+
+                $.ajax({
+                     type: "POST",
+                     url: "/extended/estimate",
+                     data: {stuffIds: JSON.stringify(selectedStuffs)
+                     },
+                     success: function () {
+                        location.href = '/extended/estimate'
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+        });
+    </script>
 
 {% endblock %}
