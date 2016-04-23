@@ -4,9 +4,12 @@
 import datetime
 import json
 
+import sqlalchemy
 from sqlalchemy import and_
+from sqlalchemy.orm import relationship
 
 from hereboxweb import database
+from hereboxweb.auth.models import User
 from hereboxweb.utils import JsonSerializable
 
 
@@ -65,6 +68,7 @@ class Reservation(database.Model, JsonSerializable):
                                   database.ForeignKey('promotion.id'), nullable=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
+    schedules = database.relationship('Schedule', backref='reservation', lazy='dynamic')
 
     def __init__(self, reservation_type, status, standard_box_count, nonstandard_goods_count,
                                     period, fixed_rate, binding_products, user_id, promotion, contact,
@@ -133,20 +137,34 @@ class ScheduleStatus(object):
 class Schedule(database.Model, JsonSerializable):
 
     __tablename__ = 'schedule'
+    __table_args__ = (
+        sqlalchemy.ForeignKeyConstraint(['staff_id'], ['user.uid']),
+        sqlalchemy.ForeignKeyConstraint(['customer_id'], ['user.uid']),
+        sqlalchemy.ForeignKeyConstraint(['reservation_id'], ['reservation.id']),
+    )
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     status = database.Column(database.SmallInteger)
-    staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
+    schedule_type = database.Column(database.SmallInteger)
+    staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=True)
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
+    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=True)
     schedule_date = database.Column(database.DateTime)
     reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('reservation.id'), nullable=True)
+                                     database.ForeignKey('reservation.id'), nullable=False)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
+    staff = relationship(User,
+                        primaryjoin="Schedule.staff_id==User.uid",
+                        foreign_keys=User.uid)
+    customer = relationship(User,
+                            primaryjoin="Schedule.customer_id==User.uid",
+                            foreign_keys=User.uid)
 
-    def __init__(self, status, staff_id, customer_id, schedule_date, reservation_id):
+    def __init__(self, status, schedule_type, customer_id, reservation_id, schedule_date,
+                        staff_id=None, goods_id=None):
         self.status = status
+        self.schedule_type = schedule_type
         self.staff_id = staff_id
         self.customer_id = customer_id
         self.schedule_date = schedule_date

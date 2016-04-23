@@ -1,21 +1,85 @@
 # -*- coding: utf-8 -*-
+import base64
 import re
 
 from datetime import timedelta
 from flask import request, render_template, redirect, url_for, make_response, session, escape
 from flask.ext.login import login_required, current_user
+from sqlalchemy import or_
+from sqlalchemy.orm import aliased
 
 from hereboxweb import database, response_template, bad_request
 from hereboxweb.admin.models import VisitTime
+from hereboxweb.auth.models import User
 from hereboxweb.schedule import schedule
 from hereboxweb.schedule.models import *
 from hereboxweb.tasks import expire_draft_reservation
 
 
+SCHEDULE_LIST_MAX_COUNT = 10
+
+
+@schedule.route('/schedule', methods=['POST'])
+@login_required
+def new_schedule():
+
+    my_schedules = Schedule.query.filter_by(
+
+    ).limit(SCHEDULE_LIST_MAX_COUNT).all()
+
+    return render_template('my_schedule.html', active_my_index='my_schedule')
+
+
 @schedule.route('/my_schedule', methods=['GET'])
 @login_required
 def my_schedule():
-    return render_template('my_schedule.html', active_my_index='my_schedule')
+    staff = aliased(User, name="staff")
+    customer = aliased(User, name="customer")
+
+    my_pickup_schedules = database.session.query(
+        Schedule,
+        staff.name.label("staff_name"),
+        customer.name.label("customer_name")).join((staff, Schedule.staff),
+                                                  (customer, Schedule.customer)).filter(
+        Schedule.customer_id == current_user.uid,
+        or_(Schedule.schedule_type == ScheduleType.PICKUP_DELIVERY,
+            Schedule.schedule_type == ScheduleType.PICKUP_RECOVERY)
+    ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
+
+    packed_my_pickup = []
+    for item in my_pickup_schedules:
+        packed_my_pickup.append(item[0])
+
+    my_delivery_schedules = database.session.query(
+        Schedule,
+        staff.name.label("staff_name"),
+        customer.name.label("customer_name")).join((staff, Schedule.staff),
+                                                   (customer, Schedule.customer)).filter(
+        Schedule.customer_id == current_user.uid,
+        Schedule.schedule_type == ScheduleType.DELIVERY
+    ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
+
+    packed_my_delivery = []
+    for item in packed_my_delivery:
+        packed_my_delivery.append(item[0])
+
+    return render_template('my_schedule.html', active_my_index='my_schedule',
+                           packed_my_pickup=packed_my_pickup,
+                           packed_my_delivery=packed_my_delivery)
+
+
+def get_estimate():
+    estimate = request.cookies.get('estimate')
+    if estimate:
+        parsed_estimate = json.loads(estimate)
+        return parsed_estimate
+
+
+def get_order():
+    order = request.cookies.get('order')
+    if order:
+        parsed_order = json.loads(order)
+        return parsed_order
 
 
 def save_estimate():
@@ -50,26 +114,23 @@ def save_estimate():
     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
     response.headers.add('Pragma', 'no-cache')
 
-    if regular_item_count != None:
-        response.set_cookie('regularItemNumberCount', str(regular_item_count), path='/reservation/')
-    if irregular_item_count != None:
-        response.set_cookie('irregularItemNumberCount', str(irregular_item_count), path='/reservation/')
+    estimate_info = {
+        'regularItemNumberCount': regular_item_count,
+        'irregularItemNumberCount': irregular_item_count,
+        'optionsPeriod': period_option,
+        'bindingProduct0NumberCount': binding_product0_count,
+        'bindingProduct1NumberCount': binding_product1_count,
+        'bindingProduct2NumberCount': binding_product2_count,
+        'bindingProduct3NumberCount': binding_product3_count,
+        'startTime': start_time,
+    }
+
     if period != None:
-        response.set_cookie('disposableNumberCount', str(period), path='/reservation/')
-    if period_option != None:
-        response.set_cookie('optionsPeriod', str(period_option), path='/reservation/')
-    if binding_product0_count != None:
-        response.set_cookie('bindingProduct0NumberCount', str(binding_product0_count), path='/reservation/')
-    if binding_product1_count != None:
-        response.set_cookie('bindingProduct1NumberCount', str(binding_product1_count), path='/reservation/')
-    if binding_product2_count != None:
-        response.set_cookie('bindingProduct2NumberCount', str(binding_product2_count), path='/reservation/')
-    if binding_product3_count != None:
-        response.set_cookie('bindingProduct3NumberCount', str(binding_product3_count), path='/reservation/')
+        estimate_info['disposableNumberCount'] = period
     if promotion != None:
-        response.set_cookie('inputPromotion', str(promotion), path='/reservation/')
-    if start_time != None:
-        response.set_cookie('startTime', str(start_time), path='/reservation/')
+        estimate_info['inputPromotion'] = promotion
+
+    response.set_cookie('estimate', json.dumps(estimate_info), path='/reservation/')
     return response
 
 
@@ -84,7 +145,6 @@ def save_order():
     address1 = request.form.get('inputAddress1')
     address2 = request.form.get('inputAddress2')
     visit_time = request.form.get('inputVisitTime')
-    start_time = request.cookies.get('startTime')
 
     if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone_number):
         return bad_request(u'잘못된 전화번호입니다.')
@@ -105,6 +165,9 @@ def save_order():
     if revisit_option == 'immediate':
         revisit_date = visit_date
         revisit_time = visit_time
+
+    estimate = get_estimate()
+    start_time = estimate['startTime']
 
     converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
     day_standard_time1 = converted_start_time.replace(hour=17, minute=0)  # 저녁 5시 기준
@@ -128,26 +191,23 @@ def save_order():
     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
     response.headers.add('Pragma', 'no-cache')
 
-    if revisit_option != None:
-        response.set_cookie('optionsRevisit', str(revisit_option), path='/reservation/')
-    if phone_number != None:
-        response.set_cookie('inputPhoneNumber', str(phone_number), path='/reservation/')
+    order_info = {
+        'optionsRevisit': revisit_option,
+        'inputPhoneNumber': phone_number,
+        'inputVisitDate': visit_date,
+        'inputPostCode': post_code,
+        'inputVisitTime': visit_time,
+        'inputAddress1': address1,
+        'inputAddress2': address2,
+    }
+
     if revisit_time != None:
-        response.set_cookie('inputRevisitTime', str(revisit_time), path='/reservation/')
-    if user_memo != None:
-        response.set_cookie('textareaMemo', user_memo, path='/reservation/')
+        order_info['inputRevisitTime'] = revisit_time
     if revisit_date != None:
-        response.set_cookie('inputRevisitDate', str(revisit_date), path='/reservation/')
-    if visit_date != None:
-        response.set_cookie('inputVisitDate', str(visit_date), path='/reservation/')
-    if post_code != None:
-        response.set_cookie('inputPostCode', str(post_code), path='/reservation/')
-    if address1 != None:
-        response.set_cookie('inputAddress1', address1, path='/reservation/')
-    if address2 != None:
-        response.set_cookie('inputAddress2', address2, path='/reservation/')
-    if visit_time != None:
-        response.set_cookie('inputVisitTime', str(visit_time), path='/reservation/')
+        order_info['inputRevisitDate'] = revisit_date
+    if user_memo != None:
+        order_info['textareaMemo'] = user_memo
+    response.set_cookie('order', json.dumps(order_info), path='/reservation/')
     return response
 
 
@@ -157,27 +217,22 @@ def estimate():
     if request.method == 'POST':
         return save_order()
 
-    regular_item_count = request.cookies.get('regularItemNumberCount')
-    irregular_item_count = request.cookies.get('irregularItemNumberCount')
-    period = request.cookies.get('disposableNumberCount')
-    period_option = request.cookies.get('optionsPeriod')
-    binding_product0_count = request.cookies.get('bindingProduct0NumberCount')
-    binding_product1_count = request.cookies.get('bindingProduct1NumberCount')
-    binding_product2_count = request.cookies.get('bindingProduct2NumberCount')
-    binding_product3_count = request.cookies.get('bindingProduct3NumberCount')
-    promotion = request.cookies.get('inputPromotion')
+    estimate_info = get_estimate()
+    if not estimate_info:
+        return render_template('estimate.html', active_menu='reservation')
 
     response = make_response(render_template('estimate.html', active_menu='reservation',
-                                             regular_item_count=regular_item_count,
-                                             irregular_item_count=irregular_item_count,
-                                             period=period,
-                                             period_option=period_option,
-                                             binding_product0_count=binding_product0_count,
-                                             binding_product1_count=binding_product1_count,
-                                             binding_product2_count=binding_product2_count,
-                                             binding_product3_count=binding_product3_count,
-                                             promotion=promotion)
+                                             regular_item_count=estimate_info.get('regularItemNumberCount'),
+                                             irregular_item_count=estimate_info.get('irregularItemNumberCount'),
+                                             period=estimate_info.get('disposableNumberCount'),
+                                             period_option=estimate_info.get('optionsPeriod'),
+                                             binding_product0_count=estimate_info.get('bindingProduct0NumberCount'),
+                                             binding_product1_count=estimate_info.get('bindingProduct1NumberCount'),
+                                             binding_product2_count=estimate_info.get('bindingProduct2NumberCount'),
+                                             binding_product3_count=estimate_info.get('bindingProduct3NumberCount'),
+                                             promotion=estimate_info.get('inputPromotion'))
                              )
+
     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
     response.headers['Cache-Control'] = 'public, max-age=0'
     response.headers.add('Last-Modified', datetime.datetime.now())
@@ -193,50 +248,34 @@ def order():
         return save_estimate()
 
     try:
-        request.cookies['startTime']
-        request.cookies['regularItemNumberCount']
-        request.cookies['irregularItemNumberCount']
-        request.cookies['disposableNumberCount']
-        request.cookies['optionsPeriod']
-        request.cookies['bindingProduct0NumberCount']
-        request.cookies['bindingProduct1NumberCount']
-        request.cookies['bindingProduct2NumberCount']
-        request.cookies['bindingProduct3NumberCount']
+        estimate_info = get_estimate()
+        estimate_info['startTime']
+        estimate_info['regularItemNumberCount']
+        estimate_info['irregularItemNumberCount']
+        estimate_info['optionsPeriod']
+        estimate_info['bindingProduct0NumberCount']
+        estimate_info['bindingProduct1NumberCount']
+        estimate_info['bindingProduct2NumberCount']
+        estimate_info['bindingProduct3NumberCount']
     except:
         return redirect(url_for('schedule.estimate'))
 
-    revisit_option = request.cookies.get('optionsRevisit')
-    phone_number = request.cookies.get('inputPhoneNumber')
-    revisit_time = request.cookies.get('inputRevisitTime')
-    user_memo = request.cookies.get('textareaMemo')
-    start_time = request.cookies.get('startTime')
-    revisit_date = request.cookies.get('inputRevisitDate')
-    visit_date = request.cookies.get('inputVisitDate')
-    post_code = request.cookies.get('inputPostCode')
-    address1 = request.cookies.get('inputAddress1')
-    address2 = request.cookies.get('inputAddress2')
-    visit_time = request.cookies.get('inputVisitTime')
-
     response = make_response(
-        render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone,
-                        revisit_option=revisit_option,
-                        phone_number=phone_number,
-                        revisit_time=revisit_time,
-                        user_memo=user_memo,
-                        start_time=start_time,
-                        revisit_date=revisit_date,
-                        visit_date=visit_date,
-                        post_code=post_code,
-                        address1=address1,
-                        address2=address2,
-                        visit_time=visit_time)
-        )
+        render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone))
+
+    order_info = get_order()
+    if order_info:
+        response = make_response(
+            render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone,
+                                                address1=order_info.get('inputAddress1'),
+                                                address2=order_info.get('inputAddress2'),
+                                                user_memo=order_info.get('textareaMemo')))
+
     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
     response.headers['Cache-Control'] = 'public, max-age=0'
     response.headers.add('Last-Modified', datetime.datetime.now())
     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
     response.headers.add('Pragma', 'no-cache')
-
     return response
 
 
@@ -246,46 +285,41 @@ def review():
     if request.method == 'POST':
         return save_order()
 
-    try:
-        request.cookies['regularItemNumberCount']
-        request.cookies['irregularItemNumberCount']
-        request.cookies['disposableNumberCount']
-        request.cookies['optionsPeriod']
-        request.cookies['bindingProduct0NumberCount']
-        request.cookies['bindingProduct1NumberCount']
-        request.cookies['bindingProduct2NumberCount']
-        request.cookies['bindingProduct3NumberCount']
-        request.cookies['optionsRevisit']
-        request.cookies['inputPhoneNumber']
-        request.cookies['inputRevisitTime']
-        request.cookies['startTime']
-        request.cookies['inputVisitDate']
-        request.cookies['inputPostCode']
-        request.cookies['inputAddress1']
-        request.cookies['inputAddress2']
-    except:
+    estimate_info = get_estimate()
+    if not estimate_info:
         return redirect(url_for('schedule.estimate'))
 
-    regular_item_count = request.cookies.get('regularItemNumberCount')
-    irregular_item_count = request.cookies.get('irregularItemNumberCount')
-    period = request.cookies.get('disposableNumberCount')
-    period_option = request.cookies.get('optionsPeriod')
-    binding_product0_count = request.cookies.get('bindingProduct0NumberCount')
-    binding_product1_count = request.cookies.get('bindingProduct1NumberCount')
-    binding_product2_count = request.cookies.get('bindingProduct2NumberCount')
-    binding_product3_count = request.cookies.get('bindingProduct3NumberCount')
-    promotion = request.cookies.get('inputPromotion')
-    revisit_option = request.cookies.get('optionsRevisit')
-    phone_number = request.cookies.get('inputPhoneNumber')
-    revisit_time = request.cookies.get('inputRevisitTime')
-    user_memo = request.cookies.get('textareaMemo')
-    start_time = request.cookies.get('startTime')
-    revisit_date = request.cookies.get('inputRevisitDate')
-    visit_date = request.cookies.get('inputVisitDate')
-    post_code = request.cookies.get('inputPostCode')
-    address1 = request.cookies.get('inputAddress1')
-    address2 = request.cookies.get('inputAddress2')
-    visit_time = request.cookies.get('inputVisitTime')
+    regular_item_count = estimate_info.get('regularItemNumberCount')
+    irregular_item_count = estimate_info.get('irregularItemNumberCount')
+    period = estimate_info.get('disposableNumberCount')
+    period_option = estimate_info.get('optionsPeriod')
+    binding_product0_count = estimate_info.get('bindingProduct0NumberCount')
+    binding_product1_count = estimate_info.get('bindingProduct1NumberCount')
+    binding_product2_count = estimate_info.get('bindingProduct2NumberCount')
+    binding_product3_count = estimate_info.get('bindingProduct3NumberCount')
+    promotion = estimate_info.get('inputPromotion')
+    start_time = estimate_info.get('startTime')
+
+    if not start_time:
+        return redirect(url_for('schedule.estimate'))
+
+    order_info = get_order()
+    if not order_info:
+        return redirect(url_for('schedule.estimate'))
+
+    revisit_option = order_info.get('optionsRevisit')
+    phone_number = order_info.get('inputPhoneNumber')
+    revisit_time = order_info.get('inputRevisitTime')
+    user_memo = order_info.get('textareaMemo')
+    revisit_date = order_info.get('inputRevisitDate')
+    visit_date = order_info.get('inputVisitDate')
+    post_code = order_info.get('inputPostCode')
+    address1 = order_info.get('inputAddress1')
+    address2 = order_info.get('inputAddress2')
+    visit_time = order_info.get('inputVisitTime')
+
+    if not post_code:
+        return redirect(url_for('schedule.estimate'))
 
     try:
         regular_item_count = int(regular_item_count)
@@ -340,11 +374,13 @@ def review():
                                              revisit_time=revisit_time,
                                              user_memo=user_memo)
                                             )
+
     response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
     response.headers['Cache-Control'] = 'public, max-age=0'
     response.headers.add('Last-Modified', datetime.datetime.now())
     response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
     response.headers.add('Pragma', 'no-cache')
+
     response.set_cookie('totalPrice', '%d' % (calculate_total_price()), path='/reservation/')
     return response
 

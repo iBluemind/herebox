@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="col-xs-6" style="margin-top: 10px;">
-                {% if phone_number  %}
+                {% if old_phone_number  %}
                     <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
                 {% else %}
                     <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
@@ -219,49 +219,66 @@
                 allowUnload = true;
                 go('review');
             });
+
+            var orderInfo = Cookies.get('order');
+            if (orderInfo)
+                orderInfo = $.parseJSON(decode_cookie(orderInfo));
+
+            if (orderInfo && orderInfo['inputPhoneNumber']) {
+                $('#inputPhoneNumber').val(orderInfo['inputPhoneNumber']);
+            }
+            if (orderInfo && orderInfo['inputPostCode']) {
+                $('#inputPostCode').val(orderInfo['inputPostCode']);
+            }
+            if (orderInfo && orderInfo['inputAddress1']) {
+                $('#inputAddress1').val("{{ address1 }}");
+            }
+            if (orderInfo && orderInfo['inputAddress2']) {
+                $('#inputAddress2').val("{{ address2 }}");
+            }
+            if (orderInfo && orderInfo['inputVisitDate']) {
+                $('#inputVisitDate').val(orderInfo['inputVisitDate']);
+            }
+            if (orderInfo && orderInfo['inputVisitTime']) {
+                $('#inputVisitTime').val(orderInfo['inputVisitTime']);
+            }
+            if (orderInfo && orderInfo['optionsRevisit']) {
+                var oldOptionsRevisit = orderInfo['optionsRevisit'];
+                switch (oldOptionsRevisit) {
+                     case 'immediate':
+                         $(":radio[id='optionsImmediate']").attr("checked", true);
+                         $(":radio[id='optionsLater']").attr("checked", false);
+                         break;
+                     case 'later':
+                         $(":radio[id='optionsImmediate']").attr("checked", false);
+                         $(":radio[id='optionsLater']").attr("checked", true);
+                         break;
+                 }
+            }
+            if (orderInfo && orderInfo['inputRevisitDate']) {
+                $('#inputRevisitDate').val(orderInfo['inputRevisitDate']);
+            }
+            if (orderInfo && orderInfo['inputRevisitTime']) {
+                $('#inputRevisitTime').val(orderInfo['inputRevisitTime']);
+            }
+            if (orderInfo && orderInfo['textareaMemo']) {
+                $('#textareaMemo').val("{{ user_memo }}");
+            }
         });
 
-        if (Cookies.get('inputPhoneNumber')) {
-            $('#inputPhoneNumber').val(Cookies.get('inputPhoneNumber'));
-        }
-        if (Cookies.get('inputPostCode')) {
-            $('#inputPostCode').val(Cookies.get('inputPostCode'));
-        }
-        if (Cookies.get('inputAddress1')) {
-            $('#inputAddress1').val(Cookies.get('inputAddress1'));
-        }
-        if (Cookies.get('inputAddress2')) {
-            $('#inputAddress2').val(Cookies.get('inputAddress2'));
-        }
-        if (Cookies.get('inputVisitDate')) {
-            $('#inputVisitDate').val(Cookies.get('inputVisitDate'));
-        }
-        if (Cookies.get('inputVisitTime')) {
-            $('#inputVisitTime').val(Cookies.get('inputVisitTime'));
-        }
-        if (Cookies.get('optionsRevisit')) {
-            var oldOptionsRevisit = Cookies.get('optionsRevisit');
-            console.log(oldOptionsRevisit);
-            switch (oldOptionsRevisit) {
-                 case 'immediate':
-                     $(":radio[id='optionsImmediate']").attr("checked", true);
-                     $(":radio[id='optionsLater']").attr("checked", false);
-                     break;
-                 case 'later':
-                     $(":radio[id='optionsImmediate']").attr("checked", false);
-                     $(":radio[id='optionsLater']").attr("checked", true);
-                     break;
-             }
-        }
-        if (Cookies.get('inputRevisitDate')) {
-            $('#inputRevisitDate').val(Cookies.get('inputRevisitDate'));
-        }
-        if (Cookies.get('inputRevisitTime')) {
-            $('#inputRevisitTime').val(Cookies.get('inputRevisitTime'));
-        }
-        if (Cookies.get('textareaMemo')) {
-            $('#textareaMemo').val(Cookies.get('textareaMemo'));
-        }
+        $(window).load(function() {
+            var estimateInfo = Cookies.get('estimate');
+            if (estimateInfo) {
+                estimateInfo = JSON.parse(decode_cookie(estimateInfo));
+
+                if (estimateInfo['startTime']) {
+                    return ;
+                }
+            }
+
+            allowUnload = true;
+            location.href = '/reservation/estimate';
+        });
 
         function go(dest) {
             var inputPhoneNumber = $('#inputPhoneNumber').val();

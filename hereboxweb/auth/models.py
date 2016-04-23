@@ -17,6 +17,7 @@ class UserStatus(object):
 
 
 class User(database.Model, UserMixin, JsonSerializable):
+
     __tablename__ = 'user'
 
     uid = database.Column(database.Integer, primary_key=True, autoincrement=True)

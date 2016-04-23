@@ -78,11 +78,6 @@
                 }
             });
 
-            if (!Cookies.get('totalPrice')) {
-                allowUnload = true;
-                location.href = '/reservation/estimate';
-            }
-
             $('#btnPrevStep').click(function() {
                 allowUnload = true;
                 location.href = "/reservation/review";
@@ -106,5 +101,14 @@
             });
         });
 
+        $(window).load(function() {
+            var totalPrice = Cookies.get('totalPrice');
+            if (totalPrice) {
+                return ;
+            }
+
+            allowUnload = true;
+            location.href = '/reservation/estimate';
+        });
     </script>
 {% endblock %}
