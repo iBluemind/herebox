@@ -6,6 +6,7 @@ from flask.ext.login import LoginManager
 
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
     RedisConnectHelper, RedisType
+from hereboxweb.utils import initialize_db
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -82,5 +83,5 @@ app.register_blueprint(admin)
 app.register_blueprint(payment)
 app.register_blueprint(book)
 
-# database.drop_all()
-database.create_all()
+
+# initialize_db()

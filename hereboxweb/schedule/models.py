@@ -141,6 +141,7 @@ class Schedule(database.Model, JsonSerializable):
         sqlalchemy.ForeignKeyConstraint(['staff_id'], ['user.uid']),
         sqlalchemy.ForeignKeyConstraint(['customer_id'], ['user.uid']),
         sqlalchemy.ForeignKeyConstraint(['reservation_id'], ['reservation.id']),
+        sqlalchemy.ForeignKeyConstraint(['schedule_time_id'], ['visit_time.id']),
     )
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
@@ -150,6 +151,7 @@ class Schedule(database.Model, JsonSerializable):
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=True)
     schedule_date = database.Column(database.DateTime)
+    schedule_time_id = database.Column(database.Integer, database.ForeignKey('visit_time.id'), nullable=False)
     reservation_id = database.Column(database.Integer,
                                      database.ForeignKey('reservation.id'), nullable=False)
     created_at = database.Column(database.DateTime)
@@ -161,13 +163,14 @@ class Schedule(database.Model, JsonSerializable):
                             primaryjoin="Schedule.customer_id==User.uid",
                             foreign_keys=User.uid)
 
-    def __init__(self, status, schedule_type, customer_id, reservation_id, schedule_date,
+    def __init__(self, status, schedule_type, customer_id, reservation_id, schedule_date, schedule_time_id,
                         staff_id=None, goods_id=None):
         self.status = status
         self.schedule_type = schedule_type
         self.staff_id = staff_id
         self.customer_id = customer_id
         self.schedule_date = schedule_date
+        self.schedule_time_id = schedule_time_id
         self.reservation_id = reservation_id
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()

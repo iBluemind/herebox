@@ -124,20 +124,22 @@ def reservation_payment():
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
-        visit_time = VisitTime.query.get(visit_time)
         new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
                                       schedule_type=ScheduleType.PICKUP_DELIVERY,
+                                      staff_id=1,
                                       customer_id=current_user.uid,
-                                      schedule_date='%s %s' % (visit_date, visit_time),
+                                      schedule_date=visit_date,
+                                      schedule_time_id=visit_time,
                                       reservation_id=new_reservation.id)
 
         new_revisit_schedule = None
         if revisit_option == 'later':
-            revisit_time = VisitTime.query.get(revisit_time)
             new_revisit_schedule = Schedule(status=ScheduleStatus.WAITING,
                                             schedule_type=ScheduleType.PICKUP_RECOVERY,
+                                            staff_id=1,
                                             customer_id=current_user.uid,
-                                            schedule_date='%s %s' % (revisit_date, revisit_time),
+                                            schedule_date=revisit_date,
+                                            schedule_time_id=revisit_time,
                                             reservation_id=new_reservation.id)
         try:
             database.session.add(new_visit_schedule)
@@ -145,6 +147,8 @@ def reservation_payment():
                 database.session.add(new_revisit_schedule)
             logged_in_user = User.query.get(current_user.uid)
             logged_in_user.phone = phone_number
+            logged_in_user.address1 = address1
+            logged_in_user.address2 = address2
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)

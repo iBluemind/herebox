@@ -12,6 +12,7 @@ class VisitTime(database.Model, JsonSerializable):
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     start_time = database.Column(database.Time)
     end_time = database.Column(database.Time)
+    schedules = database.relationship('Schedule', backref='schedule_time', lazy='dynamic')
 
     def __init__(self, start_time, end_time):
         self.start_time = start_time

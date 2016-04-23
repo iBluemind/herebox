@@ -101,7 +101,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@auth.route('/my_info', methods=['GET'])
+@auth.route('/my_info', methods=['GET', 'POST'])
 @login_required
 def my_info():
     return render_template('my_info.html', active_my_index='my_info')
@@ -138,8 +138,6 @@ def authentication_code():
     send_sms.apply_async(args=[phone, u'[히어박스] 본인확인 인증번호[%s]를 입력해주세요.' % random_number])
 
     return response_template(u'인증번호를 발송했습니다.')
-
-
 
 
 @login_manager.unauthorized_handler
