@@ -15,25 +15,27 @@
                 <div class="my-schedule-table-cell">취소</div>
             </div>
 
-            <div class="my-schedule-table-row content">
-                <div class="my-schedule-table-cell">N1603290011</div>
-                <div class="my-schedule-table-cell">2016.03.30. 12:00 ~ 14:00</div>
-                <div class="my-schedule-table-cell">신규</div>
-                <div class="my-schedule-table-cell">구본준</div>
-                <div class="my-schedule-table-cell">완료</div>
-                <div class="my-schedule-table-cell">대기</div>
-                <div class="my-schedule-table-cell">취소</div>
-            </div>
+            {% for my_schedule in packed_my_pickup %}
+                <div class="my-schedule-table-row content">
+                    <div class="my-schedule-table-cell">{{ my_schedule.reservation.reservation_id }}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_date }}</div>
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.reservation_type == 'N' %}신규
+                        {% elif my_schedule.reservation.reservation_type == 'R' %}재보관
+                        {% endif %}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.staff[0].name }}</div>
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.purchase_type == 0 %}카드
+                        {% elif my_schedule.reservation.purchase_type == 1 %}현장
+                        {% elif my_schedule.reservation.purchase_type == 2 %}휴대폰
+                        {% elif my_schedule.reservation.purchase_type == 3 %}카카오페이
+                        {% endif %}</div>
+                    <div class="my-schedule-table-cell">{% if my_schedule.status == 0 %}대기
+                        {% elif my_schedule.status == 1 %}완료
+                        {% elif my_schedule.status == 2 %}취소
+                        {% endif %}</div>
+                    <div class="my-schedule-table-cell">취소</div>
+                </div>
+            {% endfor %}
 
-            <div class="my-schedule-table-row content">
-                <div class="my-schedule-table-cell">N1603290011</div>
-                <div class="my-schedule-table-cell">2016.03.30. 12:00 ~ 14:00</div>
-                <div class="my-schedule-table-cell">신규</div>
-                <div class="my-schedule-table-cell">구본준</div>
-                <div class="my-schedule-table-cell">완료</div>
-                <div class="my-schedule-table-cell">대기</div>
-                <div class="my-schedule-table-cell">취소</div>
-            </div>
         </div>
         <p class="my-schedule-warning">
             * 주문번호를 누르시면 자세한 내용을 확인할 수 있습니다<br>
@@ -56,15 +58,26 @@
                 <div class="my-schedule-table-cell">취소</div>
             </div>
 
-            <div class="my-schedule-table-row content">
-                <div class="my-schedule-table-cell">D1603290011</div>
-                <div class="my-schedule-table-cell">2016.03.30. 12:00 ~ 14:00</div>
-                <div class="my-schedule-table-cell">신규</div>
-                <div class="my-schedule-table-cell">구본준</div>
-                <div class="my-schedule-table-cell">완료</div>
-                <div class="my-schedule-table-cell">대기</div>
-                <div class="my-schedule-table-cell">취소</div>
-            </div>
+            {% for my_schedule in packed_my_delivery %}
+                <div class="my-schedule-table-row content">
+                    <div class="my-schedule-table-cell">{{ my_schedule.reservation.reservation_id }}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_date }}</div>
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.reservation_type == 'N' %}신규
+                        {% elif my_schedule.reservation.reservation_type == 'R' %}재보관
+                        {% endif %}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.staff.name }}</div>
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.purchase_type == 0 %}카드
+                        {% elif my_schedule.reservation.purchase_type == 1 %}현장
+                        {% elif my_schedule.reservation.purchase_type == 2 %}휴대폰
+                        {% elif my_schedule.reservation.purchase_type == 3 %}카카오페이
+                        {% endif %}</div>
+                    <div class="my-schedule-table-cell">{% if my_schedule.status == 0 %}대기
+                        {% elif my_schedule.status == 1 %}완료
+                        {% elif my_schedule.status == 2 %}취소
+                        {% endif %}</div>
+                    <div class="my-schedule-table-cell">취소</div>
+                </div>
+            {% endfor %}
         </div>
         <p class="my-schedule-warning">
             * 주문번호를 누르시면 자세한 내용을 확인할 수 있습니다<br>

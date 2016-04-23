@@ -6,36 +6,43 @@ from datetime import timedelta
 from flask import request, render_template, escape, session, redirect, url_for, make_response
 from flask.ext.login import login_required, current_user
 from hereboxweb import database, response_template, bad_request
+from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
-from hereboxweb.schedule.models import Reservation, ReservationStatus, ReservationType, PurchaseType
+from hereboxweb.schedule.models import Reservation, ReservationStatus, ReservationType, PurchaseType, Schedule, \
+    ScheduleStatus, ScheduleType
+from hereboxweb.schedule.views import get_order, get_estimate
 
 
 @payment.route('/reservation/payment', methods=['GET', 'POST'])
 @login_required
 def reservation_payment():
     if request.method == 'POST':
-        regular_item_count = request.cookies.get('regularItemNumberCount')
-        irregular_item_count = request.cookies.get('irregularItemNumberCount')
-        period = request.cookies.get('disposableNumberCount')
-        period_option = request.cookies.get('optionsPeriod')
-        binding_product0_count = request.cookies.get('bindingProduct0NumberCount')
-        binding_product1_count = request.cookies.get('bindingProduct1NumberCount')
-        binding_product2_count = request.cookies.get('bindingProduct2NumberCount')
-        binding_product3_count = request.cookies.get('bindingProduct3NumberCount')
-        promotion = request.cookies.get('inputPromotion')
-        revisit_option = request.cookies.get('optionsRevisit')
-        phone_number = request.cookies.get('inputPhoneNumber')
-        revisit_time = request.cookies.get('inputRevisitTime')
-        user_memo = request.cookies.get('textareaMemo')
-        start_time = request.cookies.get('startTime')
-        revisit_date = request.cookies.get('inputRevisitDate')
-        visit_date = request.cookies.get('inputVisitDate')
-        post_code = request.cookies.get('inputPostCode')
-        address1 = request.cookies.get('inputAddress1')
-        address2 = request.cookies.get('inputAddress2')
-        visit_time = request.cookies.get('inputVisitTime')
+        estimate_info = get_estimate()
+        regular_item_count = estimate_info.get('regularItemNumberCount')
+        irregular_item_count = estimate_info.get('irregularItemNumberCount')
+        period = estimate_info.get('disposableNumberCount')
+        period_option = estimate_info.get('optionsPeriod')
+        binding_product0_count = estimate_info.get('bindingProduct0NumberCount')
+        binding_product1_count = estimate_info.get('bindingProduct1NumberCount')
+        binding_product2_count = estimate_info.get('bindingProduct2NumberCount')
+        binding_product3_count = estimate_info.get('bindingProduct3NumberCount')
+        promotion = estimate_info.get('inputPromotion')
+        start_time = estimate_info.get('startTime')
+
+        order_info = get_order()
+        revisit_option = order_info.get('optionsRevisit')
+        phone_number = order_info.get('inputPhoneNumber')
+        revisit_time = order_info.get('inputRevisitTime')
+        user_memo = order_info.get('textareaMemo')
+        revisit_date = order_info.get('inputRevisitDate')
+        visit_date = order_info.get('inputVisitDate')
+        post_code = order_info.get('inputPostCode')
+        address1 = order_info.get('inputAddress1')
+        address2 = order_info.get('inputAddress2')
+        visit_time = order_info.get('inputVisitTime')
+
         purchase_type = request.form.get('optionsPayType')
 
         try:
@@ -72,8 +79,6 @@ def reservation_payment():
         converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
         day_standard_time1 = converted_start_time.replace(hour=17, minute=0)  # 저녁 5시 기준
         day_standard_time2 = converted_start_time.replace(hour=23, minute=59, second=59)
-
-        print day_standard_time1.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
         if converted_start_time > day_standard_time1 and converted_start_time <= day_standard_time2:
             converted_visit_date = datetime.datetime.strptime(visit_date, "%Y-%m-%d")
@@ -115,6 +120,29 @@ def reservation_payment():
 
         try:
             database.session.add(new_reservation)
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
+
+        visit_time = VisitTime.query.get(visit_time)
+        new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                      schedule_type=ScheduleType.PICKUP_DELIVERY,
+                                      customer_id=current_user.uid,
+                                      schedule_date='%s %s' % (visit_date, visit_time),
+                                      reservation_id=new_reservation.id)
+
+        new_revisit_schedule = None
+        if revisit_option == 'later':
+            revisit_time = VisitTime.query.get(revisit_time)
+            new_revisit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                            schedule_type=ScheduleType.PICKUP_RECOVERY,
+                                            customer_id=current_user.uid,
+                                            schedule_date='%s %s' % (revisit_date, revisit_time),
+                                            reservation_id=new_reservation.id)
+        try:
+            database.session.add(new_visit_schedule)
+            if new_revisit_schedule:
+                database.session.add(new_revisit_schedule)
             logged_in_user = User.query.get(current_user.uid)
             logged_in_user.phone = phone_number
             database.session.commit()
@@ -122,45 +150,20 @@ def reservation_payment():
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
         return response_template(u'정상 처리되었습니다', 200)
 
-    regular_item_count = request.cookies.get('regularItemNumberCount')
-    irregular_item_count = request.cookies.get('irregularItemNumberCount')
-    period = request.cookies.get('disposableNumberCount')
-    period_option = request.cookies.get('optionsPeriod')
-    binding_product0_count = request.cookies.get('bindingProduct0NumberCount')
-    binding_product1_count = request.cookies.get('bindingProduct1NumberCount')
-    binding_product2_count = request.cookies.get('bindingProduct2NumberCount')
-    binding_product3_count = request.cookies.get('bindingProduct3NumberCount')
-    promotion = request.cookies.get('inputPromotion')
-    revisit_option = request.cookies.get('optionsRevisit')
-    phone_number = request.cookies.get('inputPhoneNumber')
-    revisit_time = request.cookies.get('inputRevisitTime')
-    user_memo = request.cookies.get('textareaMemo')
-    start_time = request.cookies.get('startTime')
-    revisit_date = request.cookies.get('inputRevisitDate')
-    visit_date = request.cookies.get('inputVisitDate')
-    post_code = request.cookies.get('inputPostCode')
-    address1 = request.cookies.get('inputAddress1')
-    address2 = request.cookies.get('inputAddress2')
-    visit_time = request.cookies.get('inputVisitTime')
+
+    estimate_info = get_estimate()
+    regular_item_count = estimate_info.get('regularItemNumberCount')
+    irregular_item_count = estimate_info.get('irregularItemNumberCount')
+    period = estimate_info.get('disposableNumberCount')
+    period_option = estimate_info.get('optionsPeriod')
+    binding_product0_count = estimate_info.get('bindingProduct0NumberCount')
+    binding_product1_count = estimate_info.get('bindingProduct1NumberCount')
+    binding_product2_count = estimate_info.get('bindingProduct2NumberCount')
+    binding_product3_count = estimate_info.get('bindingProduct3NumberCount')
 
     try:
+        estimate_info.get('startTime')
         request.cookies['totalPrice']
-        request.cookies['regularItemNumberCount']
-        request.cookies['irregularItemNumberCount']
-        request.cookies['disposableNumberCount']
-        request.cookies['optionsPeriod']
-        request.cookies['bindingProduct0NumberCount']
-        request.cookies['bindingProduct1NumberCount']
-        request.cookies['bindingProduct2NumberCount']
-        request.cookies['bindingProduct3NumberCount']
-        request.cookies['optionsRevisit']
-        request.cookies['inputPhoneNumber']
-        request.cookies['startTime']
-        request.cookies['inputVisitDate']
-        request.cookies['inputPostCode']
-        request.cookies['inputAddress1']
-        request.cookies['inputAddress2']
-        request.cookies['inputVisitTime']
     except:
         return redirect(url_for('schedule.estimate'))
 

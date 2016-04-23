@@ -262,11 +262,15 @@
                 }
             });
 
+            var estimateInfo = Cookies.get('estimate');
+            if (estimateInfo)
+                estimateInfo = $.parseJSON(decode_cookie(estimateInfo));
+
             var regularItem = $('#regularItem');
             var regularItemSubtract = regularItem.find('.subtract');
             var regularItemNumber = regularItem.find('.number');
-            if (Cookies.get('regularItemNumberCount')) {
-                var oldRegularItemNumberCount = Cookies.get('regularItemNumberCount');
+            if (estimateInfo && estimateInfo['regularItemNumberCount']) {
+                var oldRegularItemNumberCount = estimateInfo['regularItemNumberCount'];
                 regularItemNumber.text(oldRegularItemNumberCount);
             }
 
@@ -274,8 +278,8 @@
             var irregularItem = $('#irregularItem');
             var irregularItemSubtract = irregularItem.find('.subtract');
             var irregularItemNumber = irregularItem.find('.number');
-            if (Cookies.get('irregularItemNumberCount')) {
-                var oldIrregularItemNumberCount = Cookies.get('irregularItemNumberCount');
+            if (estimateInfo && estimateInfo['irregularItemNumberCount']) {
+                var oldIrregularItemNumberCount = estimateInfo['irregularItemNumberCount'];
                 irregularItemNumber.text(oldIrregularItemNumberCount);
             }
 
@@ -283,8 +287,8 @@
             var disposable = $('#disposable');
             var disposableSubtract = disposable.find('.subtract');
             var disposableNumber = disposable.find('.number');
-            if (Cookies.get('disposableNumberCount')) {
-                var oldDisposableNumberCount = Cookies.get('disposableNumberCount');
+            if (estimateInfo && estimateInfo['disposableNumberCount']) {
+                var oldDisposableNumberCount = estimateInfo['disposableNumberCount'];
                 disposableNumber.text(oldDisposableNumberCount);
             }
 
@@ -292,8 +296,8 @@
             var bindingProduct0 = $('#bindingProduct0');
             var bindingProduct0Subtract = bindingProduct0.find('.subtract');
             var bindingProduct0Number = bindingProduct0.find('.number');
-            if (Cookies.get('bindingProduct0NumberCount')) {
-                var oldBindingProduct0NumberCount = Cookies.get('bindingProduct0NumberCount');
+            if (estimateInfo && estimateInfo['bindingProduct0NumberCount']) {
+                var oldBindingProduct0NumberCount = estimateInfo['bindingProduct0NumberCount'];
                 bindingProduct0Number.text(oldBindingProduct0NumberCount);
             }
 
@@ -301,8 +305,8 @@
             var bindingProduct1 = $('#bindingProduct1');
             var bindingProduct1Subtract = bindingProduct1.find('.subtract');
             var bindingProduct1Number = bindingProduct1.find('.number');
-            if (Cookies.get('bindingProduct1NumberCount')) {
-                var oldBindingProduct1NumberCount = Cookies.get('bindingProduct1NumberCount');
+            if (estimateInfo && estimateInfo['bindingProduct1NumberCount']) {
+                var oldBindingProduct1NumberCount = estimateInfo['bindingProduct1NumberCount'];
                 bindingProduct1Number.text(oldBindingProduct1NumberCount);
             }
 
@@ -310,8 +314,8 @@
             var bindingProduct2 = $('#bindingProduct2');
             var bindingProduct2Subtract = bindingProduct2.find('.subtract');
             var bindingProduct2Number = bindingProduct2.find('.number');
-            if (Cookies.get('bindingProduct2NumberCount')) {
-                var oldBindingProduct2NumberCount = Cookies.get('bindingProduct2NumberCount');
+            if (estimateInfo && estimateInfo['bindingProduct2NumberCount']) {
+                var oldBindingProduct2NumberCount = estimateInfo['bindingProduct2NumberCount'];
                 bindingProduct2Number.text(oldBindingProduct2NumberCount);
             }
 
@@ -319,15 +323,15 @@
             var bindingProduct3 = $('#bindingProduct3');
             var bindingProduct3Subtract = bindingProduct3.find('.subtract');
             var bindingProduct3Number = bindingProduct3.find('.number');
-            if (Cookies.get('bindingProduct3NumberCount')) {
-                var oldBindingProduct3NumberCount = Cookies.get('bindingProduct3NumberCount');
+            if (estimateInfo && estimateInfo['bindingProduct3NumberCount']) {
+                var oldBindingProduct3NumberCount = estimateInfo['bindingProduct3NumberCount'];
                 bindingProduct3Number.text(oldBindingProduct3NumberCount);
             }
 
             var bindingProduct3Add = bindingProduct3.find('.add');
 
-            if (Cookies.get('optionsPeriod')) {
-                var optionsPeriod = Cookies.get('optionsPeriod');
+            if (estimateInfo && estimateInfo['optionsPeriod']) {
+                var optionsPeriod = estimateInfo['optionsPeriod'];
                 if (optionsPeriod == 'disposable') {
                     $("input:radio[id='optionsDisposable']").attr("checked", true);
                 } else {

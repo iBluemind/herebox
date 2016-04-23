@@ -21,8 +21,8 @@ class DBType(object):
 
 class DBConnectHelper(object):
     DATABASES = {
-        DBType.MAIN_DB:    'mysql+mysqldb://herebox:herebox@manjong.org:3306/herebox?charset=utf8&use_unicode=0',
-        # DBType.MAIN_DB: 'mysql+mysqldb://hereboxadmin:akswhddk8@hereboxweb.chptj9arzq1g.ap-northeast-2.rds.amazonaws.com:3306/herebox?charset=utf8&use_unicode=0',
+        # DBType.MAIN_DB:    'mysql+mysqldb://herebox:herebox@manjong.org:3306/herebox?charset=utf8&use_unicode=0',
+        DBType.MAIN_DB: 'mysql+mysqldb://hereboxadmin:akswhddk8@hereboxweb.chptj9arzq1g.ap-northeast-2.rds.amazonaws.com:3306/herebox?charset=utf8&use_unicode=0',
     }
 
     def __init__(self, app):

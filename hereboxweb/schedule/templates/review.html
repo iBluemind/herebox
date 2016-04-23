@@ -167,11 +167,6 @@
                 }
             });
 
-            if (!Cookies.get('startTime')) {
-                allowUnload = true;
-                location.href = '/reservation/estimate';
-            }
-
             $('#btnPrevStep').click(function() {
                 allowUnload = true;
                 location.href = '/reservation/order';
@@ -186,6 +181,20 @@
                 allowUnload = true;
                 location.href = '/reservation/payment';
             });
+        });
+
+        $(window).load(function() {
+            var orderInfo = Cookies.get('order');
+            if (orderInfo) {
+                orderInfo = JSON.parse(decode_cookie(orderInfo));
+
+                if (orderInfo['inputPostCode']) {
+                    return ;
+                }
+            }
+
+            allowUnload = true;
+            location.href = '/reservation/estimate';
         });
     </script>
 
