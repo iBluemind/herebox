@@ -13,7 +13,6 @@ from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.schedule import schedule
 from hereboxweb.schedule.models import *
-from hereboxweb.tasks import expire_draft_reservation
 
 
 SCHEDULE_LIST_MAX_COUNT = 10
@@ -60,7 +59,7 @@ def my_schedule():
     ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
 
     packed_my_delivery = []
-    for item in packed_my_delivery:
+    for item in my_delivery_schedules:
         packed_my_delivery.append(item[0])
 
     return render_template('my_schedule.html', active_my_index='my_schedule',

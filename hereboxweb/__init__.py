@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-import logging
 from flask import Flask
 from flask.ext.login import LoginManager
 
-from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType
-    # RedisConnectHelper, RedisType
+from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
+    RedisConnectHelper, RedisType
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -20,8 +19,6 @@ app.config['SECRET_KEY'] = 'hEREboXiSthEBeST'
 from config import SQLALCHEMY_ECHO, SQLALCHEMY_POOL_RECYCLE, \
     SQLALCHEMY_POOL_SIZE, response_template, SQLALCHEMY_TRACK_MODIFICATIONS
 
-# REDIS_PASSWORD, REDIS_PORT,REDIS_HOST,
-
 app.config['SQLALCHEMY_ECHO'] = SQLALCHEMY_ECHO
 app.config['SQLALCHEMY_POOL_RECYCLE'] = SQLALCHEMY_POOL_RECYCLE
 app.config['SQLALCHEMY_POOL_SIZE'] = SQLALCHEMY_POOL_SIZE
@@ -31,11 +28,8 @@ db_helper = DBConnectHelper(app)
 database = db_helper.get_db(DBConnectorType.USE_SQLALCHEMY, DBType.MAIN_DB)
 
 # Redis
-# redis_sessions = RedisConnectHelper(RedisType.SESSION_REDIS)
+auth_code_redis = RedisConnectHelper(RedisType.AUTH_CODE_REDIS)
 
-# SECRET KEY 설정
-# from config import GEARCOACH_SECRET_KEY
-# app.secret_key = GEARCOACH_SECRET_KEY
 
 # Status 400 응답
 @app.errorhandler(400)

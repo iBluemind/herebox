@@ -2,19 +2,22 @@
 
 
 import base64
+import re
+
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from flask import request, render_template
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
-from flask import request, url_for, redirect, flash
-from hereboxweb import database, response_template, bad_request, unauthorized, login_manager
+from flask import request, url_for, redirect, flash, session, escape
+from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis
 from hereboxweb.auth import auth
 from hereboxweb.auth.crypto import AESCipher
 from hereboxweb.auth.forms import LoginForm, SignupForm
 from hereboxweb.auth.models import User
 from config import RSA_PUBLIC_KEY_BASE64
 from config import RSA_PRIVATE_KEY_BASE64
+from hereboxweb.tasks import send_sms
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -102,6 +105,35 @@ def logout():
 @login_required
 def my_info():
     return render_template('my_info.html', active_my_index='my_info')
+
+
+@auth.route('/authentication_code', methods=['POST', 'GET'])
+@login_required
+def authentication_code():
+    if request.method == 'GET':
+        user_auth_code = request.args.get('auth_code')
+        auth_codes = auth_code_redis.get_redis()
+        if auth_codes.get(user_auth_code) is None:
+            auth_codes.delete(user_auth_code)
+            session['phone_authentication'] = True
+            return response_template(u'인증에 성공했습니다.')
+        return bad_request(u'인증에 실패했습니다.')
+
+    phone = request.form.get('phone')
+    if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone):
+        return bad_request(u'잘못된 전화번호입니다.')
+
+    import random
+    random_number = str(random.randint(1111, 9999))
+
+    auth_codes = auth_code_redis.get_redis()
+    auth_codes.set(random_number, current_user.uid)
+
+    send_sms.apply_async(args=[phone, u'[히어박스] 본인확인 인증번호[%s]를 입력해주세요.' % random_number])
+
+    return response_template(u'인증번호를 발송했습니다.')
+
+
 
 
 @login_manager.unauthorized_handler

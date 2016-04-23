@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import coolsms
 from celery import Celery
 from gcm import GCM
-from config import RABBIT_MQ_USER, RABBIT_MQ_HOST, RABBIT_MQ_PASSWORD, RABBIT_MQ_PORT, RABBIT_MQ_VHOST
+from config import RABBIT_MQ_USER, RABBIT_MQ_HOST, RABBIT_MQ_PASSWORD, RABBIT_MQ_PORT, RABBIT_MQ_VHOST, COOLSMS_API_KEY, \
+    COOLSMS_API_KEY_SECRET
 from hereboxweb import database
+from hereboxweb.auth.models import User
 from hereboxweb.schedule.models import Reservation, ReservationStatus
 
 
@@ -12,16 +15,15 @@ tasks = Celery(broker='amqp://%s:%s@%s:%s/%s' % (RABBIT_MQ_USER, RABBIT_MQ_PASSW
 
 
 @tasks.task
-def expire_draft_reservation(id, user_id):
-    Reservation.query.filter_by(
-        id=id,
-        status=ReservationStatus.DRAFT,
-        user_id=user_id).delete()
-    database.session.commit()
+def send_sms_to_user(uid, message):
+    user = User.query.get(uid)
+    if user:
+        phone = user.phone
+        cool = coolsms.rest(COOLSMS_API_KEY, COOLSMS_API_KEY_SECRET)
+        status = cool.send(phone, message, '01064849686')
 
 
 @tasks.task
-def get_valid_reservation(id, status, uid):
-    return Reservation.query.filter_by(id=id,
-                                status=status,
-                                user_id=uid).first()
+def send_sms(phone, message):
+    cool = coolsms.rest(COOLSMS_API_KEY, COOLSMS_API_KEY_SECRET)
+    status = cool.send(phone, message, '01064849686')
