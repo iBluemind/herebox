@@ -18,7 +18,7 @@ from hereboxweb.schedule.models import *
 SCHEDULE_LIST_MAX_COUNT = 10
 
 
-@schedule.route('/schedule', methods=['POST'])
+@schedule.route('/schedule', methods=['DELETE'])
 @login_required
 def new_schedule():
 

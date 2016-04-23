@@ -25,19 +25,22 @@ class User(database.Model, UserMixin, JsonSerializable):
     name = database.Column(database.String(20), nullable=False)
     email = database.Column(database.String(30), unique=True, nullable=False)
     password = database.Column(database.Text, nullable=False)
-    address = database.Column(database.String(20), nullable=True)
+    address1 = database.Column(database.String(200), nullable=True)
+    address2 = database.Column(database.String(200), nullable=True)
     status = database.Column(database.SmallInteger, nullable=False)
     created_at = database.Column(database.DateTime)
     goods = database.relationship('Goods', backref='user', lazy='dynamic')
     reservations = database.relationship('Reservation', backref='user', lazy='dynamic')
 
-    def __init__(self, email, name, address=None, status=UserStatus.NORMAL, password=None, phone=None):
+    def __init__(self, email, name, address1=None, address2=None,
+                 status=UserStatus.NORMAL, password=None, phone=None):
         self.phone = phone
         self.password = self.encrypt_password(password) if password != None else ''
         self.name = name
         self.email = email
         self.status = status
-        self.address = address
+        self.address1 = address1
+        self.address2 = address2
         self.created_at = datetime.datetime.now()
 
     @staticmethod

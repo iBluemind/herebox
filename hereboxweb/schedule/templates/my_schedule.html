@@ -3,7 +3,7 @@
 
 
     <div class="my-schedule">
-        <div class="my-schedule-title">픽업 스케줄 (2)</div>
+        <div class="my-schedule-title">픽업 스케줄 ({{ packed_my_pickup|length }})</div>
         <div class="my-schedule-table">
             <div class="my-schedule-table-row field">
                 <div class="my-schedule-table-cell">주문번호</div>
@@ -18,7 +18,7 @@
             {% for my_schedule in packed_my_pickup %}
                 <div class="my-schedule-table-row content">
                     <div class="my-schedule-table-cell">{{ my_schedule.reservation.reservation_id }}</div>
-                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_date }}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
                     <div class="my-schedule-table-cell">{% if my_schedule.reservation.reservation_type == 'N' %}신규
                         {% elif my_schedule.reservation.reservation_type == 'R' %}재보관
                         {% endif %}</div>
@@ -46,7 +46,7 @@
     </div>
 
     <div class="my-schedule">
-        <div class="my-schedule-title">배송 스케줄 (1)</div>
+        <div class="my-schedule-title">배송 스케줄 ({{ packed_my_delivery|length }})</div>
         <div class="my-schedule-table">
             <div class="my-schedule-table-row field">
                 <div class="my-schedule-table-cell">주문번호</div>
@@ -61,7 +61,7 @@
             {% for my_schedule in packed_my_delivery %}
                 <div class="my-schedule-table-row content">
                     <div class="my-schedule-table-cell">{{ my_schedule.reservation.reservation_id }}</div>
-                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_date }}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_date.strftime('%Y-%m-%d') }} {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
                     <div class="my-schedule-table-cell">{% if my_schedule.reservation.reservation_type == 'N' %}신규
                         {% elif my_schedule.reservation.reservation_type == 'R' %}재보관
                         {% endif %}</div>

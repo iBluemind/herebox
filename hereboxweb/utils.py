@@ -5,7 +5,6 @@ import re
 
 from sqlalchemy.sql import ClauseElement
 
-
 class JsonSerializable(object):
     def to_json(inst, cls):
         d = {}
@@ -48,3 +47,23 @@ def get_or_create(session, model, defaults=None, **kwargs):
             params.update(defaults)
         instance = model(**params)
         return instance
+
+
+def initialize_db():
+    from hereboxweb import database
+    from hereboxweb.admin.models import VisitTime
+    from hereboxweb.auth.models import User, UserStatus
+
+    database.drop_all()
+    database.create_all()
+
+    database.session.add(VisitTime(start_time='10:00', end_time='12:00'))
+    database.session.add(VisitTime(start_time='12:00', end_time='14:00'))
+    database.session.add(VisitTime(start_time='14:00', end_time='16:00'))
+    database.session.add(VisitTime(start_time='16:00', end_time='18:00'))
+    database.session.add(VisitTime(start_time='18:00', end_time='20:00'))
+    database.session.add(VisitTime(start_time='20:00', end_time='22:00'))
+    database.session.add(User(email='contact@herebox.kr', name='구본준', status=UserStatus.ADMIN,
+                              password='akswhddk8', phone='01064849686'))
+
+    database.session.commit()
