@@ -377,3 +377,21 @@ def review():
 @login_required
 def completion():
     return render_template('completion.html', active_menu='reservation')
+
+
+@schedule.route('/extended/estimate', methods=['GET'])
+@login_required
+def extended_estimate():
+    return render_template('extended_estimate.html', active_menu='reservation')
+
+
+@schedule.route('/extended/review', methods=['GET'])
+@login_required
+def extended_review():
+    return render_template('extended_review.html', active_menu='reservation')
+
+
+@schedule.route('/extended/completion', methods=['GET'])
+@login_required
+def extended_completion():
+    return render_template('extended_completion.html', active_menu='reservation')

@@ -3,21 +3,21 @@
 
     <div class="container">
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/5-step-5.png') }}">
+            <img src="{{ url_for('static', filename='assets/img/4-step-2-4.png') }}">
         </div>
 
         <div style="text-align: center; margin: 70px 0 100px 0; color: #212121;">
             <div>
                 <img src="{{ url_for('static', filename='assets/img/mark-complete.png') }}">
-                <span style="font-family: 'Nanum Barun Gothic Light', sans-serif; display: block; font-size: 20px; margin-top: 20px;">예약이 성공적으로 완료되었습니다!</span>
+                <span style="font-family: 'Nanum Barun Gothic Light', sans-serif; display: block; font-size: 20px; margin-top: 20px;">연장이 성공적으로 완료되었습니다!</span>
             </div>
 
             <div style="font-family: 'Nanum Barun Gothic Light', sans-serif;">
-                예약한 스케줄은 ‘내 스케줄’ 메뉴에서 언제든 확인할 수 있습니다
+                연장한 물품은 ‘보관 중인 물품’ 메뉴에서 언제든 확인할 수 있습니다
             </div>
 
             <div style="margin-top: 20px;">
-                <a href="/my_schedule" style="font-size: 14px; color: #ffa000;">내 스케줄 보기 ></a>
+                <a href="/my_schedule" style="font-size: 14px; color: #ffa000;">보관 중인 스케줄 보기 ></a>
             </div>
         </div>
     </div>
@@ -29,12 +29,12 @@
     <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
 
     <script>
-        $(document).ready(function() {
-            var totalPrice = Cookies.get('totalPrice');
-            if (!totalPrice) {
-                location.href = '/reservation/estimate';
-            }
-            purchaseCookieClear();
-        });
+{#        $(document).ready(function() {#}
+{#            var totalPrice = Cookies.get('totalPrice');#}
+{#            if (!totalPrice) {#}
+{#                location.href = '/reservation/estimate';#}
+{#            }#}
+{#            purchaseCookieClear();#}
+{#        });#}
     </script>
 {% endblock %}
