@@ -111,13 +111,19 @@ def my_info():
 @login_required
 def authentication_code():
     if request.method == 'GET':
-        user_auth_code = request.args.get('auth_code')
+        user_auth_code = request.args.get('authCode')
+        print user_auth_code
+        if not re.match('^([0-9]{4})$', user_auth_code):
+            return bad_request(u'올바른 인증코드를 입력해주세요.')
+
         auth_codes = auth_code_redis.get_redis()
         if auth_codes.get(user_auth_code) is None:
-            auth_codes.delete(user_auth_code)
-            session['phone_authentication'] = True
-            return response_template(u'인증에 성공했습니다.')
-        return bad_request(u'인증에 실패했습니다.')
+            return bad_request(u'인증에 실패했습니다.')
+
+        auth_codes.delete(user_auth_code)
+        session['phone_authentication'] = True
+        return response_template(u'인증에 성공했습니다.')
+
 
     phone = request.form.get('phone')
     if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone):

@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="form-group col-xs-12">
-            <label id="newUserPhone" for="inputPhone" class="col-xs-4 control-label">핸드폰 번호</label>
+            <label for="inputPhone" class="col-xs-4 control-label">핸드폰 번호</label>
             <div class="col-xs-6" style="padding-right: 5px;">
                 <input id="inputNewPhone" type="tel" class="form-control" placeholder="핸드폰 번호를 입력해주세요">
             </div>
@@ -66,16 +66,17 @@
 
             $("#btnAuthCode").click(function () {
 
-                var newUserPhone = $("#newUserPhone").val();
+                var newUserPhone = $("#inputNewPhone").val();
                 var phoneRegex = /^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$/;
                 if (!phoneRegex.test(newUserPhone)) {
                     alert("핸드폰 번호를 하이픈(-) 없이 입력해주세요.");
+                    return ;
                 }
 
                 $.ajax({
                      type: "POST",
                      url: "/authentication_code",
-                     data: {phone: $("#inputNewPhone").val()
+                     data: {phone: newUserPhone
                      },
                      success: function () {
                         alert("인증번호를 발송했습니다.");
@@ -94,10 +95,17 @@
                     return ;
                 }
 
+                var userAuthCode = $("#inputCode").val();
+                var authCodeRegex = /^([0-9]{4})$/;
+                if (!authCodeRegex.test(userAuthCode)) {
+                    alert("올바른 인증코드를 입력해주세요.");
+                    return ;
+                }
+
                 $.ajax({
                      type: "GET",
                      url: "/authentication_code",
-                     data: {phone: $("#inputCode").val()
+                     data: {authCode: userAuthCode
                      },
                      success: function () {
                         alert("인증에 성공했습니다.");
