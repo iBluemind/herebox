@@ -39,27 +39,77 @@
             </div>
         </div>
         <div class="form-group col-xs-12">
-            <label for="inputPhone" class="col-xs-4 control-label">핸드폰 번호</label>
+            <label id="newUserPhone" for="inputPhone" class="col-xs-4 control-label">핸드폰 번호</label>
             <div class="col-xs-6" style="padding-right: 5px;">
-                <input type="tel" class="form-control" id="inputPhone" placeholder="핸드폰 번호를 입력해주세요">
+                <input id="inputNewPhone" type="tel" class="form-control" placeholder="핸드폰 번호를 입력해주세요">
             </div>
-            <button type="button" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">인증번호 받기</button>
+            <button type="button" id="btnAuthCode" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">인증번호 받기</button>
         </div>
         <div class="form-group col-xs-12">
             <label for="inputCode" class="col-xs-4 control-label"></label>
             <div class="col-xs-6" style="padding-right: 5px;">
                 <input type="text" class="form-control" id="inputCode" placeholder="인증번호를 입력하세요">
             </div>
-            <button type="button" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">확인</button>
-        </div>
-        <div class="form-group col-xs-12">
-            <label for="inputNewPhone" class="col-xs-4 control-label"></label>
-            <div class="col-xs-8" style="padding-right: 0;">
-                <input type="tel" class="form-control" id="inputNewPhone" placeholder="변경하실 핸드폰 번호를 입력하세요">
-            </div>
+            <button id="btnAuthCodeCheck" type="button" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">확인</button>
         </div>
 
         <button type="submit" class="btn btn-hbprimary" style="margin: 100px 0 100px;">수정하기</button>
     </form>
+
+{% endblock %}
+{% block jscript %}
+
+    <script>
+
+        $(document).ready(function () {
+            var isBtnAuthCode = false;
+
+            $("#btnAuthCode").click(function () {
+
+                var newUserPhone = $("#newUserPhone").val();
+                var phoneRegex = /^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$/;
+                if (!phoneRegex.test(newUserPhone)) {
+                    alert("핸드폰 번호를 하이픈(-) 없이 입력해주세요.");
+                }
+
+                $.ajax({
+                     type: "POST",
+                     url: "/authentication_code",
+                     data: {phone: $("#inputNewPhone").val()
+                     },
+                     success: function () {
+                        alert("인증번호를 발송했습니다.");
+                        isBtnAuthCode = true;
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+
+            $("#btnAuthCodeCheck").click(function () {
+                if (!isBtnAuthCode) {
+                    alert("인증번호 받기 버튼을 먼저 눌러주세요.");
+                    return ;
+                }
+
+                $.ajax({
+                     type: "GET",
+                     url: "/authentication_code",
+                     data: {phone: $("#inputCode").val()
+                     },
+                     success: function () {
+                        alert("인증에 성공했습니다.");
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+        });
+
+    </script>
 
 {% endblock %}
