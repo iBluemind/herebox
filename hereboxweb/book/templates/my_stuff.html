@@ -23,7 +23,7 @@
                             <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
                             <h2>{{ my_stuff.name }}</h2>
                             <p>
-                                관리번호: {{ my_stuff.name }}
+                                관리번호: {{ my_stuff.goods_id }}
                                 <br>
                                 보관기간: {{ my_stuff.created_at.strftime('%Y-%m-%d') }} ~ {{ my_stuff.expired_at }}
                                 <br>
@@ -71,7 +71,7 @@
                         <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
                         <h2>{{ my_stuff.name }}</h2>
                         <p>
-                            관리번호: {{ my_stuff.name }}
+                            관리번호: {{ my_stuff.goods_id }}
                             <br>
                             보관기간 {{ my_stuff.created_at.strftime('%Y-%m-%d') }} ~ {{ my_stuff.expired_at }}
                             <br>
