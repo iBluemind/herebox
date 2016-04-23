@@ -15,6 +15,12 @@ from hereboxweb.schedule.models import Reservation, ReservationStatus, Reservati
 from hereboxweb.schedule.views import get_order, get_estimate
 
 
+@payment.route('/extended/payment', methods=['GET', 'POST'])
+@login_required
+def extended_payment():
+    return render_template('extended_payment.html', active_menu='reservation')
+
+
 @payment.route('/reservation/payment', methods=['GET', 'POST'])
 @login_required
 def reservation_payment():
@@ -205,5 +211,5 @@ def reservation_payment():
 
     if user_total_price != total_price:
         return redirect(url_for('schedule.estimate'))
-    return render_template('reservation_payment.html', active_my_index='my_schedule')
+    return render_template('reservation_payment.html', active_menu='reservation')
 

@@ -3,7 +3,7 @@
 
     <div class="container" style="width: 740px;">
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/5step_4.png') }}">
+            <img src="{{ url_for('static', filename='assets/img/4-step-2-3.png') }}">
         </div>
 
         <div class="row" style="margin-top: 90px;">
@@ -18,14 +18,7 @@
             </div>
 
             <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                <div style="float: right;">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="optionsPayType" id="optionsVisit" value="visit" checked>
-                            직원 방문 시 결제 (현금/카드)
-                        </label>
-                    </div>
-
+                <div style="margin-left: 100px;">
                     <div class="radio" style="margin-top: 30px;">
                         <label>
                             <input type="radio" name="optionsPayType" id="optionsCard" value="card">
@@ -51,7 +44,7 @@
         </div>
 
         <div style="margin: 80px 0 100px 0; text-align: center;">
-            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnNextStep" onclick="location.href='/extended/completion';" class="btn btn-hbprimary">다음 단계</button>
             <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
         </div>
     </div>
@@ -65,50 +58,50 @@
     <script>
         var allowUnload = false;
         $(document).ready(function() {
-            $(window).on('beforeunload', function() {
-                if (allowUnload) {
-                    return ;
-                } else {
-                    return '현재 입력된 항목들이 지워집니다! 정말 예약을 취소하시겠습니까?';
-                }
-            });
-            $(window).on('unload', function() {
-                if (!allowUnload) {
-                    purchaseCookieClear();
-                }
-            });
-
-            $('#btnPrevStep').click(function() {
-                allowUnload = true;
-                location.href = "/reservation/review";
-            });
-
-            $('#btnNextStep').click(function() {
-                allowUnload = true;
-                $.ajax({
-                     type: "POST",
-                     url: "/reservation/payment",
-                     data: {optionsPayType: $(":radio[name='optionsPayType']").val()
-                     },
-                     success: function () {
-                        location.href = '/reservation/completion';
-                     },
-                     error: function(request, status, error) {
-                        var parsedBody = $.parseJSON(request.responseText);
-                        alert(parsedBody['message']);
-                     }
-                });
-            });
+{#            $(window).on('beforeunload', function() {#}
+{#                if (allowUnload) {#}
+{#                    return ;#}
+{#                } else {#}
+{#                    return '현재 입력된 항목들이 지워집니다! 정말 예약을 취소하시겠습니까?';#}
+{#                }#}
+{#            });#}
+{#            $(window).on('unload', function() {#}
+{#                if (!allowUnload) {#}
+{#                    purchaseCookieClear();#}
+{#                }#}
+{#            });#}
+{##}
+{#            $('#btnPrevStep').click(function() {#}
+{#                allowUnload = true;#}
+{#                location.href = "/reservation/review";#}
+{#            });#}
+{##}
+{#            $('#btnNextStep').click(function() {#}
+{#                allowUnload = true;#}
+{#                $.ajax({#}
+{#                     type: "POST",#}
+{#                     url: "/reservation/payment",#}
+{#                     data: {optionsPayType: $(":radio[name='optionsPayType']").val()#}
+{#                     },#}
+{#                     success: function () {#}
+{#                        location.href = '/reservation/completion';#}
+{#                     },#}
+{#                     error: function(request, status, error) {#}
+{#                        var parsedBody = $.parseJSON(request.responseText);#}
+{#                        alert(parsedBody['message']);#}
+{#                     }#}
+{#                });#}
+{#            });#}
         });
 
         $(window).load(function() {
-            var totalPrice = Cookies.get('totalPrice');
-            if (totalPrice) {
-                return ;
-            }
-
-            allowUnload = true;
-            location.href = '/reservation/estimate';
+{#            var totalPrice = Cookies.get('totalPrice');#}
+{#            if (totalPrice) {#}
+{#                return ;#}
+{#            }#}
+{##}
+{#            allowUnload = true;#}
+{#            location.href = '/reservation/estimate';#}
         });
     </script>
 {% endblock %}
