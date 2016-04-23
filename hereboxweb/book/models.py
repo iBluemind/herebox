@@ -2,6 +2,9 @@
 
 
 import datetime
+
+from sqlalchemy import and_
+
 from hereboxweb import database
 from hereboxweb.utils import JsonSerializable
 
@@ -34,12 +37,12 @@ class Outgoing(database.Model, JsonSerializable):
         self.created_at = datetime.datetime.now()
 
 
-class InStoreStatusType(object):
+class InStoreStatus(object):
     IN_STORE = 0        # 보관중
     OUT_OF_STORE = 1    # 보관 중 아님
 
 
-class BoxStatusType(object):
+class BoxStatus(object):
     AVAILABLE = 0       # 사용가능
     UNAVAILABLE = 1     # 사용중
 
@@ -52,10 +55,10 @@ class Box(database.Model, JsonSerializable):
     box_id = database.Column(database.String(5))
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     status = database.Column(database.SmallInteger)     # 박스의 사용여부
-    expired_at = database.Column(database.DateTime)
+    expired_at = database.Column(database.DateTime, nullable=True)
     created_at = database.Column(database.DateTime)
 
-    def __init__(self, box_id, in_store, status, expired_at):
+    def __init__(self, box_id, in_store, status, expired_at=None):
         self.box_id = box_id
         self.in_store = in_store
         self.status = status
@@ -74,32 +77,43 @@ class Goods(database.Model, JsonSerializable):
     __tablename__ = 'goods'
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    name = database.Column(database.String(20))
     goods_id = database.Column(database.String(11))
     goods_type = database.Column(database.SmallInteger)
     memo = database.Column(database.Text)
+    photo = database.Column(database.Text)
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     box_id = database.Column(database.Integer, database.ForeignKey('box.id'), nullable=True)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    expired_at = database.Column(database.DateTime)
+    reservation_id = database.Column(database.Integer,
+                                     database.ForeignKey('reservation.id'), nullable=False)
+    expired_at = database.Column(database.Date)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
 
-    def __init__(self, goods_type, memo, in_store, box_id, user_id, expired_at):
+    def __init__(self, goods_type, name, memo, in_store, user_id, reservation_id, expired_at, box_id=None):
         self.goods_id = self._generate_goods_id(goods_type)
         self.goods_type = goods_type
+        self.name = name
         self.memo = memo
         self.in_store = in_store
         self.box_id = box_id
         self.user_id = user_id
+        self.reservation_id = reservation_id
         self.expired_at = expired_at
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
+
+    def _get_today_goods_count(self):
+        today = datetime.date.today()
+        return Goods.query.filter(and_(Goods.created_at >= today.strftime('%Y-%m-%d 00:00:00'),
+                                       Goods.created_at <= today.strftime('%Y-%m-%d 23:59:59'))).count()
 
     def _generate_goods_id(self, first_char):
         today = datetime.date.today()
         day_number = today.strftime('%y%m%d')
         init_number = self._get_goods_init_number()[first_char]
-        serial_number = init_number + self.id
+        serial_number = init_number + self._get_today_goods_count()
         return '%c%s00%s' % (first_char, day_number, serial_number)
 
     def _get_goods_init_number(self):
