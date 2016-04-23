@@ -66,6 +66,8 @@ class Reservation(database.Model, JsonSerializable):
                               database.ForeignKey('user.uid'), nullable=False)
     promotion_id = database.Column(database.Integer,
                                   database.ForeignKey('promotion.id'), nullable=True)
+    goods_id = database.Column(database.Integer,
+                                   database.ForeignKey('goods.id'), nullable=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
     schedules = database.relationship('Schedule', backref='reservation', lazy='dynamic')
@@ -74,7 +76,7 @@ class Reservation(database.Model, JsonSerializable):
                                     period, fixed_rate, binding_products, user_id, promotion, contact,
                                     address, delivery_date, delivery_time, recovery_date,
                                     recovery_time, revisit_option, user_memo,
-                                    purchase_type, purchase_id=None):
+                                    purchase_type, purchase_id=None, goods_id=None):
         self.reservation_id = self._generate_reservation_id(reservation_type)
         self.reservation_type = reservation_type
         self.status = status
@@ -95,6 +97,7 @@ class Reservation(database.Model, JsonSerializable):
         self.user_memo = user_memo
         self.purchase_id = purchase_id
         self.user_id = user_id
+        self.goods_id = goods_id
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
 

@@ -373,7 +373,7 @@
                 return totalBindingProductPrice;
             };
 
-            var changeTotalPrice = function() {
+            var changeTotalPrice = function(direction, count) {
                 var totalPrice = calculateStoragePrice() + calculateBindingProductPrice();
                 if (totalPrice < 0) {
                     totalPrice = 0;

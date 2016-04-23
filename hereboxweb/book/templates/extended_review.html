@@ -22,14 +22,12 @@
                     기간 연장 물품
 
                     <div style="display: table; width: 100%; font-size: 14px;">
-                        <div style="display: table-row;">
-                            <div style="display: table-cell;">겨울 니트, 바지 종류</div>
-                            <div style="display: table-cell; text-align: right;">{{ standard_box_count }}개월</div>
-                        </div>
-                        <div style="display: table-row;">
-                            <div style="display: table-cell;">겨울 니트, 바지 종류</div>
-                            <div style="display: table-cell; text-align: right;">{{ nonstandard_goods_count }}개월</div>
-                        </div>
+                        {% for stuff in packed_stuffs %}
+                            <div style="display: table-row;">
+                                <div style="display: table-cell;">{{ stuff.name }}</div>
+                                <div style="display: table-cell; text-align: right;">{{ stuff.new_period }}개월</div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
 
