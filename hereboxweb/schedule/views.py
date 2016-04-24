@@ -247,7 +247,7 @@ def order():
         estimate_info['bindingProduct2NumberCount']
         estimate_info['bindingProduct3NumberCount']
     except:
-        return redirect(url_for('schedule.estimate'))
+        return redirect(url_for('index'))
 
     response = make_response(
         render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone))
@@ -276,7 +276,7 @@ def review():
 
     estimate_info = get_estimate()
     if not estimate_info:
-        return redirect(url_for('schedule.estimate'))
+        return redirect(url_for('index'))
 
     regular_item_count = estimate_info.get('regularItemNumberCount')
     irregular_item_count = estimate_info.get('irregularItemNumberCount')
@@ -290,11 +290,11 @@ def review():
     start_time = estimate_info.get('startTime')
 
     if not start_time:
-        return redirect(url_for('schedule.estimate'))
+        return redirect(url_for('index'))
 
     order_info = get_order()
     if not order_info:
-        return redirect(url_for('schedule.estimate'))
+        return redirect(url_for('index'))
 
     revisit_option = order_info.get('optionsRevisit')
     phone_number = order_info.get('inputPhoneNumber')
@@ -308,7 +308,7 @@ def review():
     visit_time = order_info.get('inputVisitTime')
 
     if not post_code:
-        return redirect(url_for('schedule.estimate'))
+        return redirect(url_for('index'))
 
     try:
         regular_item_count = int(regular_item_count)
@@ -319,7 +319,7 @@ def review():
         binding_product2_count = int(binding_product2_count)
         binding_product3_count = int(binding_product3_count)
     except:
-        return redirect(url_for('schedule.estimate'))
+        return redirect(url_for('index'))
 
     def calculate_total_price():
         total_storage_price = 0
