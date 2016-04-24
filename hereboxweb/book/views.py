@@ -95,7 +95,7 @@ def extended_estimate():
         stuff_ids = json.loads(stuff_ids)
 
         stuffs = Goods.query.filter(
-            Goods.id.in_(stuff_ids)
+            Goods.goods_id.in_(stuff_ids)
         ).limit(10).all()
 
         if not stuffs:
