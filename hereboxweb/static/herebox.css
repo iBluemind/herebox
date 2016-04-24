@@ -3,9 +3,15 @@ body {
 }
 
 body,
-.navbar-static-top,
-.navbar-static-bottom {
+.navbar-fixed-top {
   min-width: 1200px;
+  padding-top: 70px;
+}
+
+.navbar-herebox {
+  background-color: #fff;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .container {
@@ -467,6 +473,23 @@ input[type="color"]:focus,
   outline: 0 none;
 }
 
+#top-shadow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 81px;
+  z-index: 0;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  display: none;
+}
+
+.navbar {
+  z-index: 1000;
+}
+
 a {
   color: #727272;
 }
@@ -475,17 +498,11 @@ dl, ul, ol, menu, li {
   list-style: none;
 }
 
-.navbar-static-top {
-  margin-top: 19px;
-  margin-bottom: 19px;
-}
-
 .navbar-nav > .active > a {
   color: #ffa000;
 }
 
 .navbar-brand {
-  padding: 10px;
   vertical-align: middle;
 }
 

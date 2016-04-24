@@ -23,10 +23,10 @@
                         {% elif my_schedule.reservation.reservation_type == 'R' %}재보관
                         {% endif %}</div>
                     <div class="my-schedule-table-cell">{{ my_schedule.staff[0].name }}</div>
-                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.purchase_type == 0 %}카드
-                        {% elif my_schedule.reservation.purchase_type == 1 %}현장
-                        {% elif my_schedule.reservation.purchase_type == 2 %}휴대폰
-                        {% elif my_schedule.reservation.purchase_type == 3 %}카카오페이
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.pay_type == 0 %}카드
+                        {% elif my_schedule.reservation.pay_type == 1 %}현장
+                        {% elif my_schedule.reservation.pay_type == 2 %}휴대폰
+                        {% elif my_schedule.reservation.pay_type == 3 %}카카오페이
                         {% endif %}</div>
                     <div class="my-schedule-table-cell">{% if my_schedule.status == 0 %}대기
                         {% elif my_schedule.status == 1 %}완료
@@ -66,10 +66,10 @@
                         {% elif my_schedule.reservation.reservation_type == 'R' %}재보관
                         {% endif %}</div>
                     <div class="my-schedule-table-cell">{{ my_schedule.staff.name }}</div>
-                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.purchase_type == 0 %}카드
-                        {% elif my_schedule.reservation.purchase_type == 1 %}현장
-                        {% elif my_schedule.reservation.purchase_type == 2 %}휴대폰
-                        {% elif my_schedule.reservation.purchase_type == 3 %}카카오페이
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.pay_type == 0 %}카드
+                        {% elif my_schedule.reservation.pay_type == 1 %}현장
+                        {% elif my_schedule.reservation.pay_type == 2 %}휴대폰
+                        {% elif my_schedule.reservation.pay_type == 3 %}카카오페이
                         {% endif %}</div>
                     <div class="my-schedule-table-cell">{% if my_schedule.status == 0 %}대기
                         {% elif my_schedule.status == 1 %}완료

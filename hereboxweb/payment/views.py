@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import re
 import time
 
@@ -8,22 +9,136 @@ from flask.ext.login import login_required, current_user
 from hereboxweb import database, response_template, bad_request
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
+from hereboxweb.book.models import Goods
 from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
-from hereboxweb.schedule.models import Reservation, ReservationStatus, ReservationType, PurchaseType, Schedule, \
+from hereboxweb.schedule.models import Reservation, ReservationStatus, ReservationType, Schedule, \
     ScheduleStatus, ScheduleType
 from hereboxweb.schedule.views import get_order, get_estimate
+from hereboxweb.utils import add_months
+
+pay_types = {
+    'visit': PayType.DIRECT,
+    'card': PayType.CARD,
+    'phone': PayType.PHONE,
+    'kakao': PayType.KAKAOPAY,
+}
 
 
 @payment.route('/extended/payment', methods=['GET', 'POST'])
 @login_required
 def extended_payment():
+    def caculate_total_price():
+        total_price = 0
+        for goods_id in estimate_info.keys():
+            if type(estimate_info[goods_id]) is int:
+                if goods_id.startswith('B'):
+                    total_price += (9900 * estimate_info[goods_id])
+                else:
+                    total_price += (7500 * estimate_info[goods_id])
+            else:
+                del estimate_info[goods_id]
+
+        return total_price
+
+    if request.method == 'POST':
+        estimate_info = request.cookies.get('estimate')
+        order_info = request.cookies.get('order')
+        user_pay_type = request.form.get('optionsPayType')
+
+        if not estimate_info or not order_info:
+            return redirect(url_for('book.my_stuff'))
+
+        estimate_info = json.loads(estimate_info)
+        order_info = json.loads(order_info)
+
+        start_time = order_info.get('start_time')
+        user_total_price = order_info.get('total_price')
+
+        try:
+            datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+            user_total_price = int(user_total_price)
+        except:
+            return response_template(u'잘못된 요청입니다.', status=400)
+
+        total_price = caculate_total_price()
+        if user_total_price != total_price:
+            return response_template(u'잘못된 요청입니다.', status=400)
+
+        stuffs = Goods.query.filter(
+            Goods.goods_id.in_(estimate_info.keys())
+        ).limit(10).all()
+
+        packed_stuffs = []
+        for item in stuffs:
+            item.expired_at = add_months(item.expired_at, estimate_info[item.goods_id])
+            packed_stuffs.append(item)
+
+        if len(packed_stuffs) == 0:
+            return response_template(u'잘못된 요청입니다.', status=400)
+
+        purchase = Purchase(
+            status=PurchaseStatus.NORMAL,
+            amount=total_price,
+            pay_type=pay_types[user_pay_type],
+            user_id=current_user.uid
+        )
+
+        try:
+            database.session.add(purchase)
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', status=500)
+        return response_template(u'정상 처리되었습니다', status=200)
+
+    estimate_info = request.cookies.get('estimate')
+    order_info = request.cookies.get('order')
+
+    if not estimate_info or not order_info:
+        return redirect(url_for('book.my_stuff'))
+
+    estimate_info = json.loads(estimate_info)
+    order_info = json.loads(order_info)
+
+    start_time = order_info.get('start_time')
+    user_total_price = order_info.get('total_price')
+
+    if not start_time or not user_total_price:
+        return redirect(url_for('book.my_stuff'))
+
+    try:
+        datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+        user_total_price = int(user_total_price)
+    except:
+        return response_template(u'잘못된 요청입니다.', status=400)
+
+    total_price = caculate_total_price()
+    if user_total_price != total_price:
+        return redirect(url_for('book.my_stuff'))
     return render_template('extended_payment.html', active_menu='reservation')
 
 
 @payment.route('/reservation/payment', methods=['GET', 'POST'])
 @login_required
 def reservation_payment():
+    def calculate_total_price():
+        total_storage_price = 0
+        if period_option == 'subscription':
+            # 매월 자동 결제일 경우!
+            total_storage_price = total_storage_price + (7500 * regular_item_count)
+            total_storage_price = total_storage_price + (9900 * irregular_item_count)
+        else:
+            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+
+        total_binding_products_price = 0
+        total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
+        total_binding_products_price = total_binding_products_price + 500 * binding_product1_count
+        total_binding_products_price = total_binding_products_price + 1500 * binding_product2_count
+        total_binding_products_price = total_binding_products_price + 1000 * binding_product3_count
+
+        return total_storage_price + total_binding_products_price
+
     if request.method == 'POST':
         estimate_info = get_estimate()
         regular_item_count = estimate_info.get('regularItemNumberCount')
@@ -49,7 +164,7 @@ def reservation_payment():
         address2 = order_info.get('inputAddress2')
         visit_time = order_info.get('inputVisitTime')
 
-        purchase_type = request.form.get('optionsPayType')
+        user_pay_type = request.form.get('optionsPayType')
 
         try:
             regular_item_count = int(regular_item_count)
@@ -95,13 +210,6 @@ def reservation_payment():
             if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
                 return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
 
-        purchase_types = {
-            'visit': PurchaseType.DIRECT,
-            'card': PurchaseType.CARD,
-            'phone': PurchaseType.PHONE,
-            'kakao': PurchaseType.KAKAOPAY,
-        }
-
         new_reservation = Reservation(
             reservation_type=ReservationType.PICKUP_NEW,
             status=ReservationStatus.WAITING,
@@ -120,12 +228,26 @@ def reservation_payment():
             recovery_time=revisit_time,
             revisit_option=1 if revisit_option == 'later' else 0,
             user_memo=user_memo,
-            purchase_type=purchase_types[purchase_type],
+            pay_type=pay_types[user_pay_type],
             user_id=current_user.uid,
+        )
+
+        user_total_price = int(request.cookies.get('totalPrice'))
+        total_price = calculate_total_price()
+
+        if user_total_price != total_price:
+            return redirect(url_for('schedule.estimate'))
+
+        purchase = Purchase(
+            status=PurchaseStatus.NORMAL,
+            amount=total_price,
+            pay_type=pay_types[user_pay_type],
+            user_id=current_user.uid
         )
 
         try:
             database.session.add(new_reservation)
+            database.session.add(purchase)
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
@@ -186,25 +308,7 @@ def reservation_payment():
         binding_product2_count = int(binding_product2_count)
         binding_product3_count = int(binding_product3_count)
     except:
-        return bad_request(u'잘못된 요청입니다.')
-
-    def calculate_total_price():
-        total_storage_price = 0
-        if period_option == 'subscription':
-            # 매월 자동 결제일 경우!
-            total_storage_price = total_storage_price + (7500 * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * irregular_item_count)
-        else:
-            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
-
-        total_binding_products_price = 0
-        total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
-        total_binding_products_price = total_binding_products_price + 500 * binding_product1_count
-        total_binding_products_price = total_binding_products_price + 1500 * binding_product2_count
-        total_binding_products_price = total_binding_products_price + 1000 * binding_product3_count
-
-        return total_storage_price + total_binding_products_price
+        return redirect(url_for('schedule.estimate'))
 
     user_total_price = int(request.cookies.get('totalPrice'))
     total_price = calculate_total_price()

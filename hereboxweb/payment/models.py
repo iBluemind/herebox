@@ -11,6 +11,14 @@ class PurchaseStatus(object):
     ERROR = 1
 
 
+# 결제 방법
+class PayType(object):
+    CARD = 0
+    DIRECT = 1
+    PHONE = 2
+    KAKAOPAY = 3
+
+
 # 결제 내역
 class Purchase(database.Model, JsonSerializable):
 
@@ -19,11 +27,14 @@ class Purchase(database.Model, JsonSerializable):
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     status = database.Column(database.SmallInteger)
     amount = database.Column(database.String(10))
+    pay_type = database.Column(database.SmallInteger)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     created_at = database.Column(database.DateTime)
 
-    def __init__(self, status, user_id, created_at):
-        self.user_id = user_id
+    def __init__(self, status, amount, pay_type, user_id):
         self.status = status
+        self.amount = amount
+        self.pay_type = pay_type
+        self.user_id = user_id
         self.created_at = datetime.datetime.now()
 
