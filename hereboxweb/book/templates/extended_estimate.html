@@ -81,8 +81,7 @@
             </div>
 
             <div style="font-size: 14px; color: #727272;">
-                총 보관 비용 : <span id="totalStoragePrice"></span><br>
-                포장 용품 비용 : <span id="totalBindingProductPrice"></span><br>
+                총 연장 비용 : <span id="totalExtendPrice"></span><br>
 
                 <br>
                 <p style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#discountManual">할인 정책 알아보기 ></p>
@@ -166,6 +165,7 @@
                         currentPrice = (9900 * currentPeriod);
                     }
                     totalPrice += currentPrice;
+                    $('#totalExtendPrice').text(numeral(totalPrice).format('0,0'));
                     estimateInfo[goodsId] = currentPeriod;
                 });
 
