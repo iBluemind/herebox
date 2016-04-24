@@ -2,12 +2,9 @@
 
 import coolsms
 from celery import Celery
-from gcm import GCM
 from config import RABBIT_MQ_USER, RABBIT_MQ_HOST, RABBIT_MQ_PASSWORD, RABBIT_MQ_PORT, RABBIT_MQ_VHOST, COOLSMS_API_KEY, \
     COOLSMS_API_KEY_SECRET
-from hereboxweb import database
 from hereboxweb.auth.models import User
-from hereboxweb.schedule.models import Reservation, ReservationStatus
 
 
 tasks = Celery(broker='amqp://%s:%s@%s:%s/%s' % (RABBIT_MQ_USER, RABBIT_MQ_PASSWORD, RABBIT_MQ_HOST,
