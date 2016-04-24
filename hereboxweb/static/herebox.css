@@ -813,7 +813,7 @@ dl, ul, ol, menu, li {
 .my-stuff-items {
   display: table;
   overflow: hidden;
-  margin: 0;
+  margin: 0 auto;
   border-spacing: 10px;
 }
 

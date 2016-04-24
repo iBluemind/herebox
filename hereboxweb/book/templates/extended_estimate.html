@@ -8,10 +8,8 @@
 
         <div class="row">
             <div class="estimate-title" style="margin-top: 80px;">기간 연장할 물품 ({{ packed_stuffs | length }})</div>
-
             <div class="my-stuff-items">
                 <div class="my-stuff-items-row">
-
                     {% for my_stuff in packed_stuffs %}
                         {% if loop.index % 3 == 1 %}
                             </div>
@@ -144,12 +142,13 @@
             });
 
             var estimateInfo = Cookies.get('estimate');
-            if (estimateInfo)
-                estimateInfo = $.parseJSON(decode_cookie(estimateInfo));
-            else {
+            if (!estimateInfo) {
+                allowUnload = true;
                 purchaseCookieClear();
                 location.href = '/my_stuff';
             }
+
+            estimateInfo = $.parseJSON(decode_cookie(estimateInfo));
 
             var changeTotalPrice = function(direction, count) {
                 var totalPrice = 0;
