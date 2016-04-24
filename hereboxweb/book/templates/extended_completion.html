@@ -17,7 +17,7 @@
             </div>
 
             <div style="margin-top: 20px;">
-                <a href="/my_schedule" style="font-size: 14px; color: #ffa000;">보관 중인 스케줄 보기 ></a>
+                <a href="/my_stuff" style="font-size: 14px; color: #ffa000;">보관 중인 물품 보기 ></a>
             </div>
         </div>
     </div>
@@ -29,12 +29,17 @@
     <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
 
     <script>
-{#        $(document).ready(function() {#}
-{#            var totalPrice = Cookies.get('totalPrice');#}
-{#            if (!totalPrice) {#}
-{#                location.href = '/reservation/estimate';#}
-{#            }#}
-{#            purchaseCookieClear();#}
-{#        });#}
+        $(document).ready(function() {
+            var orderInfo = Cookies.get('order');
+            if (!orderInfo) {
+                purchaseCookieClear();
+                location.href = '/extended/estimate';
+            }
+            orderInfo = $.parseJSON(decode_cookie(orderInfo));
+            if (!orderInfo['total_price']) {
+                purchaseCookieClear();
+                location.href = '/extended/estimate';
+            }
+        });
     </script>
 {% endblock %}

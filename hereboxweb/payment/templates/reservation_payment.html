@@ -65,6 +65,8 @@
     <script>
         var allowUnload = false;
         $(document).ready(function() {
+            allowUnload = false;
+
             $(window).on('beforeunload', function() {
                 if (allowUnload) {
                     return ;
@@ -88,7 +90,7 @@
                 $.ajax({
                      type: "POST",
                      url: "/reservation/payment",
-                     data: {optionsPayType: $(":radio[name='optionsPayType']").val()
+                     data: {optionsPayType: $(":radio[name='optionsPayType']:checked").val()
                      },
                      success: function () {
                         location.href = '/reservation/completion';
@@ -107,6 +109,7 @@
                 return ;
             }
 
+            purchaseCookieClear();
             allowUnload = true;
             location.href = '/reservation/estimate';
         });

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import re
 from sqlalchemy.sql import ClauseElement
 
@@ -91,3 +90,16 @@ def staff_required(func):
                 return current_app.login_manager.unauthorized()
         return func(*args, **kwargs)
     return decorated_view
+
+
+def add_months(src_date, months):
+    import calendar
+    import datetime
+
+    month = src_date.month - 1 + months
+    year = int(src_date.year + month / 12)
+    month = month % 12 + 1
+    day = min(src_date.day, calendar.monthrange(year, month)[1])
+    return datetime.date(year, month, day)
+
+

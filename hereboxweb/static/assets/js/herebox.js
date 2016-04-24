@@ -3,6 +3,8 @@ function purchaseCookieClear() {
 	Cookies.remove('estimate', { path: '/reservation/' });
     Cookies.remove('order', { path: '/reservation/' });
     Cookies.remove('totalPrice', { path: '/reservation/' });
+    Cookies.remove('estimate', { path: '/extended/' });
+    Cookies.remove('order', { path: '/extended/' });
 }
 
 

@@ -19,12 +19,12 @@
   </head>
 
   <body>
-    <!-- Static navbar -->
-    <nav class="navbar navbar-static-top">
+    <nav class="navbar navbar-herebox navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <a class="navbar-brand" href="/">
-              <img src="{{ url_for('static', filename='assets/img/top-logo.png') }}"></a>
+              <img src="{{ url_for('static', filename='assets/img/top-logo.png') }}">
+          </a>
         </div>
         <ul class="nav navbar-nav navbar-right">
           <li {% if active_menu == 'introduce' %}class="active"{% endif %}><a href="/introduce">소개</a></li>
@@ -47,6 +47,7 @@
           {% endif %}
         </ul>
       </div>
+      <div id="top-shadow"></div>
     </nav>
 
     {% block content %}{% endblock %}
@@ -130,6 +131,21 @@
     <script src="{{ url_for('static', filename='libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
+
+    <script>
+        $(document).ready(function(){
+            $(window).scroll(function(){
+                var y = $(window).scrollTop();
+                if (y > 0) {
+                  $("#top-shadow").css({'display':'block', 'z-index': 0});
+                  $(".navbar-brand").css({'z-index': 100, 'position': 'relative'});
+                  $(".navbar li").css({'z-index': 100});
+                } else {
+                  $("#top-shadow").css({'display':'none'});
+                }
+            });
+        })
+    </script>
 
     {% block jscript %}{% endblock %}
   </body>

@@ -26,14 +26,6 @@ class ReservationStatus(object):
     ACCEPTED = 1    # 접수
 
 
-# 결제 방법
-class PurchaseType(object):
-    CARD = 0
-    DIRECT = 1
-    PHONE = 2
-    KAKAOPAY = 3
-
-
 # 예약
 class Reservation(database.Model, JsonSerializable):
 
@@ -46,7 +38,7 @@ class Reservation(database.Model, JsonSerializable):
     standard_box_count = database.Column(database.SmallInteger)                 # 규격박스 갯수
     nonstandard_goods_count = database.Column(database.SmallInteger)            # 비규격물품 갯수
     period = database.Column(database.SmallInteger)                             # 계약 월수
-    purchase_type = database.Column(database.SmallInteger)                      # 결제 방법
+    pay_type = database.Column(database.SmallInteger)                           # 결제 방법
     fixed_rate = database.Column(database.SmallInteger)                         # 자동결제 여부
     promotion = database.Column(database.SmallInteger)                          # 프로모션 여부
     binding_products = database.Column(database.Text)                           # 포장용품
@@ -76,14 +68,14 @@ class Reservation(database.Model, JsonSerializable):
                                     period, fixed_rate, binding_products, user_id, promotion, contact,
                                     address, delivery_date, delivery_time, recovery_date,
                                     recovery_time, revisit_option, user_memo,
-                                    purchase_type, purchase_id=None, goods_id=None):
+                                    pay_type, purchase_id=None, goods_id=None):
         self.reservation_id = self._generate_reservation_id(reservation_type)
         self.reservation_type = reservation_type
         self.status = status
         self.standard_box_count = standard_box_count
         self.nonstandard_goods_count = nonstandard_goods_count
         self.period = period
-        self.purchase_type = purchase_type
+        self.pay_type = pay_type
         self.fixed_rate = fixed_rate
         self.promotion = promotion
         self.binding_products = self.parse_binding_products(binding_products)

@@ -10,8 +10,7 @@ from hereboxweb import database, response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book
 from hereboxweb.schedule.models import Reservation
-from hereboxweb.utils import staff_required
-
+from hereboxweb.utils import staff_required, add_months
 
 STUFF_LIST_MAX_COUNT = 10
 
@@ -65,13 +64,6 @@ def goods():
     if not reservation:
         return response_template(u'%s 주문을 찾을 수 없습니다.' % reservation_id, status=400)
 
-    def add_months(src_date, months):
-        month = src_date.month - 1 + months
-        year = int(src_date.year + month / 12)
-        month = month % 12 + 1
-        day = min(src_date.day, calendar.monthrange(year, month)[1])
-        return datetime.date(year, month, day)
-
     today = datetime.date.today()
     expired = add_months(today, reservation.period)
 
@@ -92,149 +84,6 @@ def goods():
     return response_template(u'정상 처리되었습니다.')
 
 
-def get_estimate():
-    estimate = request.cookies.get('estimate')
-    if estimate:
-        parsed_estimate = json.loads(estimate)
-        return parsed_estimate
-
-
-def get_order():
-    order = request.cookies.get('order')
-    if order:
-        parsed_order = json.loads(order)
-        return parsed_order
-
-
-def save_estimate():
-    regular_item_count = request.form.get('regularItemNumberCount')
-    irregular_item_count = request.form.get('irregularItemNumberCount')
-    period = request.form.get('disposableNumberCount')
-    period_option = request.form.get('optionsPeriod')
-    binding_product0_count = request.form.get('bindingProduct0NumberCount')
-    binding_product1_count = request.form.get('bindingProduct1NumberCount')
-    binding_product2_count = request.form.get('bindingProduct2NumberCount')
-    binding_product3_count = request.form.get('bindingProduct3NumberCount')
-    promotion = request.form.get('inputPromotion')
-    start_time = request.form.get('startTime')
-
-    try:
-        regular_item_count = int(regular_item_count)
-        irregular_item_count = int(irregular_item_count)
-        period = int(period)
-        binding_product0_count = int(binding_product0_count)
-        binding_product1_count = int(binding_product1_count)
-        binding_product2_count = int(binding_product2_count)
-        binding_product3_count = int(binding_product3_count)
-    except:
-        return bad_request(u'잘못된 요청입니다.')
-
-    response = make_response(render_template('reservation.html', active_menu='reservation',
-                                             phone_number=current_user.phone))
-
-    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    response.headers.add('Last-Modified', datetime.datetime.now())
-    response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
-    response.headers.add('Pragma', 'no-cache')
-
-    estimate_info = {
-        'regularItemNumberCount': regular_item_count,
-        'irregularItemNumberCount': irregular_item_count,
-        'optionsPeriod': period_option,
-        'bindingProduct0NumberCount': binding_product0_count,
-        'bindingProduct1NumberCount': binding_product1_count,
-        'bindingProduct2NumberCount': binding_product2_count,
-        'bindingProduct3NumberCount': binding_product3_count,
-        'startTime': start_time,
-    }
-
-    if period != None:
-        estimate_info['disposableNumberCount'] = period
-    if promotion != None:
-        estimate_info['inputPromotion'] = promotion
-
-    response.set_cookie('estimate', json.dumps(estimate_info), path='/reservation/')
-    return response
-
-
-def save_order():
-    revisit_option = request.form.get('optionsRevisit')
-    phone_number = request.form.get('inputPhoneNumber')
-    revisit_time = request.form.get('inputRevisitTime')
-    user_memo = request.form.get('textareaMemo')
-    revisit_date = request.form.get('inputRevisitDate')
-    visit_date = request.form.get('inputVisitDate')
-    post_code = request.form.get('inputPostCode')
-    address1 = request.form.get('inputAddress1')
-    address2 = request.form.get('inputAddress2')
-    visit_time = request.form.get('inputVisitTime')
-
-    if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone_number):
-        return bad_request(u'잘못된 전화번호입니다.')
-
-    if len(user_memo) > 200:
-        return bad_request(u'메모가 너무 깁니다.')
-
-    if len(address1) > 200:
-        return bad_request(u'address1이 너무 깁니다.')
-
-    if len(address2) > 200:
-        return bad_request(u'address2가 너무 깁니다.')
-
-    if current_user.phone:
-        if current_user.phone != phone_number:
-            return bad_request(u'연락처 정보가 다릅니다.')
-
-    if revisit_option == 'immediate':
-        revisit_date = visit_date
-        revisit_time = visit_time
-
-    estimate = get_estimate()
-    start_time = estimate['startTime']
-
-    converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
-    day_standard_time1 = converted_start_time.replace(hour=17, minute=0)  # 저녁 5시 기준
-    day_standard_time2 = converted_start_time.replace(hour=23, minute=59, second=59)
-
-    if converted_start_time > day_standard_time1 and converted_start_time <= day_standard_time2:
-        converted_visit_date = datetime.datetime.strptime(visit_date, "%Y-%m-%d")
-        converted_revisit_date = datetime.datetime.strptime(revisit_date, "%Y-%m-%d")
-        today = datetime.datetime.now()
-        tommorrow = today + timedelta(days=1)
-
-        if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
-            return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
-
-    response = make_response(render_template('reservation.html', active_menu='reservation',
-                                             phone_number=current_user.phone))
-
-    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
-    response.headers['Cache-Control'] = 'public, max-age=0'
-    response.headers.add('Last-Modified', datetime.datetime.now())
-    response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
-    response.headers.add('Pragma', 'no-cache')
-
-    order_info = {
-        'optionsRevisit': revisit_option,
-        'inputPhoneNumber': phone_number,
-        'inputVisitDate': visit_date,
-        'inputPostCode': post_code,
-        'inputVisitTime': visit_time,
-        'inputAddress1': address1,
-        'inputAddress2': address2,
-    }
-
-    if revisit_time != None:
-        order_info['inputRevisitTime'] = revisit_time
-    if revisit_date != None:
-        order_info['inputRevisitDate'] = revisit_date
-    if user_memo != None:
-        order_info['textareaMemo'] = user_memo
-    response.set_cookie('order', json.dumps(order_info), path='/reservation/')
-    return response
-
-
 @book.route('/extended/estimate', methods=['GET', 'POST'])
 @login_required
 def extended_estimate():
@@ -250,7 +99,7 @@ def extended_estimate():
         ).limit(10).all()
 
         if not stuffs:
-            return response_template(u'해당되는 물품이 없습니다.', status=201)
+            return response_template(u'해당되는 물품이 없습니다.', status=400)
 
         stuff_info = {}
         for stuff in stuffs:
@@ -275,6 +124,9 @@ def extended_estimate():
         remaining_day = item.expired_at - today
         item.remaining_day = remaining_day.days
         packed_stuffs.append(item)
+
+    if len(packed_stuffs) == 0:
+        return redirect(url_for('book.my_stuff'))
 
     return render_template('extended_estimate.html', active_menu='reservation',
                            packed_stuffs=packed_stuffs)
@@ -315,9 +167,6 @@ def extended_review():
         except:
             return response_template(u'잘못된 요청입니다.', status=400)
 
-        print user_total_price
-        print total_price
-
         if user_total_price != total_price:
             return response_template(u'잘못된 요청입니다.', status=400)
 
@@ -335,16 +184,19 @@ def extended_review():
         return redirect(url_for('book.my_stuff'))
 
     estimate_info = json.loads(estimate_info)
+    order_info = json.loads(order_info)
+
     stuffs = Goods.query.filter(
         Goods.goods_id.in_(estimate_info.keys())
     ).limit(10).all()
-
-    order_info = json.loads(order_info)
 
     packed_stuffs = []
     for item in stuffs:
         item.new_period = estimate_info[item.goods_id]
         packed_stuffs.append(item)
+
+    if len(packed_stuffs) == 0:
+        return redirect(url_for('book.my_stuff'))
 
     return render_template('extended_review.html', active_menu='reservation',
                            packed_stuffs=packed_stuffs,
