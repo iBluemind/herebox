@@ -697,12 +697,16 @@ dl, ul, ol, menu, li {
   font-family: "Nanum Barun Gothic Bold", sans-serif;
   color: #ffc107;
   font-size: 20px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .footer-contact {
   font-size: 20px;
   padding-bottom: 41px;
   border-bottom: solid 1px #727272;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 .footer-contact .contact-title {
@@ -809,8 +813,8 @@ dl, ul, ol, menu, li {
 .my-stuff-items {
   display: table;
   overflow: hidden;
-  margin: 0 auto;
-  border-spacing: 20px;
+  margin: 0;
+  border-spacing: 10px;
 }
 
 .my-stuff-items-row {
