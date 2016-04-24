@@ -4,18 +4,19 @@
     <div class="container" style="padding: 71px 30px 100px;">
         <span class="greetings">반갑습니다! {{ current_user.name }} 님</span>
 
-        <div class="row my-index-menu">
-            <div class="col-xs-4 text-center {% if active_my_index == 'my_stuff' %}active{% endif %}">
-                <a href="/my_stuff">보관 중인 물품</a></div>
-            <div class="col-xs-4 text-center {% if active_my_index == 'my_schedule' %}active{% endif %}">
-                <a href="/my_schedule">내 스케줄</a></div>
-            <div class="col-xs-4 text-center {% if active_my_index == 'my_info' %}active{% endif %}">
-                <a href="/my_info">내 정보</a></div>
-        </div>
-
-        <div>
-            {% block my_index_body %}
-            {% endblock %}
+        <div style="width: 960px; margin: 0 auto;">
+            <div class="row my-index-menu">
+                <div class="col-xs-4 text-center {% if active_my_index == 'my_stuff' %}active{% endif %}">
+                    <a href="/my_stuff">보관 중인 물품</a></div>
+                <div class="col-xs-4 text-center {% if active_my_index == 'my_schedule' %}active{% endif %}">
+                    <a href="/my_schedule">내 스케줄</a></div>
+                <div class="col-xs-4 text-center {% if active_my_index == 'my_info' %}active{% endif %}">
+                    <a href="/my_info">내 정보</a></div>
+            </div>
+            <div>
+                {% block my_index_body %}
+                {% endblock %}
+            </div>
         </div>
     </div>
 
