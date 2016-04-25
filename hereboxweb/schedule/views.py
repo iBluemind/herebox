@@ -385,31 +385,26 @@ def completion():
 @login_required
 def delivery_order():
     if request.method == 'POST':
-        return save_stuffs()
+        return save_stuffs('/delivery/')
 
-    # packed_stuffs = get_stuffs()
-    # if not packed_stuffs:
-    #     return redirect(url_for('index'))
-    #
-    # if len(packed_stuffs) == 0:
-    #     return redirect(url_for('index'))
-    #
-    # response = make_response(
-    #     render_template('delivery_reservation.html', active_menu='reservation',
-    #                                             old_phone_number=current_user.phone))
-    #
-    # order_info = get_order()
-    # if order_info:
-    #     response = make_response(
-    #         render_template('delivery_reservation.html', active_menu='reservation',
-    #                         old_phone_number=current_user.phone,
-    #                         address1=order_info.get('inputAddress1'),
-    #                         address2=order_info.get('inputAddress2'),
-    #                         user_memo=order_info.get('textareaMemo')))
-    #
-    # return response
-    return render_template('delivery_reservation.html', active_menu='reservation',
-                           old_phone_number=current_user.phone)
+    packed_stuffs = get_stuffs()
+    if not packed_stuffs or len(packed_stuffs) == 0:
+        return redirect(url_for('index'))
+
+    response = make_response(
+        render_template('delivery_reservation.html', active_menu='reservation',
+                                                old_phone_number=current_user.phone))
+
+    order_info = get_order()
+    if order_info:
+        response = make_response(
+            render_template('delivery_reservation.html', active_menu='reservation',
+                            old_phone_number=current_user.phone,
+                            address1=order_info.get('inputAddress1'),
+                            address2=order_info.get('inputAddress2'),
+                            user_memo=order_info.get('textareaMemo')))
+
+    return response
 
 
 @schedule.route('/delivery/review', methods=['GET', 'POST'])

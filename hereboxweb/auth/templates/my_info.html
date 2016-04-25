@@ -1,7 +1,27 @@
 {% extends "index_logged_in.html" %}
 {% block my_index_body %}
 
-    <form class="my-info-form form-horizontal">
+    <form class="my-info-form form-horizontal" action="{{url_for('auth.my_info')}}" method="POST">
+        {% for field in form.errors %}
+            <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">오류:</span>
+            {% for error in form.errors[field] %}
+                {{ form[field].label }}: {{ error }}
+            {% endfor %}
+            </div>
+        {% endfor %}
+
+        {% if form.message %}
+            <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">오류:</span>
+            {{ form.message }}
+            </div>
+        {% endif %}
+
+        {{ form.csrf_token }}
+
         <div class="form-group col-xs-12">
             <label for="inputName" class="col-xs-4 control-label">이름</label>
             <div class="col-xs-8" style="padding-right: 0;">
@@ -17,34 +37,52 @@
         <div class="form-group col-xs-12">
             <label for="inputPassword" class="col-xs-4 control-label">새 비밀번호</label>
             <div class="col-xs-8" style="padding-right: 0;">
-                <input type="password" class="form-control" id="inputPassword" placeholder="비밀번호 변경을 원하시면 입력하세요">
+                {{ form.password(placeholder="비밀번호 변경을 원하시면 입력하세요", class="form-control") }}
             </div>
         </div>
         <div class="form-group col-xs-12">
             <label for="inputPasswordCheck" class="col-xs-4 control-label">새 비밀번호 확인</label>
             <div class="col-xs-8" style="padding-right: 0;">
-                <input type="password" class="form-control" id="inputPasswordCheck" placeholder="비밀번호 변경을 원하시면 입력하세요">
+                {{ form.password_check(placeholder="비밀번호 변경을 원하시면 입력하세요", class="form-control") }}
             </div>
         </div>
         <div class="form-group col-xs-12">
             <label for="inputAddress" class="col-xs-4 control-label">주소</label>
             <div class="col-xs-8" style="padding-right: 0;">
-                <input type="text" class="form-control" id="inputAddress" placeholder="주소를 입력해주세요" value="{{ current_user.address1 if current_user.address1 }}">
+                {{ form.address1(placeholder="주소를 입력해주세요", class="form-control", value=current_user.address1) }}
             </div>
         </div>
         <div class="form-group col-xs-12">
             <label for="inputAddressDetail" class="col-xs-4 control-label">상세주소</label>
             <div class="col-xs-8" style="padding-right: 0;">
-                <input type="text" class="form-control" id="inputAddressDetail" placeholder="상세주소를 입력해주세요" value="{{ current_user.address2 if current_user.address2 }}">
+                {{ form.address2(placeholder="상세주소를 입력해주세요", class="form-control", value=current_user.address2) }}
             </div>
         </div>
-        <div class="form-group col-xs-12">
-            <label for="inputPhone" class="col-xs-4 control-label">핸드폰 번호</label>
-            <div class="col-xs-6" style="padding-right: 5px;">
-                <input id="inputNewPhone" type="tel" class="form-control" placeholder="핸드폰 번호를 입력해주세요" value="{{ current_user.phone if current_user.phone }}">
+
+        {% if current_user.phone %}
+            <div class="form-group col-xs-12">
+                <label for="inputPhone" class="col-xs-4 control-label">핸드폰 번호</label>
+                <div class="col-xs-8" style="padding-right: 5px;">
+                    <input id="inputPhone" type="tel" class="form-control" placeholder="핸드폰 번호를 입력해주세요" value="{{ current_user.phone }}" disabled>
+                </div>
             </div>
-            <button type="button" id="btnAuthCode" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">인증번호 받기</button>
-        </div>
+            <div class="form-group col-xs-12">
+                <label for="inputNewPhone" class="col-xs-4 control-label"></label>
+                <div class="col-xs-6" style="padding-right: 5px;">
+                    {{ form.phone(placeholder="변경하려는 핸드폰 번호를 입력해주세요", class="form-control") }}
+                </div>
+                <button type="button" id="btnAuthCode" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">인증번호 받기</button>
+            </div>
+        {% else %}
+            <div class="form-group col-xs-12">
+                <label for="inputNewPhone" class="col-xs-4 control-label">핸드폰 번호</label>
+                <div class="col-xs-6" style="padding-right: 5px;">
+                    {{ form.phone(placeholder="핸드폰 번호를 입력해주세요", class="form-control") }}
+                </div>
+                <button type="button" id="btnAuthCode" class="col-xs-2 btn btn-hbprimary" style="padding: 10px 16px;">인증번호 받기</button>
+            </div>
+        {% endif %}
+
         <div class="form-group col-xs-12">
             <label for="inputCode" class="col-xs-4 control-label"></label>
             <div class="col-xs-6" style="padding-right: 5px;">
@@ -60,13 +98,11 @@
 {% block jscript %}
 
     <script>
-
         $(document).ready(function () {
             var isBtnAuthCode = false;
 
             $("#btnAuthCode").click(function () {
-
-                var newUserPhone = $("#inputNewPhone").val();
+                var newUserPhone = $("#phone").val();
                 var phoneRegex = /^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$/;
                 if (!phoneRegex.test(newUserPhone)) {
                     alert("핸드폰 번호를 하이픈(-) 없이 입력해주세요.");
@@ -117,7 +153,6 @@
                 });
             });
         });
-
     </script>
 
 {% endblock %}
