@@ -10,10 +10,10 @@ from flask import request, render_template
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask import request, url_for, redirect, flash, session, escape
-from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis
+from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis, forbidden
 from hereboxweb.auth import auth
 from hereboxweb.auth.crypto import AESCipher
-from hereboxweb.auth.forms import LoginForm, SignupForm
+from hereboxweb.auth.forms import LoginForm, SignupForm, ChangeForm
 from hereboxweb.auth.models import User
 from config import RSA_PUBLIC_KEY_BASE64
 from config import RSA_PRIVATE_KEY_BASE64
@@ -104,7 +104,33 @@ def logout():
 @auth.route('/my_info', methods=['GET', 'POST'])
 @login_required
 def my_info():
-    return render_template('my_info.html', active_my_index='my_info')
+    form = ChangeForm()
+    if form.validate_on_submit():
+        password = form.password.data
+        address1 = form.address1.data
+        address2 = form.address2.data
+        phone = form.phone.data
+
+        user = User.query.get(current_user.uid)
+        if current_user.phone != phone if phone else False:
+            if not session.pop('phone_authentication', False):
+                form.phone.errors.append(u'휴대폰 번호 인증을 먼저 받아주세요')
+                return render_template('my_info.html', active_my_index='my_info', form=form)
+            else:
+                user.phone = phone
+
+        user.address1 = address1
+        user.address2 = address2
+
+        if password:
+            encrypted_password = User.encrypt_password(password)
+            user.password = encrypted_password
+
+        try:
+            database.session.commit()
+        except:
+            form.message = u'문제가 발생했습니다. 잠시후 다시 시도해주세요'
+    return render_template('my_info.html', active_my_index='my_info', form=form)
 
 
 @auth.route('/authentication_code', methods=['POST', 'GET'])
@@ -118,12 +144,11 @@ def authentication_code():
 
         auth_codes = auth_code_redis.get_redis()
         if auth_codes.get(user_auth_code) is None:
-            return bad_request(u'인증에 실패했습니다.')
+            return unauthorized(u'인증에 실패했습니다.')
 
         auth_codes.delete(user_auth_code)
         session['phone_authentication'] = True
         return response_template(u'인증에 성공했습니다.')
-
 
     phone = request.form.get('phone')
     if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone):

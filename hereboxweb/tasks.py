@@ -17,10 +17,10 @@ def send_sms_to_user(uid, message):
     if user:
         phone = user.phone
         cool = coolsms.rest(COOLSMS_API_KEY, COOLSMS_API_KEY_SECRET)
-        status = cool.send(phone, message, '01064849686')
+        status = cool.send(phone, message, '16002964')
 
 
 @tasks.task
 def send_sms(phone, message):
     cool = coolsms.rest(COOLSMS_API_KEY, COOLSMS_API_KEY_SECRET)
-    status = cool.send(phone, message, '01064849686')
+    status = cool.send(phone, message, '16002964')

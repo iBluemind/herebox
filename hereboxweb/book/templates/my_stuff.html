@@ -32,7 +32,7 @@
                             </p>
 
                             <p class="item-btn-group">
-                                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
+                                <button type="button" class="btn btn-hbprimary btn-delivery-single" style="padding: 12px 33px 12px 33px;">배송 요청</button>
                                 <button type="button" class="btn btn-hbsub btn-extend-single" style="padding: 12px 33px 12px 33px;">기간 연장</button>
                             </p>
                         </div>
@@ -102,6 +102,28 @@
 
     <script>
         $(document).ready(function () {
+            $("#btnDelivery").click(function () {
+                var selectedStuffs = [];
+                $('.my-herebox-stuff-checkbox input:checked').each(function() {
+                    selectedStuffs.push($(this).attr('name'));
+                });
+
+                $.ajax({
+                     type: "POST",
+                     url: "/delivery/order",
+                     data: {stuffIds: JSON.stringify(selectedStuffs)
+                     },
+                     success: function () {
+                        location.href = '/delivery/order'
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+
+
             $("#btnExtend").click(function () {
                 var selectedStuffs = [];
                 $('.my-herebox-stuff-checkbox input:checked').each(function() {
@@ -136,6 +158,29 @@
                          },
                          success: function () {
                             location.href = '/extended/estimate'
+                         },
+                         error: function(request, status, error) {
+                            var parsedBody = $.parseJSON(request.responseText);
+                            alert(parsedBody['message']);
+                         }
+                    });
+                });
+            });
+
+
+            $(".btn-delivery-single").each(function() {
+                $(this).click(function () {
+                    var selectedStuffs = [];
+                    var goodsId = $(this).parent().siblings("p").find("span#goodsId").text();
+                    selectedStuffs.push(goodsId);
+
+                    $.ajax({
+                         type: "POST",
+                         url: "/delivery/order",
+                         data: {stuffIds: JSON.stringify(selectedStuffs)
+                         },
+                         success: function () {
+                            location.href = '/delivery/order'
                          },
                          error: function(request, status, error) {
                             var parsedBody = $.parseJSON(request.responseText);

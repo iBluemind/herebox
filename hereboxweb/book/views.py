@@ -84,7 +84,7 @@ def goods():
     return response_template(u'정상 처리되었습니다.')
 
 
-def save_stuffs():
+def save_stuffs(api_endpoint):
     stuff_ids = request.form.get('stuffIds')
     if not stuff_ids:
         return response_template(u'물품 아이디가 없습니다.', status=400)
@@ -103,7 +103,7 @@ def save_stuffs():
         stuff_info[str(stuff.goods_id)] = 0
 
     response = make_response(response_template(u'정상 처리되었습니다.'))
-    response.set_cookie('estimate', json.dumps(stuff_info), path='/extended/')
+    response.set_cookie('estimate', json.dumps(stuff_info), path=api_endpoint)
     return response
 
 
@@ -111,12 +111,12 @@ def get_stuffs():
     stuffs = request.cookies.get('estimate')
     if stuffs:
         stuffs = json.loads(stuffs)
-        stuffs = Goods.query.filter(
+        imported_stuffs = Goods.query.filter(
             Goods.goods_id.in_(stuffs.keys())
         ).limit(10).all()
 
         packed_stuffs = []
-        for item in stuffs:
+        for item in imported_stuffs:
             today = datetime.date.today()
             remaining_day = item.expired_at - today
             item.remaining_day = remaining_day.days
@@ -129,13 +129,10 @@ def get_stuffs():
 @login_required
 def extended_estimate():
     if request.method == 'POST':
-        return save_stuffs()
+        return save_stuffs('/reservation/')
 
     packed_stuffs = get_stuffs()
-    if not packed_stuffs:
-        return redirect(url_for('book.my_stuff'))
-
-    if len(packed_stuffs) == 0:
+    if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('book.my_stuff'))
 
     return render_template('extended_estimate.html', active_menu='reservation',
