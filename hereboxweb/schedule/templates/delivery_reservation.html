@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container" style="width: 740px;">
+
+        <div style="margin: 40px 0 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/4-step-1.png') }}">
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-truck.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">배송 유형</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        상황에 맞는 배송을 선택해주세요
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="radio" style="float:left; display:inline-block;">
+                    <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                        <input type="radio" name="optionsDelivery" id="optionsRestore" value="restore" checked>
+                        재보관 가능
+                        <p class="estimate-month-item-desc">
+                            남은 보관 기간 내에 재보관이 가능합니다<br>
+                            (재보관 시 픽업 비용 박스당 2,000원 부과)<br>
+                            * 내가 보관 중인 물품에서 확인 가능합니다
+                        </p>
+                    </label>
+                    <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                        <input type="radio" name="optionsDelivery" id="optionsExpire" value="expire">
+                        보관 종료
+                        <p class="estimate-month-item-desc">
+                            남은 보관 기간에 상관없이 보관을 종료합니다<br>
+                            * 남아있는 보관 기간은 소멸됩니다
+                        </p>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-phone.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">본인 인증</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        고객님의 물품을 안전하게 보호하기 위해 물품을<br>
+                        찾을 때는 본인 인증이 필요합니다<br>
+                        * 인증이 어려운 경우 고객센터로 문의하세요
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6" style="margin-top: 10px;">
+                <div>
+                    <div style="float: left; width: 68%;">
+                        {% if old_phone_number  %}
+                            <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ old_phone_number }}" disabled>
+                        {% else %}
+                            <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
+                        {% endif %}
+                    </div>
+                    <button type="button" id="btnAuthCode" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">인증번호 받기</button>
+
+                    <div style="margin-top: 20px; float: left; width: 68%;">
+                        <input type="text" class="form-control" id="inputCode" placeholder="인증번호를 입력해주세요">
+                    </div>
+                    <button type="button" id="btnAuthCode" class="btn btn-hbprimary" style="float: left; margin-top: 20px; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-address.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">주소</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        픽업맨이 방문할 주소를 입력해주세요<br>
+                        * 현재 서울시만 서비스 가능
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div>
+                    <div style="float: left; width: 68%;">
+                        <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요">
+                    </div>
+                    <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">우편번호 찾기</button>
+                </div>
+                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요">
+                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요">
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-calendar.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">배송 일시</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        배송을 희망하는 날짜와 시간을 선택해주세요<br>
+                        (월요일-일요일, 10am-10pm, 공휴일 휴무)<br>
+                        * 희망 날짜 1일 전 17시까지 신청
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
+
+                <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                    <option value="1">10:00-12:00</option>
+                    <option value="2">12:00-14:00</option>
+                    <option value="3">14:00-16:00</option>
+                    <option value="4">16:00-18:00</option>
+                    <option value="5">18:00-20:00</option>
+                    <option value="6">20:00-22:00</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-memo.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">남기실 말씀</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        히어박스에 남기실 말씀을 적어주세요<br>
+                        * 핸드폰 번호와 연락받을 연락처가 다를 경우 입<br>
+                        력해주세요
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요"></textarea>
+            </div>
+        </div>
+
+        <div style="margin: 80px 0 100px 0; text-align: center;">
+            <button id="btnNextStep" onclick="location.href='/delivery/review';" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
+    <script src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
+
+    <script>
+        var allowUnload = false;
+        $(document).ready(function() {
+            $(window).on('beforeunload', function() {
+                if (allowUnload) {
+                    return ;
+                } else {
+                    return '현재 입력된 항목들이 지워집니다! 정말 예약을 취소하시겠습니까?';
+                }
+            });
+            $(window).on('unload', function() {
+                if (!allowUnload) {
+                    purchaseCookieClear();
+                }
+            });
+
+            var dateTimePickerOptions = {
+                format: 'YYYY-MM-DD',
+                dayViewHeaderFormat:'YYYY MMMM',
+                minDate: moment().add(1, 'd'),
+                maxDate: moment().add(15, 'd'),
+                locale: 'ko'
+            };
+
+            var current = moment();
+            var todayDateOnly = moment().format("YYYY-MM-DD");
+            var borderTime1 = moment(todayDateOnly + " 17:00:00");
+            var borderTime2 = moment(todayDateOnly + " 23:59:59");
+            if (current > borderTime1 && current <= borderTime2) {
+                dateTimePickerOptions['minDate'] = moment().add(2, 'd');
+                dateTimePickerOptions['maxDate'] = moment().add(17, 'd');
+            }
+
+            $('#inputVisitDate').datetimepicker(dateTimePickerOptions);
+            $('#inputRevisitDate').datetimepicker(dateTimePickerOptions);
+
+            $(":radio[name='optionsRevisit']").change(function() {
+                switch($(this).val()) {
+                     case 'immediate':
+                         $('#revisitDatetime').fadeOut();
+                         break;
+                     case 'later':
+                         $('#revisitDatetime').fadeIn();
+                         break;
+                }
+                $(":radio[name='optionsRevisit']").val($(this).val());
+            });
+
+            if ($(':radio[id="optionsImmediate"]:checked').val()) {
+                $('#revisitDatetime').fadeOut();
+            }
+
+            var estimateInfo = Cookies.get('estimate');
+{#            if (!estimateInfo) {#}
+{#                allowUnload = true;#}
+{#                purchaseCookieClear();#}
+{#                location.href = '/my_stuff';#}
+{#            }#}
+{##}
+{#            estimateInfo = $.parseJSON(decode_cookie(estimateInfo));#}
+
+            $('#btnPrevStep').click(function() {
+                if (errorCheck())
+                    return ;
+                allowUnload = true;
+                go('estimate');
+            });
+
+            $('#btnNextStep').click(function() {
+                if (errorCheck()) {
+                    return;
+                }
+                allowUnload = true;
+                go('review');
+            });
+
+            var orderInfo = Cookies.get('order');
+            if (orderInfo)
+                orderInfo = $.parseJSON(decode_cookie(orderInfo));
+
+            if (orderInfo && orderInfo['inputPhoneNumber']) {
+                $('#inputPhoneNumber').val(orderInfo['inputPhoneNumber']);
+            }
+            if (orderInfo && orderInfo['inputPostCode']) {
+                $('#inputPostCode').val(orderInfo['inputPostCode']);
+            }
+            if (orderInfo && orderInfo['inputAddress1']) {
+                $('#inputAddress1').val("{{ address1 }}");
+            }
+            if (orderInfo && orderInfo['inputAddress2']) {
+                $('#inputAddress2').val("{{ address2 }}");
+            }
+            if (orderInfo && orderInfo['inputVisitDate']) {
+                $('#inputVisitDate').val(orderInfo['inputVisitDate']);
+            }
+            if (orderInfo && orderInfo['inputVisitTime']) {
+                $('#inputVisitTime').val(orderInfo['inputVisitTime']);
+            }
+            if (orderInfo && orderInfo['optionsRevisit']) {
+                var oldOptionsRevisit = orderInfo['optionsRevisit'];
+                switch (oldOptionsRevisit) {
+                     case 'immediate':
+                         $(":radio[id='optionsImmediate']").attr("checked", true);
+                         $(":radio[id='optionsLater']").attr("checked", false);
+                         break;
+                     case 'later':
+                         $(":radio[id='optionsImmediate']").attr("checked", false);
+                         $(":radio[id='optionsLater']").attr("checked", true);
+                         break;
+                 }
+            }
+            if (orderInfo && orderInfo['inputRevisitDate']) {
+                $('#inputRevisitDate').val(orderInfo['inputRevisitDate']);
+            }
+            if (orderInfo && orderInfo['inputRevisitTime']) {
+                $('#inputRevisitTime').val(orderInfo['inputRevisitTime']);
+            }
+            if (orderInfo && orderInfo['textareaMemo']) {
+                $('#textareaMemo').val("{{ user_memo }}");
+            }
+        });
+
+        function go(dest) {
+            var inputPhoneNumber = $('#inputPhoneNumber').val();
+            var inputPostCode = $('#inputPostCode').val();
+            var inputAddress1 = $('#inputAddress1').val();
+            var inputAddress2 = $('#inputAddress2').val();
+            var inputVisitDate = $('#inputVisitDate').val();
+            var inputVisitTime = $('#inputVisitTime').val();
+            var optionsRevisit = $(":radio[name='optionsRevisit']").val();
+            var inputRevisitDate = $('#inputRevisitDate').val();
+            var inputRevisitTime = $('#inputRevisitTime').val();
+            var textareaMemo = $('#textareaMemo').val();
+            $.ajax({
+                 type: "POST",
+                 url: "/reservation/" + dest,
+                 data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
+                    inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputVisitDate: inputVisitDate,
+                     inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
+                     inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo
+                 },
+                 success: function () {
+                    location.href = '/delivery/' + dest;
+                 },
+                 error: function(request, status, error) {
+                    var parsedBody = $.parseJSON(request.responseText);
+                    alert(parsedBody['message']);
+                 }
+            });
+        }
+
+        function errorCheck() {
+            var isError = false;
+            if ($('#inputPhoneNumber').val().length == 0) {
+                $('#inputPhoneNumber').addClass('has-error');
+                isError = true;
+            }
+            if ($('#inputPostCode').val().length == 0) {
+                $('#inputPostCode').addClass('has-error');
+                isError = true;
+            }
+            if ($('#inputAddress1').val().length == 0) {
+                $('#inputAddress1').addClass('has-error');
+                isError = true;
+            }
+            if ($('#inputAddress2').val().length == 0) {
+                $('#inputAddress2').addClass('has-error');
+                isError = true;
+            }
+
+            if (isError) {
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
+
+            return isError;
+        }
+
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                    // 도로명 주소의 노출 규칙에 따라 주소를 조합한다.
+                    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                    var fullRoadAddr = data.roadAddress; // 도로명 주소 변수
+                    var extraRoadAddr = ''; // 도로명 조합형 주소 변수
+
+                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraRoadAddr += data.bname;
+                    }
+                    // 건물명이 있고, 공동주택일 경우 추가한다.
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                       extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    // 도로명, 지번 조합형 주소가 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                    if(extraRoadAddr !== ''){
+                        extraRoadAddr = ' (' + extraRoadAddr + ')';
+                    }
+                    // 도로명, 지번 주소의 유무에 따라 해당 조합형 주소를 추가한다.
+                    if(fullRoadAddr !== ''){
+                        fullRoadAddr += extraRoadAddr;
+                    }
+
+                    $('#inputPostCode').val(data.zonecode);
+                    $('#inputAddress1').val(fullRoadAddr);
+                    $('#inputAddress1').val(data.jibunAddress);
+
+                    // 사용자가 '선택 안함'을 클릭한 경우, 예상 주소라는 표시를 해준다.
+                    if(data.autoRoadAddress) {
+                        //예상되는 도로명 주소에 조합형 주소를 추가한다.
+                        var expRoadAddr = data.autoRoadAddress + extraRoadAddr;
+                        $('#inputAddress1').val('(예상 도로명 주소 : ' + expRoadAddr + ')');
+
+                    } else if(data.autoJibunAddress) {
+                        var expJibunAddr = data.autoJibunAddress;
+                        $('#inputAddress1').val('(예상 지번 주소 : ' + expJibunAddr + ')');
+                    }
+                }
+            }).open();
+        }
+    </script>
+
+{% endblock %}

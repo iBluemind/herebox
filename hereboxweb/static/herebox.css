@@ -8,6 +8,13 @@ body,
   padding-top: 90px;
 }
 
+a:hover,
+a:link,
+a:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
 .navbar-herebox {
   background-color: #fff;
   padding-top: 10px;
@@ -724,8 +731,12 @@ dl, ul, ol, menu, li {
   float: left;
 }
 
-.footer .footer-menu {
+.footer .footer-menu a:link,
+.footer .footer-menu a:hover,
+.footer .footer-menu a:focus {
   font-size: 18px;
+  text-decoration: none;
+  color: #727272;
 }
 
 .footer-bottom {
@@ -917,7 +928,7 @@ dl, ul, ol, menu, li {
 }
 
 .my-info-form {
-  width: 800px;
+  width: 760px;
   margin: 0 auto;
   text-align: center;
 }
@@ -1045,4 +1056,10 @@ dl, ul, ol, menu, li {
   font-size: 20px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', sans-serif;
+}
+
+.my-info-label {
+  font-family: 'Nanum Barun Gothic Light', sans-serif;
+  color: #212121;
+  font-size: 20px;
 }
