@@ -12,6 +12,7 @@ from sqlalchemy.orm import aliased
 from hereboxweb import database, response_template, bad_request
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
+from hereboxweb.book.views import save_stuffs, get_stuffs
 from hereboxweb.schedule import schedule
 from hereboxweb.schedule.models import *
 
@@ -379,3 +380,146 @@ def review():
 def completion():
     return render_template('completion.html', active_menu='reservation')
 
+
+@schedule.route('/delivery/order', methods=['GET', 'POST'])
+@login_required
+def delivery_order():
+    if request.method == 'POST':
+        return save_stuffs()
+
+    # packed_stuffs = get_stuffs()
+    # if not packed_stuffs:
+    #     return redirect(url_for('index'))
+    #
+    # if len(packed_stuffs) == 0:
+    #     return redirect(url_for('index'))
+    #
+    # response = make_response(
+    #     render_template('delivery_reservation.html', active_menu='reservation',
+    #                                             old_phone_number=current_user.phone))
+    #
+    # order_info = get_order()
+    # if order_info:
+    #     response = make_response(
+    #         render_template('delivery_reservation.html', active_menu='reservation',
+    #                         old_phone_number=current_user.phone,
+    #                         address1=order_info.get('inputAddress1'),
+    #                         address2=order_info.get('inputAddress2'),
+    #                         user_memo=order_info.get('textareaMemo')))
+    #
+    # return response
+    return render_template('delivery_reservation.html', active_menu='reservation',
+                           old_phone_number=current_user.phone)
+
+
+@schedule.route('/delivery/review', methods=['GET', 'POST'])
+@login_required
+def delivery_review():
+    if request.method == 'POST':
+        return save_order()
+
+    # estimate_info = get_estimate()
+    # if not estimate_info:
+    #     return redirect(url_for('index'))
+
+    # regular_item_count = estimate_info.get('regularItemNumberCount')
+    # irregular_item_count = estimate_info.get('irregularItemNumberCount')
+    # period = estimate_info.get('disposableNumberCount')
+    # period_option = estimate_info.get('optionsPeriod')
+    # binding_product0_count = estimate_info.get('bindingProduct0NumberCount')
+    # binding_product1_count = estimate_info.get('bindingProduct1NumberCount')
+    # binding_product2_count = estimate_info.get('bindingProduct2NumberCount')
+    # binding_product3_count = estimate_info.get('bindingProduct3NumberCount')
+    # promotion = estimate_info.get('inputPromotion')
+    # start_time = estimate_info.get('startTime')
+    #
+    # if not start_time:
+    #     return redirect(url_for('index'))
+    #
+    # order_info = get_order()
+    # if not order_info:
+    #     return redirect(url_for('index'))
+    #
+    # revisit_option = order_info.get('optionsRevisit')
+    # phone_number = order_info.get('inputPhoneNumber')
+    # revisit_time = order_info.get('inputRevisitTime')
+    # user_memo = order_info.get('textareaMemo')
+    # revisit_date = order_info.get('inputRevisitDate')
+    # visit_date = order_info.get('inputVisitDate')
+    # post_code = order_info.get('inputPostCode')
+    # address1 = order_info.get('inputAddress1')
+    # address2 = order_info.get('inputAddress2')
+    # visit_time = order_info.get('inputVisitTime')
+    #
+    # if not post_code:
+    #     return redirect(url_for('index'))
+    #
+    # try:
+    #     regular_item_count = int(regular_item_count)
+    #     irregular_item_count = int(irregular_item_count)
+    #     period = int(period)
+    #     binding_product0_count = int(binding_product0_count)
+    #     binding_product1_count = int(binding_product1_count)
+    #     binding_product2_count = int(binding_product2_count)
+    #     binding_product3_count = int(binding_product3_count)
+    # except:
+    #     return redirect(url_for('index'))
+    #
+    # def calculate_total_price():
+    #     total_storage_price = 0
+    #     if period_option == 'subscription':
+    #         # 매월 자동 결제일 경우!
+    #         total_storage_price = total_storage_price + (7500 * regular_item_count)
+    #         total_storage_price = total_storage_price + (9900 * irregular_item_count)
+    #     else:
+    #         total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+    #         total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+    #
+    #     total_binding_products_price = 0
+    #     total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
+    #     total_binding_products_price = total_binding_products_price + 500 * binding_product1_count
+    #     total_binding_products_price = total_binding_products_price + 1500 * binding_product2_count
+    #     total_binding_products_price = total_binding_products_price + 1000 * binding_product3_count
+    #
+    #     return total_storage_price + total_binding_products_price
+    #
+    # visit_time = VisitTime.query.get(visit_time)
+    # if revisit_time:
+    #     revisit_time = VisitTime.query.get(revisit_time)
+    #
+    # response = make_response(render_template('review.html', active_menu='reservation',
+    #                                          standard_box_count=regular_item_count,
+    #                                          nonstandard_goods_count=irregular_item_count,
+    #                                          period_option=True if period_option == 'subscription' else False,
+    #                                          period=period,
+    #                                          binding_products={u'포장용 에어캡 1m': binding_product0_count,
+    #                                                            u'실리카겔 (제습제) 50g': binding_product1_count,
+    #                                                            u'압축팩 40cm x 60cm': binding_product2_count,
+    #                                                            u'테이프 48mm x 40m': binding_product3_count},
+    #                                          promotion=promotion,
+    #                                          total_price=u'{:,d}원'.format(calculate_total_price()),
+    #                                          phone=phone_number,
+    #                                          address='%s %s' % (address1, address2),
+    #                                          visit_date=visit_date,
+    #                                          visit_time=visit_time,
+    #                                          revisit_option=1 if revisit_option == 'later' else 0,
+    #                                          revisit_date=revisit_date,
+    #                                          revisit_time=revisit_time,
+    #                                          user_memo=user_memo)
+    #                                         )
+    #
+    # response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    # response.headers['Cache-Control'] = 'public, max-age=0'
+    # response.headers.add('Last-Modified', datetime.datetime.now())
+    # response.headers.add('Cache-Control', 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0')
+    # response.headers.add('Pragma', 'no-cache')
+    #
+    # response.set_cookie('totalPrice', '%d' % (calculate_total_price()), path='/reservation/')
+    # return response
+    return render_template('delivery_review.html', active_menu='reservation')
+
+
+@schedule.route('/delivery/completion', methods=['GET'])
+@login_required
+def delivery_completion():
+    return render_template('delivery_completion.html', active_menu='reservation')

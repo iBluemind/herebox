@@ -84,46 +84,56 @@ def goods():
     return response_template(u'정상 처리되었습니다.')
 
 
+def save_stuffs():
+    stuff_ids = request.form.get('stuffIds')
+    if not stuff_ids:
+        return response_template(u'물품 아이디가 없습니다.', status=400)
+
+    stuff_ids = json.loads(stuff_ids)
+
+    stuffs = Goods.query.filter(
+        Goods.goods_id.in_(stuff_ids)
+    ).limit(10).all()
+
+    if not stuffs:
+        return response_template(u'해당되는 물품이 없습니다.', status=400)
+
+    stuff_info = {}
+    for stuff in stuffs:
+        stuff_info[str(stuff.goods_id)] = 0
+
+    response = make_response(response_template(u'정상 처리되었습니다.'))
+    response.set_cookie('estimate', json.dumps(stuff_info), path='/extended/')
+    return response
+
+
+def get_stuffs():
+    stuffs = request.cookies.get('estimate')
+    if stuffs:
+        stuffs = json.loads(stuffs)
+        stuffs = Goods.query.filter(
+            Goods.goods_id.in_(stuffs.keys())
+        ).limit(10).all()
+
+        packed_stuffs = []
+        for item in stuffs:
+            today = datetime.date.today()
+            remaining_day = item.expired_at - today
+            item.remaining_day = remaining_day.days
+            packed_stuffs.append(item)
+
+        return packed_stuffs
+
+
 @book.route('/extended/estimate', methods=['GET', 'POST'])
 @login_required
 def extended_estimate():
     if request.method == 'POST':
-        stuff_ids = request.form.get('stuffIds')
-        if not stuff_ids:
-            return response_template(u'물품 아이디가 없습니다.', status=400)
+        return save_stuffs()
 
-        stuff_ids = json.loads(stuff_ids)
-
-        stuffs = Goods.query.filter(
-            Goods.goods_id.in_(stuff_ids)
-        ).limit(10).all()
-
-        if not stuffs:
-            return response_template(u'해당되는 물품이 없습니다.', status=400)
-
-        stuff_info = {}
-        for stuff in stuffs:
-            stuff_info[str(stuff.goods_id)] = 0
-
-        response = make_response(response_template(u'정상 처리되었습니다.'))
-        response.set_cookie('estimate', json.dumps(stuff_info), path='/extended/')
-        return response
-
-    stuffs = request.cookies.get('estimate')
-    if not stuffs:
+    packed_stuffs = get_stuffs()
+    if not packed_stuffs:
         return redirect(url_for('book.my_stuff'))
-
-    stuffs = json.loads(stuffs)
-    stuffs = Goods.query.filter(
-        Goods.goods_id.in_(stuffs.keys())
-    ).limit(10).all()
-
-    packed_stuffs = []
-    for item in stuffs:
-        today = datetime.date.today()
-        remaining_day = item.expired_at - today
-        item.remaining_day = remaining_day.days
-        packed_stuffs.append(item)
 
     if len(packed_stuffs) == 0:
         return redirect(url_for('book.my_stuff'))

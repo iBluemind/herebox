@@ -74,8 +74,10 @@
                             </span>
 
                             <span>
-                                <img src="{{ url_for('static', filename='assets/img/icon-kt.png') }}">
-                                히어박스
+                                <a href="http://plus.kakao.com/home/l3tcgmkr" target="_blank">
+                                    <img src="{{ url_for('static', filename='assets/img/icon-kt.png') }}">
+                                    히어박스
+                                </a>
                             </span>
                         </li>
                     </ul>
@@ -86,21 +88,31 @@
                 <div class="col-xs-4">
                     <div class="footer-menu">
                         <div>
-                            <span>소개</span>
-                            <span style="margin-left: 98px; margin-right: 94px;">이용약관</span>
-                            <span>로그인</span>
+                            <span><a href="/introduce">소개</a></span>
+                            <span style="margin-left: 98px; margin-right: 94px;"><a href="/terms">이용약관</a></span>
+                            {% if not current_user.is_authenticated %}
+                            <span><a href="/login">로그인</a></span>
+                            {% endif %}
                         </div>
 
                         <div>
-                            <span>자주하는 질문</span>
-                            <span style="margin-left: 30px; margin-right: 30px;">개인정보취급방침</span>
-                            <span>회원가입</span>
+                            <span><a href="/faq">자주하는 질문</a></span>
+                            <span style="margin-left: 30px; margin-right: 30px;"><a href="/privacy">개인정보취급방침</a></span>
+                            {% if not current_user.is_authenticated %}
+                            <span><a href="/signup">회원가입</a></span>
+                            {% endif %}
                         </div>
 
                         <div style="margin-top: 28px;">
-                            <img src="{{ url_for('static', filename='assets/img/icon-fb.png') }}">
-                            <img src="{{ url_for('static', filename='assets/img/icon-insta.png') }}" style="margin-left: 20px; margin-right: 20px;">
-                            <img src="{{ url_for('static', filename='assets/img/icon-blog.png') }}">
+                            <a href="https://www.facebook.com/hereboxkr/" target="_blank">
+                                <img src="{{ url_for('static', filename='assets/img/icon-fb.png') }}">
+                            </a>
+                            <a href="https://www.instagram.com/_herebox/" target="_blank">
+                                <img src="{{ url_for('static', filename='assets/img/icon-insta.png') }}" style="margin-left: 20px; margin-right: 20px;">
+                            </a>
+                            <a href="http://blog.naver.com/herebox" target="_blank">
+                                <img src="{{ url_for('static', filename='assets/img/icon-blog.png') }}">
+                            </a>
                         </div>
                     </div>
                 </div>
