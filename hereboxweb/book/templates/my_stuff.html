@@ -110,12 +110,12 @@
                             </p>
 
                             <p class="item-btn-group">
-                                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
+                                <button type="button" class="btn btn-hbprimary btn-pickup-single" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
                             </p>
                         </div>
 
-                        <div class="checkbox my-stuff-checkbox">
-                            <label><input type="checkbox" value=""></label>
+                        <div class="checkbox my-herebox-stuff-checkbox">
+                            <label><input type="checkbox" name="{{ my_stuff.goods_id }}"></label>
                         </div>
                     </div>
                 {% endfor %}
@@ -123,7 +123,7 @@
         </div>
             <div class="my-stuff-btn-group">
                 <span>선택한 물품 모두</span>
-                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
+                <button type="button" id="btnPickup" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
             </div>
         </div>
     </div>
@@ -133,6 +133,27 @@
 
     <script>
         $(document).ready(function () {
+            $("#btnPickup").click(function () {
+                var selectedStuffs = [];
+                $('.my-herebox-stuff-checkbox input:checked').each(function() {
+                    selectedStuffs.push($(this).attr('name'));
+                });
+
+                $.ajax({
+                     type: "POST",
+                     url: "/pickup/order",
+                     data: {stuffIds: JSON.stringify(selectedStuffs)
+                     },
+                     success: function () {
+                        location.href = '/pickup/order'
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+
             $("#btnDelivery").click(function () {
                 var selectedStuffs = [];
                 $('.my-herebox-stuff-checkbox input:checked').each(function() {
@@ -210,6 +231,28 @@
                          },
                          success: function () {
                             location.href = '/delivery/order'
+                         },
+                         error: function(request, status, error) {
+                            var parsedBody = $.parseJSON(request.responseText);
+                            alert(parsedBody['message']);
+                         }
+                    });
+                });
+            });
+
+            $(".btn-pickup-single").each(function() {
+                $(this).click(function () {
+                    var selectedStuffs = [];
+                    var goodsId = $(this).parent().siblings("p").find("span#goodsId").text();
+                    selectedStuffs.push(goodsId);
+
+                    $.ajax({
+                         type: "POST",
+                         url: "/pickup/order",
+                         data: {stuffIds: JSON.stringify(selectedStuffs)
+                         },
+                         success: function () {
+                            location.href = '/pickup/order'
                          },
                          error: function(request, status, error) {
                             var parsedBody = $.parseJSON(request.responseText);

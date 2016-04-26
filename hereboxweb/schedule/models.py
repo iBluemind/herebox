@@ -52,16 +52,9 @@ class ReservationUtils(object):
     def _generate_reservation_id(self, first_char, cls):
         today = datetime.date.today()
         day_number = today.strftime('%y%m%d')
-        init_number = self._get_reservation_init_number()[first_char]
+        init_number = 20
         serial_number = init_number + self._get_today_reservation_count(cls)
         return '%c%s00%s' % (first_char, day_number, serial_number)
-
-    def _get_reservation_init_number(self):
-        return {
-            ReservationType.PICKUP_NEW: 20,
-            ReservationType.PICKUP_AGAIN: 21,
-            ReservationType.DELIVERY: 22
-        }
 
 
 reservation_goods = database.Table(
@@ -139,7 +132,6 @@ class RestoreReservation(Reservation):
     __tablename__ = 'restore_reservation'
 
     id = database.Column(database.Integer, database.ForeignKey('reservation.id'), primary_key=True)
-    fixed_rate = database.Column(database.SmallInteger)                                 # 자동결제 여부
     recovery_date = database.Column(database.Date)                                      # 방문일시(회수)
     recovery_time = database.Column(database.Integer,
                                     database.ForeignKey('visit_time.id'), nullable=True)
@@ -230,6 +222,8 @@ class ScheduleType(object):
     PICKUP_DELIVERY = 0     # 배달(픽업)
     PICKUP_RECOVERY = 1     # 회수(픽업)
     DELIVERY = 2            # 배송
+    RESTORE_DELIVERY = 3    # 배달(재보관)
+    RESTORE_RECOVERY = 4    # 회수(재보관)
 
 
 class ScheduleStatus(object):

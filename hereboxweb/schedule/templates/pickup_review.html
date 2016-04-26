@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container" style="width: 740px;">
+        <div style="margin: 40px 0 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/4-step-2.png') }}">
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="estimate-title">배송 요청한 물품 ({{ packed_stuffs | length }})</div>
+            <div class="my-stuff-items">
+                <div class="my-stuff-items-row">
+                    {% for my_stuff in packed_stuffs %}
+                        {% if loop.index % 3 == 1 %}
+                            </div>
+                            <div class="my-stuff-items-row">
+                        {% endif %}
+
+                        <div class="item">
+                            <div class="item-box" style="height: 370px;">
+                                <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
+                                <h2>{{ my_stuff.name }}</h2>
+                                <p style="margin-top: 20px;">
+                                    관리번호: <span id="goods_id">{{ my_stuff.goods_id }}</span>
+                                    <br>
+                                    보관기간: {{ my_stuff.created_at.strftime('%Y-%m-%d') }} ~ {{ my_stuff.expired_at }}
+                                    <br>
+                                    만료일까지 {{ my_stuff.remaining_day }}일 남았습니다
+                                    <br><br>
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 100px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">확인</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        예약 내용이 정확한지 확인해주세요
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div style="margin-top: 20px;">
+                    핸드폰 번호
+                    <p style="font-size: 14px;">
+                        {{ phone_number }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    주소
+                    <p style="font-size: 14px;">
+                        {{ address }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    방문 일시
+                    <p style="font-size: 14px;">
+                        {{ visit_date_time }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    픽업 준비
+                    <p style="font-size: 14px;">
+                        {% if revisit_option %}
+                            재방문 신청
+                        {% else %}
+                            재방문 신청안함
+                        {% endif %}
+                    </p>
+                </div>
+
+                {% if revisit_option %}
+                    <div style="margin-top: 20px;">
+                        재방문 일시
+                        <p style="font-size: 14px;">
+                            {{ revisit_date_time }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <div style="margin-top: 20px;">
+                    남기실 말씀
+                    <p style="font-size: 14px;">
+                        {% if user_memo %}
+                            {{ user_memo }}
+                        {% else %}
+                            없음
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 80px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; text-align: center;">
+            예상 배송 비용
+            <div>
+                <div id="totalPrice" style="display: inline-block; margin: 10px 0; padding: 15px 120px; font-family: 'Nanum Barun Gothic Bold', sans-serif; font-size: 26px; color: #ffc107; border-radius: 4px; background-color: #ffffff; border: solid 1px #ffc107;">
+                    {{ total_price }}
+                </div>
+            </div>
+
+            <div style="font-size: 14px; color: #727272;">
+                개당 2,000원
+                <br><br>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0 10px 0;">
+            <div class="checkbox" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">
+                <label>
+                    <input type="checkbox" id="chkAgree">
+                    히어박스의 <a href="/terms" target="_blank" style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
+                </label>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 100px; text-align: center;">
+            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
+
+    <script>
+        var allowUnload = false;
+        $(document).ready(function() {
+            $(window).on('beforeunload', function() {
+                if (allowUnload) {
+                    return ;
+                } else {
+                    return '현재 입력된 항목들이 지워집니다! 정말 예약을 취소하시겠습니까?';
+                }
+            });
+            $(window).on('unload', function() {
+                if (!allowUnload) {
+                    purchaseCookieClear();
+                }
+            });
+
+            $('#btnPrevStep').click(function() {
+                allowUnload = true;
+                location.href = '/pickup/order';
+            });
+
+            $('#btnNextStep').click(function() {
+                if (!$("input:checkbox[id='chkAgree']").is(":checked")) {
+                    alert('이용약관에 동의해주셔야 합니다.');
+                    return ;
+                }
+
+                allowUnload = true;
+                location.href = '/pickup/payment';
+            });
+        });
+
+        $(window).load(function() {
+            var orderInfo = Cookies.get('order');
+            if (orderInfo) {
+                orderInfo = JSON.parse(decode_cookie(orderInfo));
+
+                if (orderInfo['inputPostCode']) {
+                    return ;
+                }
+            }
+
+            purchaseCookieClear();
+            allowUnload = true;
+            location.href = '/';
+        });
+    </script>
+
+{% endblock %}

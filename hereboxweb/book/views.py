@@ -21,7 +21,8 @@ STUFF_LIST_MAX_COUNT = 10
 def my_stuff():
     my_herebox_stuffs = Goods.query.filter(
         Goods.user_id == current_user.uid,
-        Goods.in_store == InStoreStatus.IN_STORE
+        Goods.in_store == InStoreStatus.IN_STORE,
+        Goods.status == GoodsStatus.ACTIVE
     ).order_by(Goods.created_at.desc()).limit(STUFF_LIST_MAX_COUNT).all()
 
     packed_my_herebox_stuffs = []
@@ -33,7 +34,8 @@ def my_stuff():
 
     my_stuffs = Goods.query.filter(
         Goods.user_id == current_user.uid,
-        Goods.in_store == InStoreStatus.OUT_OF_STORE
+        Goods.in_store == InStoreStatus.OUT_OF_STORE,
+        Goods.status == GoodsStatus.ACTIVE
     ).order_by(Goods.created_at.desc()).limit(STUFF_LIST_MAX_COUNT).all()
 
     packed_my_stuffs = []

@@ -14,7 +14,7 @@ from hereboxweb.book.views import get_stuffs
 from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
 from hereboxweb.schedule.models import NewReservation, ReservationStatus, ReservationType, Schedule, \
-    ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation
+    ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation
 from hereboxweb.schedule.views import get_order, get_estimate
 from hereboxweb.utils import add_months
 
@@ -24,6 +24,158 @@ pay_types = {
     'phone': PayType.PHONE,
     'kakao': PayType.KAKAOPAY,
 }
+
+
+@payment.route('/pickup/payment', methods=['GET', 'POST'])
+@login_required
+def pickup_payment():
+    def calculate_total_price(stuffs_count):
+        return stuffs_count * 2000
+
+    if request.method == 'POST':
+        packed_stuffs = get_stuffs()
+        if not packed_stuffs or len(packed_stuffs) == 0:
+            return redirect(url_for('index'))
+
+        order_info = get_order()
+        revisit_option = order_info.get('optionsRevisit')
+        phone_number = order_info.get('inputPhoneNumber')
+        revisit_time = order_info.get('inputRevisitTime')
+        user_memo = order_info.get('textareaMemo')
+        revisit_date = order_info.get('inputRevisitDate')
+        visit_date = order_info.get('inputVisitDate')
+        post_code = order_info.get('inputPostCode')
+        address1 = order_info.get('inputAddress1')
+        address2 = order_info.get('inputAddress2')
+        visit_time = order_info.get('inputVisitTime')
+
+        user_pay_type = request.form.get('optionsPayType')
+
+        if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone_number):
+            return bad_request(u'잘못된 전화번호입니다.')
+
+        if len(user_memo) > 200:
+            return bad_request(u'메모가 너무 깁니다.')
+
+        if len(address1) > 200:
+            return bad_request(u'address1이 너무 깁니다.')
+
+        if len(address2) > 200:
+            return bad_request(u'address2가 너무 깁니다.')
+
+        if current_user.phone:
+            if current_user.phone != phone_number:
+                return bad_request(u'연락처 정보가 다릅니다.')
+
+        if revisit_option == 'immediate':
+            revisit_date = visit_date
+            revisit_time = visit_time
+
+        start_time = escape(session.get('start_time'))
+
+        converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+        day_standard_time1 = converted_start_time.replace(hour=17, minute=0)  # 저녁 5시 기준
+        day_standard_time2 = converted_start_time.replace(hour=23, minute=59, second=59)
+
+        if converted_start_time > day_standard_time1 and converted_start_time <= day_standard_time2:
+            converted_visit_date = datetime.datetime.strptime(visit_date, "%Y-%m-%d")
+            converted_revisit_date = datetime.datetime.strptime(revisit_date, "%Y-%m-%d")
+            today = datetime.datetime.now()
+            tommorrow = today + timedelta(days=1)
+
+            if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
+                return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
+
+        user_total_price = int(request.cookies.get('totalPrice'))
+        total_price = calculate_total_price(len(packed_stuffs))
+
+        if user_total_price != total_price:
+            return redirect(url_for('schedule.estimate'))
+
+        purchase = Purchase(
+            status=PurchaseStatus.NORMAL,
+            amount=total_price,
+            pay_type=pay_types[user_pay_type],
+            user_id=current_user.uid
+        )
+
+        database.session.add(purchase)
+
+        committed_reservations = []
+        for reservation in packed_stuffs:
+            restore_reservation = RestoreReservation(
+                status=ReservationStatus.WAITING,
+                user_id=current_user.uid,
+                contact=phone_number,
+                address='%s %s' % (address1, address2),
+                delivery_date=visit_date,
+                delivery_time=visit_time,
+                recovery_date=revisit_date,
+                recovery_time=revisit_time,
+                revisit_option=ReservationRevisitType.LATER if revisit_option == 'later' else ReservationRevisitType.IMMEDIATE,
+                user_memo=user_memo,
+                pay_type=pay_types[user_pay_type],
+                goods_id=reservation.id,
+                purchase_id=purchase.id
+            )
+            database.session.add(restore_reservation)
+            committed_reservations.append(restore_reservation)
+
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
+
+        for reservation in committed_reservations:
+            new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                          schedule_type=ScheduleType.RESTORE_DELIVERY,
+                                          staff_id=1,
+                                          customer_id=current_user.uid,
+                                          schedule_date=visit_date,
+                                          schedule_time_id=visit_time,
+                                          reservation_id=reservation.id)
+            database.session.add(new_visit_schedule)
+
+            new_revisit_schedule = None
+            if revisit_option == 'later':
+                new_revisit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                                schedule_type=ScheduleType.RESTORE_RECOVERY,
+                                                staff_id=1,
+                                                customer_id=current_user.uid,
+                                                schedule_date=revisit_date,
+                                                schedule_time_id=revisit_time,
+                                                reservation_id=reservation.id)
+            if new_revisit_schedule:
+                database.session.add(new_revisit_schedule)
+
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
+        return response_template(u'정상 처리되었습니다', 200)
+
+    packed_stuffs = get_stuffs()
+    if not packed_stuffs or len(packed_stuffs) == 0:
+        return redirect(url_for('index'))
+
+    order_info = get_order()
+    if not order_info:
+        return redirect(url_for('index'))
+
+    revisit_option = order_info['optionsRevisit']
+    phone_number = order_info['inputPhoneNumber']
+    visit_date = order_info['inputVisitDate']
+    post_code = order_info['inputPostCode']
+    address1 = order_info['inputAddress1']
+    address2 = order_info['inputAddress2']
+    visit_time = order_info['inputVisitTime']
+
+    user_total_price = int(request.cookies.get('totalPrice'))
+    total_price = calculate_total_price(len(packed_stuffs))
+
+    if user_total_price != total_price:
+        return redirect(url_for('schedule.estimate'))
+    return render_template('pickup_payment.html', active_menu='reservation')
 
 
 @payment.route('/delivery/payment', methods=['GET', 'POST'])

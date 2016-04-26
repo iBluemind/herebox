@@ -34,7 +34,9 @@ def my_schedule():
                                                    ).filter(
         Schedule.customer_id == current_user.uid,
         or_(Schedule.schedule_type == ScheduleType.PICKUP_DELIVERY,
-            Schedule.schedule_type == ScheduleType.PICKUP_RECOVERY)
+            Schedule.schedule_type == ScheduleType.PICKUP_RECOVERY,
+            Schedule.schedule_type == ScheduleType.RESTORE_DELIVERY,
+            Schedule.schedule_type == ScheduleType.RESTORE_RECOVERY,)
     ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
 
     packed_my_pickup = []
@@ -119,7 +121,7 @@ def save_estimate():
     return response
 
 
-def save_order():
+def save_order(template, api_endpoint):
     revisit_option = request.form.get('optionsRevisit')
     phone_number = request.form.get('inputPhoneNumber')
     revisit_time = request.form.get('inputRevisitTime')
@@ -165,7 +167,7 @@ def save_order():
         if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
             return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
 
-    response = make_response(render_template('reservation.html', active_menu='reservation',
+    response = make_response(render_template(template, active_menu='reservation',
                                              phone_number=current_user.phone))
 
     order_info = {
@@ -178,13 +180,12 @@ def save_order():
         'inputAddress2': address2,
     }
 
-    if revisit_time != None:
+    if revisit_option == 'later':
         order_info['inputRevisitTime'] = revisit_time
-    if revisit_date != None:
         order_info['inputRevisitDate'] = revisit_date
     if user_memo != None:
         order_info['textareaMemo'] = user_memo
-    response.set_cookie('order', json.dumps(order_info), path='/reservation/')
+    response.set_cookie('order', json.dumps(order_info), path=api_endpoint)
     return response
 
 
@@ -192,7 +193,7 @@ def save_order():
 @login_required
 def estimate():
     if request.method == 'POST':
-        return save_order()
+        return save_order('reservation.html', '/reservation/')
 
     estimate_info = get_estimate()
     if not estimate_info:
@@ -248,7 +249,7 @@ def order():
 @login_required
 def review():
     if request.method == 'POST':
-        return save_order()
+        return save_order('reservation.html', '/reservation/')
 
     estimate_info = get_estimate()
     if not estimate_info:
@@ -477,4 +478,80 @@ def delivery_review():
 @schedule.route('/delivery/completion', methods=['GET'])
 @login_required
 def delivery_completion():
+    return render_template('completion.html', active_menu='reservation')
+
+
+@schedule.route('/pickup/order', methods=['GET', 'POST'])
+@login_required
+def pickup_order():
+    if request.method == 'POST':
+        return save_stuffs('/pickup/')
+
+    packed_stuffs = get_stuffs()
+    if not packed_stuffs or len(packed_stuffs) == 0:
+        return redirect(url_for('index'))
+
+    order_info = get_order()
+    if not order_info:
+        session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return make_response(
+            render_template('pickup_reservation.html', active_menu='reservation',
+                                                phone_number=current_user.phone))
+    return make_response(
+        render_template('pickup_reservation.html', active_menu='reservation',
+                        phone_number=current_user.phone,
+                        address1=order_info.get('inputAddress1'),
+                        address2=order_info.get('inputAddress2'),
+                        user_memo=order_info.get('textareaMemo')))
+
+
+@schedule.route('/pickup/review', methods=['GET', 'POST'])
+@login_required
+def pickup_review():
+    if request.method == 'POST':
+        return save_order('pickup_reservation.html', '/pickup/')
+
+    packed_stuffs = get_stuffs()
+    if not packed_stuffs or len(packed_stuffs) == 0:
+        return redirect(url_for('index'))
+
+    order_info = get_order()
+    if not order_info:
+        return redirect(url_for('index'))
+
+    revisit_option = order_info.get('optionsRevisit')
+    phone_number = order_info.get('inputPhoneNumber')
+    revisit_time = order_info.get('inputRevisitTime')
+    user_memo = order_info.get('textareaMemo')
+    revisit_date = order_info.get('inputRevisitDate')
+    visit_date = order_info.get('inputVisitDate')
+    post_code = order_info.get('inputPostCode')
+    address1 = order_info.get('inputAddress1')
+    address2 = order_info.get('inputAddress2')
+    visit_time = order_info.get('inputVisitTime')
+
+    if not post_code:
+        return redirect(url_for('index'))
+
+    def calculate_total_price():
+        return 2000 * len(packed_stuffs)
+
+    visit_time = VisitTime.query.get(visit_time)
+    response = make_response(render_template('pickup_review.html', active_menu='reservation',
+                                             packed_stuffs=packed_stuffs,
+                                             phone_number=phone_number,
+                                             address=u'%s %s' % (address1, address2),
+                                             visit_date_time=u'%s %s' % (visit_date, visit_time),
+                                             revisit_option=1 if revisit_option == 'later' else 0,
+                                             revisit_date_time=u'%s %s' % (revisit_date, revisit_time),
+                                             user_memo=user_memo,
+                                             total_price=u'{:,d}원'.format(calculate_total_price()))
+                                            )
+    response.set_cookie('totalPrice', '%d' % (calculate_total_price()), path='/pickup/')
+    return response
+
+
+@schedule.route('/pickup/completion', methods=['GET'])
+@login_required
+def pickup_completion():
     return render_template('completion.html', active_menu='reservation')
