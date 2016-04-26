@@ -184,10 +184,6 @@
 
             $('#inputDeliveryDate').datetimepicker(dateTimePickerOptions);
 
-            $(":radio[name='optionsRestore']").change(function() {
-                $(":radio[name='optionsRestore']").val($(this).val());
-            });
-
             var estimateInfo = Cookies.get('estimate');
             if (!estimateInfo) {
                 allowUnload = true;
@@ -304,7 +300,7 @@
             var inputAddress2 = $('#inputAddress2').val();
             var inputDeliveryDate = $('#inputDeliveryDate').val();
             var inputDeliveryTime = $('#inputDeliveryTime').val();
-            var optionsDelivery= $(":radio[name='optionsDelivery']").val();
+            var optionsDelivery= $(":radio[name='optionsDelivery']:checked").val();
             var textareaMemo = $('#textareaMemo').val();
             $.ajax({
                  type: "POST",

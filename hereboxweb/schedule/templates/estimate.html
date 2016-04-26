@@ -350,7 +350,7 @@
                 var irregularItemNumberCount = Number(irregularItemNumber.text());
                 var disposableNumberCount = Number(disposableNumber.text());
 
-                if ($(":radio[name='optionsPeriod']").val() == 'disposable') {
+                if ($(":radio[name='optionsPeriod']:checked").val() == 'disposable') {
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount * disposableNumberCount);
                 } else {
@@ -409,15 +409,7 @@
                 changeTotalPrice
             );
 
-            $(":radio[name='optionsPeriod']").change(function() {
-                $(":radio[name='optionsPeriod']").val($(this).val());
-            });
-
-            $("input:radio[id='optionsDisposable']").change(function () {
-                changeTotalPrice();
-            });
-
-            $("input:radio[id='optionsSubscription']").change(function () {
+            $('input[type=radio][name=optionsPeriod]').change(function() {
                 changeTotalPrice();
             });
 
@@ -431,7 +423,7 @@
                 var regularItemNumberCount = regularItemNumber.text();
                 var irregularItemNumberCount = irregularItemNumber.text();
                 var disposableNumberCount = disposableNumber.text();
-                var optionsPeriod = $(":radio[name='optionsPeriod']").val();
+                var optionsPeriod = $(":radio[name='optionsPeriod']:checked").val();
                 var bindingProduct0NumberCount = bindingProduct0Number.text();
                 var bindingProduct1NumberCount = bindingProduct1Number.text();
                 var bindingProduct2NumberCount = bindingProduct2Number.text();
