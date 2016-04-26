@@ -68,8 +68,7 @@
         </div>
     </div>
 
-    <div style="margin-top: 60px;">
-        <div class="my-stuff-title">
+        <div class="my-stuff-title" style="margin-top: 60px;">
             <span>내가 보관 중인 물품 ({{ packed_my_stuffs | length }})</span>
             <div class="btn-up">
                 <img src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
@@ -82,6 +81,7 @@
             {% else %}
                 <div class="my-stuff-items">
             {% endif %}
+                <div class="my-stuff-items-row">
                 {% for my_stuff in packed_my_stuffs %}
                     {% if loop.index % 3 == 1 %}
                         </div>
@@ -102,8 +102,7 @@
                             </p>
 
                             <p class="item-btn-group">
-                                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
-                                <button type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
+                                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
                             </p>
                         </div>
 
@@ -113,6 +112,7 @@
                     </div>
                 {% endfor %}
             </div>
+        </div>
             <div class="my-stuff-btn-group">
                 <span>선택한 물품 모두</span>
                 <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
