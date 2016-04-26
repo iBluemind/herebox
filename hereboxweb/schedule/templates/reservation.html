@@ -189,20 +189,18 @@
             $('#inputVisitDate').datetimepicker(dateTimePickerOptions);
             $('#inputRevisitDate').datetimepicker(dateTimePickerOptions);
 
-            $(":radio[name='optionsRevisit']").change(function() {
-                switch($(this).val()) {
-                     case 'immediate':
-                         $('#revisitDatetime').fadeOut();
-                         break;
-                     case 'later':
-                         $('#revisitDatetime').fadeIn();
-                         break;
+            $('input[type=radio][name=optionsRevisit]').change(function() {
+                if (this.value == "immediate") {
+                    $('#revisitDatetime').fadeOut();
+                } else if (this.value == "later") {
+                    $('#revisitDatetime').fadeIn();
                 }
-                $(":radio[name='optionsRevisit']").val($(this).val());
             });
 
-            if ($(':radio[id="optionsImmediate"]:checked').val()) {
+            if ($('input[type=radio][name=optionsRevisit]:checked').val() == "immediate") {
                 $('#revisitDatetime').fadeOut();
+            } else {
+                $('#revisitDatetime').fadeIn();
             }
 
             $('#btnPrevStep').click(function() {
@@ -284,7 +282,7 @@
             var inputAddress2 = $('#inputAddress2').val();
             var inputVisitDate = $('#inputVisitDate').val();
             var inputVisitTime = $('#inputVisitTime').val();
-            var optionsRevisit = $(":radio[name='optionsRevisit']").val();
+            var optionsRevisit = $(":radio[name='optionsRevisit']:checked").val();
             var inputRevisitDate = $('#inputRevisitDate').val();
             var inputRevisitTime = $('#inputRevisitTime').val();
             var textareaMemo = $('#textareaMemo').val();
