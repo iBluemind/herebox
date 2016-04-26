@@ -38,28 +38,14 @@ def my_stuff():
 
     packed_my_stuffs = []
     for item in my_stuffs:
+        today = datetime.date.today()
+        remaining_day = item.expired_at - today
+        item.remaining_day = remaining_day.days
         packed_my_stuffs.append(item)
 
     return render_template('my_stuff.html', active_my_index='my_stuff',
                            packed_my_herebox_stuffs=packed_my_herebox_stuffs,
                            packed_my_stuffs=packed_my_stuffs)
-
-
-@book.route('/reservation/accept', methods=['POST'])
-# @staff_required
-def accept_reservation():
-    reservation_id = request.form.get('reservation_id')
-    reservation = Reservation.query.filter(Reservation.reservation_id == reservation_id).first()
-    if not reservation:
-        return response_template(u'%s 주문을 찾을 수 없습니다.' % reservation_id, status=400)
-
-    reservation.status = ReservationStatus.ACCEPTED
-
-    try:
-        database.session.commit()
-    except:
-        return response_template(u'오류가 발생했습니다.', status=500)
-    return response_template(u'정상 처리되었습니다.')
 
 
 def save_stuffs(api_endpoint):
