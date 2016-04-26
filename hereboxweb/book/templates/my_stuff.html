@@ -4,16 +4,73 @@
     <div>
         <div class="my-stuff-title">
             <span>히어박스 창고에 보관 중인 물품 ({{ packed_my_herebox_stuffs | length }})</span>
-            <img style="float: right;" src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
+            <div class="btn-up">
+                <img src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
+            </div>
         </div>
 
-        {% if packed_my_herebox_stuffs | length < 3 %}
-            <div class="my-stuff-items" style="margin-left: 10px;">
-        {% else %}
-            <div class="my-stuff-items">
-        {% endif %}
-            <div class="my-stuff-items-row">
-                {% for my_stuff in packed_my_herebox_stuffs %}
+        <div class="my-stuff-content">
+            {% if packed_my_herebox_stuffs | length < 3 %}
+                <div class="my-stuff-items" style="margin-left: 10px;">
+            {% else %}
+                <div class="my-stuff-items">
+            {% endif %}
+                <div class="my-stuff-items-row">
+                    {% for my_stuff in packed_my_herebox_stuffs %}
+                        {% if loop.index % 3 == 1 %}
+                            </div>
+                            <div class="my-stuff-items-row">
+                        {% endif %}
+
+                        <div class="item">
+                            <div class="item-box">
+                                <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
+                                <h2>{{ my_stuff.name }}</h2>
+                                <p>
+                                    관리번호: <span id="goodsId">{{ my_stuff.goods_id }}</span>
+                                    <br>
+                                    보관기간: {{ my_stuff.created_at.strftime('%Y-%m-%d') }} ~ {{ my_stuff.expired_at }}
+                                    <br>
+                                    만료일까지 {{ my_stuff.remaining_day }}일 남았습니다
+                                    <br><br>
+                                </p>
+
+                                <p class="item-btn-group">
+                                    <button type="button" class="btn btn-hbprimary btn-delivery-single" style="padding: 12px 33px 12px 33px;">배송 요청</button>
+                                    <button type="button" class="btn btn-hbsub btn-extend-single" style="padding: 12px 33px 12px 33px;">기간 연장</button>
+                                </p>
+                            </div>
+
+                            <div class="checkbox my-herebox-stuff-checkbox">
+                                <label><input type="checkbox" name="{{ my_stuff.goods_id }}"></label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="my-stuff-btn-group">
+                <span>선택한 물품 모두</span>
+                <button id="btnDelivery" type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
+                <button id="btnExtend" type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 60px;">
+        <div class="my-stuff-title">
+            <span>내가 보관 중인 물품 ({{ packed_my_stuffs | length }})</span>
+            <div class="btn-up">
+                <img src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
+            </div>
+        </div>
+
+        <div class="my-stuff-content">
+            {% if packed_my_stuffs | length < 3 %}
+                <div class="my-stuff-items" style="margin-left: 71px;">
+            {% else %}
+                <div class="my-stuff-items">
+            {% endif %}
+                {% for my_stuff in packed_my_stuffs %}
                     {% if loop.index % 3 == 1 %}
                         </div>
                         <div class="my-stuff-items-row">
@@ -24,78 +81,30 @@
                             <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
                             <h2>{{ my_stuff.name }}</h2>
                             <p>
-                                관리번호: <span id="goodsId">{{ my_stuff.goods_id }}</span>
+                                관리번호: {{ my_stuff.goods_id }}
                                 <br>
                                 보관기간: {{ my_stuff.created_at.strftime('%Y-%m-%d') }} ~ {{ my_stuff.expired_at }}
                                 <br>
-                                만료일까지 {{ my_stuff.remaining_day }}일 남았습니다
+                                만료일까지 17일 남았습니다
                                 <br><br>
                             </p>
 
                             <p class="item-btn-group">
-                                <button type="button" class="btn btn-hbprimary btn-delivery-single" style="padding: 12px 33px 12px 33px;">배송 요청</button>
-                                <button type="button" class="btn btn-hbsub btn-extend-single" style="padding: 12px 33px 12px 33px;">기간 연장</button>
+                                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
+                                <button type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
                             </p>
                         </div>
 
-                        <div class="checkbox my-herebox-stuff-checkbox">
-                            <label><input type="checkbox" name="{{ my_stuff.goods_id }}"></label>
+                        <div class="checkbox my-stuff-checkbox">
+                            <label><input type="checkbox" value=""></label>
                         </div>
                     </div>
                 {% endfor %}
             </div>
-        </div>
-        <div class="my-stuff-btn-group">
-            <span>선택한 물품 모두</span>
-            <button id="btnDelivery" type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
-            <button id="btnExtend" type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
-        </div>
-    </div>
-
-    <div>
-        <div class="my-stuff-title">
-            <span>내가 보관 중인 물품 ({{ packed_my_stuffs | length }})</span>
-            <img style="float: right;" src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
-        </div>
-        {% if packed_my_stuffs | length < 3 %}
-            <div class="my-stuff-items" style="margin-left: 71px;">
-        {% else %}
-            <div class="my-stuff-items">
-        {% endif %}
-            {% for my_stuff in packed_my_stuffs %}
-                {% if loop.index % 3 == 1 %}
-                    </div>
-                    <div class="my-stuff-items-row">
-                {% endif %}
-
-                <div class="item">
-                    <div class="item-box">
-                        <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
-                        <h2>{{ my_stuff.name }}</h2>
-                        <p>
-                            관리번호: {{ my_stuff.goods_id }}
-                            <br>
-                            보관기간: {{ my_stuff.created_at.strftime('%Y-%m-%d') }} ~ {{ my_stuff.expired_at }}
-                            <br>
-                            만료일까지 17일 남았습니다
-                            <br><br>
-                        </p>
-
-                        <p class="item-btn-group">
-                            <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">배송 요청</button>
-                            <button type="button" class="btn btn-hbsub" style="padding: 12px 33px 12px 33px;">기간 연장</button>
-                        </p>
-                    </div>
-
-                    <div class="checkbox my-stuff-checkbox">
-                        <label><input type="checkbox" value=""></label>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-        <div class="my-stuff-btn-group">
-            <span>선택한 물품 모두</span>
-            <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
+            <div class="my-stuff-btn-group">
+                <span>선택한 물품 모두</span>
+                <button type="button" class="btn btn-hbprimary" style="padding: 12px 33px 12px 33px;">픽업 요청</button>
+            </div>
         </div>
     </div>
 
@@ -124,7 +133,6 @@
                      }
                 });
             });
-
 
             $("#btnExtend").click(function () {
                 var selectedStuffs = [];
@@ -169,7 +177,6 @@
                 });
             });
 
-
             $(".btn-delivery-single").each(function() {
                 $(this).click(function () {
                     var selectedStuffs = [];
@@ -190,6 +197,19 @@
                          }
                     });
                 });
+            });
+
+            $('.btn-up').click(function() {
+                var myStuffContent = $(this).parent(".my-stuff-title").siblings(".my-stuff-content");
+                if (myStuffContent.hasClass("hide")) {
+                    myStuffContent.removeClass("hide");
+                    myStuffContent.slideDown();
+                    $(this).find("img").attr("src", "/static/assets/img/icon-btup.png");
+                } else {
+                    myStuffContent.addClass("hide");
+                    myStuffContent.slideUp();
+                    $(this).find("img").attr("src", "/static/assets/img/icon-btdown.png");
+                }
             });
 
         });
