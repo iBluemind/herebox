@@ -96,8 +96,8 @@ def delivery_payment():
 
         database.session.add(purchase)
 
-        committed_stuffs = []
-        for stuff in packed_stuffs:
+        committed_reservations = []
+        for reservation in packed_stuffs:
             delivery_reservation = DeliveryReservation(
                 status=ReservationStatus.WAITING,
                 user_id=current_user.uid,
@@ -108,25 +108,25 @@ def delivery_payment():
                 delivery_time=visit_time,
                 user_memo=user_memo,
                 pay_type=pay_types[user_pay_type],
-                goods_id=stuff.id,
+                goods_id=reservation.id,
                 purchase_id=purchase.id
             )
             database.session.add(delivery_reservation)
-            committed_stuffs.append(delivery_reservation)
+            committed_reservations.append(delivery_reservation)
 
         try:
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
-        for stuff in committed_stuffs:
+        for reservation in committed_reservations:
             new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
                                           schedule_type=ScheduleType.DELIVERY,
                                           staff_id=1,
                                           customer_id=current_user.uid,
                                           schedule_date=visit_date,
                                           schedule_time_id=visit_time,
-                                          reservation_id=stuff.id)
+                                          reservation_id=reservation.id)
             database.session.add(new_visit_schedule)
 
         try:
@@ -306,7 +306,8 @@ def reservation_payment():
             binding_product1_count = int(binding_product1_count)
             binding_product2_count = int(binding_product2_count)
             binding_product3_count = int(binding_product3_count)
-            period = int(period)
+            if period_option == 'disposable':
+                period = int(period)
             irregular_item_count = int(irregular_item_count)
         except:
             return bad_request(u'잘못된 요청입니다.')
@@ -441,7 +442,8 @@ def reservation_payment():
     try:
         regular_item_count = int(regular_item_count)
         irregular_item_count = int(irregular_item_count)
-        period = int(period)
+        if period_option == 'disposable':
+            period = int(period)
         binding_product0_count = int(binding_product0_count)
         binding_product1_count = int(binding_product1_count)
         binding_product2_count = int(binding_product2_count)

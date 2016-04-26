@@ -331,11 +331,16 @@
             var bindingProduct3Add = bindingProduct3.find('.add');
 
             if (estimateInfo && estimateInfo['optionsPeriod']) {
-                var optionsPeriod = estimateInfo['optionsPeriod'];
-                if (optionsPeriod == 'disposable') {
-                    $("input:radio[id='optionsDisposable']").attr("checked", true);
-                } else {
-                    $("input:radio[id='optionsSubscription']").attr("checked", true);
+                var oldOptionsPeriod = estimateInfo['optionsPeriod'];
+                switch (oldOptionsPeriod) {
+                    case 'disposable':
+                        $("input:radio[id='optionsDisposable']").attr("checked", true);
+                        $("input:radio[id='optionsSubscription']").attr("checked", false);
+                        break;
+                    case 'subscription':
+                        $("input:radio[id='optionsSubscription']").attr("checked", true);
+                        $("input:radio[id='optionsDisposable']").attr("checked", false);
+                        break;
                 }
             }
 
@@ -345,7 +350,7 @@
                 var irregularItemNumberCount = Number(irregularItemNumber.text());
                 var disposableNumberCount = Number(disposableNumber.text());
 
-                if ($(":radio[id='optionsDisposable']:checked").val()) {
+                if ($(":radio[name='optionsPeriod']").val() == 'disposable') {
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount * disposableNumberCount);
                 } else {
@@ -404,12 +409,15 @@
                 changeTotalPrice
             );
 
-            $(":radio[name='optionsPeriod']").change(function () {
-                if ($(":radio[name='optionsPeriod']").val() == 'disposable') {
-                    $("input:radio[id='optionsDisposable']").attr("checked", true);
-                } else {
-                    $("input:radio[id='optionsSubscription']").attr("checked", true);
-                }
+            $(":radio[name='optionsPeriod']").change(function() {
+                $(":radio[name='optionsPeriod']").val($(this).val());
+            });
+
+            $("input:radio[id='optionsDisposable']").change(function () {
+                changeTotalPrice();
+            });
+
+            $("input:radio[id='optionsSubscription']").change(function () {
                 changeTotalPrice();
             });
 

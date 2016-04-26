@@ -26,17 +26,11 @@ def my_schedule():
     staff = aliased(User, name="staff")
     customer = aliased(User, name="customer")
 
-    all_type_reservation = with_polymorphic(
-                            Reservation, [NewReservation, RestoreReservation,
-                                            DeliveryReservation],
-                            aliased=True)
-
     my_pickup_schedules = database.session.query(
         Schedule,
         staff.name.label("staff_name"),
         customer.name.label("customer_name")).join((staff, Schedule.staff),
-                                                  (customer, Schedule.customer),
-                                                  (Schedule.reservations.of_type(all_type_reservation))
+                                                  (customer, Schedule.customer)
                                                    ).filter(
         Schedule.customer_id == current_user.uid,
         or_(Schedule.schedule_type == ScheduleType.PICKUP_DELIVERY,
@@ -51,8 +45,7 @@ def my_schedule():
         Schedule,
         staff.name.label("staff_name"),
         customer.name.label("customer_name")).join((staff, Schedule.staff),
-                                                   (customer, Schedule.customer),
-                                                   (Schedule.reservations.of_type(all_type_reservation))
+                                                   (customer, Schedule.customer)
                                                    ).filter(
         Schedule.customer_id == current_user.uid,
         Schedule.schedule_type == ScheduleType.DELIVERY
@@ -95,7 +88,8 @@ def save_estimate():
     try:
         regular_item_count = int(regular_item_count)
         irregular_item_count = int(irregular_item_count)
-        period = int(period)
+        if period_option == 'disposable':
+            period = int(period)
         binding_product0_count = int(binding_product0_count)
         binding_product1_count = int(binding_product1_count)
         binding_product2_count = int(binding_product2_count)
@@ -116,7 +110,7 @@ def save_estimate():
         'bindingProduct3NumberCount': binding_product3_count,
     }
 
-    if period != None:
+    if period_option == 'disposable':
         estimate_info['disposableNumberCount'] = period
     if promotion != None:
         estimate_info['inputPromotion'] = promotion
@@ -295,7 +289,8 @@ def review():
     try:
         regular_item_count = int(regular_item_count)
         irregular_item_count = int(irregular_item_count)
-        period = int(period)
+        if period_option == 'disposable':
+            period = int(period)
         binding_product0_count = int(binding_product0_count)
         binding_product1_count = int(binding_product1_count)
         binding_product2_count = int(binding_product2_count)

@@ -86,12 +86,13 @@ class Goods(database.Model, JsonSerializable):
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     box_id = database.Column(database.Integer, database.ForeignKey('box.id'), nullable=True)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
+    fixed_rate = database.Column(database.SmallInteger)   # 자동결제 여부
     expired_at = database.Column(database.Date)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
 
-    def __init__(self, goods_type, name, memo, in_store, user_id, expired_at=None, reservations=None,
-                                                box_id=None):
+    def __init__(self, goods_type, name, memo, in_store, user_id, fixed_rate,
+                                expired_at=None, schedules=None, box_id=None):
         self.goods_id = self._generate_goods_id(goods_type)
         self.goods_type = goods_type
         self.name = name
@@ -99,7 +100,8 @@ class Goods(database.Model, JsonSerializable):
         self.in_store = in_store
         self.box_id = box_id
         self.user_id = user_id
-        self.reservations = reservations
+        self.fixed_rate = fixed_rate
+        self.schedules = schedules
         self.expired_at = expired_at
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
