@@ -33,35 +33,30 @@ auth_code_redis = RedisConnectHelper(RedisType.AUTH_CODE_REDIS)
 
 
 # Status 400 응답
-@app.errorhandler(400)
 def bad_request(message=u'잘못된 형식으로 요청했습니다.', error=None):
     if type(message) is not unicode:
         message = str(message)
     return response_template(message, 400)
 
 # Status 401 응답
-@app.errorhandler(401)
 def unauthorized(message=u'로그인이 필요합니다.', error=None):
     if type(message) is not unicode:
         message = str(message)
     return response_template(message, 401)
 
 # Status 403 응답
-@app.errorhandler(403)
 def forbidden(message=u'권한이 없습니다.', error=None):
     if type(message) is not unicode:
         message = str(message)
     return response_template(message, 403)
 
 # Status 404 응답
-@app.errorhandler(404)
 def not_found(message=u'잘못된 요청입니다. 요청 API를 확인해주세요.', error=None):
     if type(message) is not unicode:
         message = str(message)
     return response_template(message, 404)
 
 # Status 500 응답
-@app.errorhandler(500)
 def internal_error(message=u'점검 중이거나 내부 문제가 발생했습니다. 나중에 다시 시도해주세요.', error=None):
     if type(message) is not unicode:
         message = str(message)

@@ -8,6 +8,9 @@ function purchaseCookieClear() {
     Cookies.remove('estimate', { path: '/delivery/' });
     Cookies.remove('order', { path: '/delivery/' });
     Cookies.remove('totalPrice', { path: '/delivery/' });
+    Cookies.remove('estimate', { path: '/pickup/' });
+    Cookies.remove('order', { path: '/pickup/' });
+    Cookies.remove('totalPrice', { path: '/pickup/' });
 }
 
 

@@ -3,9 +3,9 @@
 
 import datetime
 from flask import request, render_template
-from hereboxweb import database, response_template
+from hereboxweb import database, response_template, bad_request
 from hereboxweb.admin import admin
-from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus
+from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsStatus, BoxStatus
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus
 from hereboxweb.utils import add_months
 
@@ -39,9 +39,11 @@ def allocate_goods():
 
     box = None
     if goods_type == GoodsType.STANDARD_BOX:
-        box = Box.query.filter(Box.box_id == box_id).first()
+        box = Box.query.filter(Box.box_id == box_id, Box.status == BoxStatus.AVAILABLE).first()
         if not box:
             return response_template(u'%s 상자를 찾을 수 없습니다.' % box_id, status=400)
+
+        box.status = BoxStatus.UNAVAILABLE
 
     reservation = Reservation.query.filter(
                         Reservation.reservation_id == reservation_id,
@@ -68,13 +70,23 @@ def allocate_goods():
                       user_id=user_id,
                       schedules=pickup_schedules,
                       expired_at=expired,
-                      fixed_rate=reservation.fixed_rate)
+                      fixed_rate=reservation.fixed_rate,
+                      status=GoodsStatus.ACTIVE)
 
     try:
         database.session.add(new_goods)
         database.session.commit()
     except:
         return response_template(u'오류가 발생했습니다.', status=500)
+
+    if goods_type == GoodsType.STANDARD_BOX:
+        box.goods_id = new_goods.id
+
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'오류가 발생했습니다.', status=500)
+
     return response_template(u'정상 처리되었습니다.')
 
 
@@ -106,6 +118,33 @@ def release_goods():
                             .first()
 
     goods.in_store = InStoreStatus.OUT_OF_STORE
+
+    try:
+        database.session.commit()
+    except:
+        return response_template(u'오류가 발생했습니다.', status=500)
+    return response_template(u'정상 처리되었습니다.')
+
+
+@admin.route('/goods/free', methods=['POST'])
+# @staff_required
+def free_goods():
+    goods_id = request.form.get('goods_id')
+
+    today = datetime.date.today()
+    goods = Goods.query.filter(
+                               Goods.goods_id == goods_id,
+                               today >= Goods.expired_at,
+                               Goods.status == GoodsStatus.ACTIVE).first()
+
+    if not goods:
+        return bad_request(u'물품 %s를 찾을 수 없습니다.' % goods_id)
+
+    if goods.box_id != None:
+        box = Box.query.get(goods.box_id)
+        box.goods_id = None
+        box.status = BoxStatus.AVAILABLE
+    goods.status = GoodsStatus.EXPIRED
 
     try:
         database.session.commit()
