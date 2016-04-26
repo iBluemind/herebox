@@ -7,7 +7,7 @@ from datetime import timedelta
 from flask import request, render_template, redirect, url_for, make_response, session, escape
 from flask.ext.login import login_required, current_user
 from sqlalchemy import or_
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, with_polymorphic
 
 from hereboxweb import database, response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
@@ -26,11 +26,18 @@ def my_schedule():
     staff = aliased(User, name="staff")
     customer = aliased(User, name="customer")
 
+    all_type_reservation = with_polymorphic(
+                            Reservation, [NewReservation, RestoreReservation,
+                                            DeliveryReservation],
+                            aliased=True)
+
     my_pickup_schedules = database.session.query(
         Schedule,
         staff.name.label("staff_name"),
         customer.name.label("customer_name")).join((staff, Schedule.staff),
-                                                  (customer, Schedule.customer)).filter(
+                                                  (customer, Schedule.customer),
+                                                  (Schedule.reservations.of_type(all_type_reservation))
+                                                   ).filter(
         Schedule.customer_id == current_user.uid,
         or_(Schedule.schedule_type == ScheduleType.PICKUP_DELIVERY,
             Schedule.schedule_type == ScheduleType.PICKUP_RECOVERY)
@@ -44,7 +51,9 @@ def my_schedule():
         Schedule,
         staff.name.label("staff_name"),
         customer.name.label("customer_name")).join((staff, Schedule.staff),
-                                                   (customer, Schedule.customer)).filter(
+                                                   (customer, Schedule.customer),
+                                                   (Schedule.reservations.of_type(all_type_reservation))
+                                                   ).filter(
         Schedule.customer_id == current_user.uid,
         Schedule.schedule_type == ScheduleType.DELIVERY
     ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
