@@ -10,6 +10,23 @@ from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleT
 from hereboxweb.utils import add_months
 
 
+@admin.route('/reservation/accept', methods=['POST'])
+# @staff_required
+def accept_reservation():
+    reservation_id = request.form.get('reservation_id')
+    reservation = Reservation.query.filter(Reservation.reservation_id == reservation_id).first()
+    if not reservation:
+        return response_template(u'%s 주문을 찾을 수 없습니다.' % reservation_id, status=400)
+
+    reservation.status = ReservationStatus.ACCEPTED
+
+    try:
+        database.session.commit()
+    except:
+        return response_template(u'오류가 발생했습니다.', status=500)
+    return response_template(u'정상 처리되었습니다.')
+
+
 @admin.route('/goods/allocate', methods=['POST'])
 # @staff_required
 def allocate_goods():
