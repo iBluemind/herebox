@@ -67,7 +67,7 @@ def initialize_db():
                               password='akswhddk8', phone='01064849686'))
 
     from hereboxweb.book.models import Box, BoxStatus, InStoreStatus
-    for i in xrange(1, 1000):
+    for i in xrange(1, 10):
         database.session.add(Box(box_id='1A%03d' % i, in_store=InStoreStatus.IN_STORE,
                                                         status=BoxStatus.AVAILABLE))
 

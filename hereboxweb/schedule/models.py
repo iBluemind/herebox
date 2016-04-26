@@ -41,6 +41,7 @@ class ReservationDeliveryType(object):
     RESTORE = 0         # 재보관 가능
     EXPIRE = 1          # 보관 종료
 
+
 class ReservationUtils(object):
     def _get_today_reservation_count(self, cls):
         today = datetime.date.today()
@@ -188,6 +189,7 @@ class NewReservation(Reservation):
     revisit_option = database.Column(database.SmallInteger)                     # 재방문 여부(배달날짜 != 회수날짜)
     promotion_id = database.Column(database.Integer,
                                    database.ForeignKey('promotion.id'), nullable=True)
+
     __mapper_args__ = {'polymorphic_identity': 'new_reservation'}
 
     def __init__(self, status, standard_box_count, nonstandard_goods_count,
@@ -255,9 +257,8 @@ class Schedule(database.Model, JsonSerializable):
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=True)
     schedule_date = database.Column(database.DateTime)
     schedule_time_id = database.Column(database.Integer, database.ForeignKey('visit_time.id'), nullable=False)
-    reservation_type = database.Column(database.String(50))
     reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('new_reservation.id'), nullable=True)
+                                     database.ForeignKey('reservation.id'), nullable=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
     staff = relationship(User,
@@ -266,14 +267,10 @@ class Schedule(database.Model, JsonSerializable):
     customer = relationship(User,
                             primaryjoin="Schedule.customer_id==User.uid",
                             foreign_keys=User.uid)
-
-    __mapper_args__ = {
-        'polymorphic_identity': 'schedule',
-        'polymorphic_on': reservation_type
-    }
+    reservations = relationship("Reservation", backref='schedule')
 
     def __init__(self, status, schedule_type, customer_id, schedule_date, schedule_time_id,
-                        reservation_id=None, staff_id=None, goods_id=None):
+                                            reservation_id=None, staff_id=None, goods_id=None):
         self.status = status
         self.schedule_type = schedule_type
         self.staff_id = staff_id
@@ -295,24 +292,18 @@ class CompletedSchedule(database.Model, JsonSerializable):
     staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
-    new_reservation_id = database.Column(database.Integer,
-                                         database.ForeignKey('new_reservation.id'), nullable=True)
-    restore_reservation_id = database.Column(database.Integer,
-                                         database.ForeignKey('restore_reservation.id'), nullable=True)
-    delivery_reservation_id = database.Column(database.Integer,
-                                          database.ForeignKey('delivery_reservation.id'), nullable=True)
+    reservation_id = database.Column(database.Integer,
+                                     database.ForeignKey('reservation.id'), nullable=True)
     scheduled_at = database.Column(database.DateTime)       # 예약된 시간
     created_at = database.Column(database.DateTime)         # 완료된 시간
 
-    def __init__(self, purchase_id, staff_id, customer_id, goods_id, new_reservation_id,
-                                        restore_reservation_id, delivery_reservation_id, scheduled_at):
+    def __init__(self, purchase_id, staff_id, customer_id, goods_id, scheduled_at,
+                                            reservation_id=None):
         self.purchase_id = purchase_id
         self.staff_id = staff_id
         self.customer_id = customer_id
         self.goods_id = goods_id
-        self.new_reservation_id = new_reservation_id
-        self.restore_reservation_id = restore_reservation_id
-        self.delivery_reservation_id = delivery_reservation_id
+        self.reservation_id = reservation_id
         self.scheduled_at = scheduled_at
         self.created_at = datetime.datetime.now()
 
@@ -328,25 +319,20 @@ class CanceledSchedule(database.Model, JsonSerializable):
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
     reason = database.Column(database.Text)
-    new_reservation_id = database.Column(database.Integer,
-                                         database.ForeignKey('new_reservation.id'), nullable=True)
-    restore_reservation_id = database.Column(database.Integer,
-                                         database.ForeignKey('restore_reservation.id'), nullable=True)
-    delivery_reservation_id = database.Column(database.Integer,
-                                          database.ForeignKey('delivery_reservation.id'), nullable=True)
+    reservation_type = database.Column(database.String(50))
+    reservation_id = database.Column(database.Integer,
+                                     database.ForeignKey('reservation.id'), nullable=True)
     scheduled_at = database.Column(database.DateTime)   # 예약된 시간
     created_at = database.Column(database.DateTime)     # 취소된 시간
 
-    def __init__(self, purchase_id, staff_id, customer_id, goods_id, reason, new_reservation_id,
-                                        restore_reservation_id, delivery_reservation_id, scheduled_at):
+    def __init__(self, purchase_id, staff_id, customer_id, goods_id, reason, scheduled_at,
+                                                        reservation_id=None):
         self.purchase_id = purchase_id
         self.staff_id = staff_id
         self.customer_id = customer_id
         self.goods_id = goods_id
         self.reason = reason
-        self.new_reservation_id = new_reservation_id
-        self.restore_reservation_id = restore_reservation_id
-        self.delivery_reservation_id = delivery_reservation_id
+        self.reservation_id = reservation_id
         self.scheduled_at = scheduled_at
         self.created_at = datetime.datetime.now()
 

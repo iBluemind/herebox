@@ -62,10 +62,10 @@
                 <div class="my-schedule-table-row content">
                     <div class="my-schedule-table-cell">{{ my_schedule.reservation.reservation_id }}</div>
                     <div class="my-schedule-table-cell">{{ my_schedule.schedule_date.strftime('%Y-%m-%d') }} {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
-                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.delivery_option == '0' %}재보관 가능
-                        {% elif my_schedule.reservation.delivery_option == '1' %}보관 종료
+                    <div class="my-schedule-table-cell">{% if my_schedule.reservation.delivery_option == 0 %}재보관 가능
+                        {% elif my_schedule.reservation.delivery_option == 1 %}보관 종료
                         {% endif %}</div>
-                    <div class="my-schedule-table-cell">{{ my_schedule.staff.name }}</div>
+                    <div class="my-schedule-table-cell">{{ my_schedule.staff[0].name }}</div>
                     <div class="my-schedule-table-cell">{% if my_schedule.reservation.pay_type == 0 %}카드
                         {% elif my_schedule.reservation.pay_type == 1 %}현장
                         {% elif my_schedule.reservation.pay_type == 2 %}휴대폰
