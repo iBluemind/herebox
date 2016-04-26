@@ -269,11 +269,7 @@
         $(window).load(function() {
             var estimateInfo = Cookies.get('estimate');
             if (estimateInfo) {
-                estimateInfo = JSON.parse(decode_cookie(estimateInfo));
-
-                if (estimateInfo['startTime']) {
-                    return ;
-                }
+                return ;
             }
 
             purchaseCookieClear();

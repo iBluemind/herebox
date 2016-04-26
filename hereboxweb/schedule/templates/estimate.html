@@ -338,7 +338,6 @@
                     $("input:radio[id='optionsSubscription']").attr("checked", true);
                 }
             }
-            var startTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
             var calculateStoragePrice = function() {
                 var totalStoragePrice = 0;
@@ -438,7 +437,7 @@
                          irregularItemNumberCount: irregularItemNumberCount, disposableNumberCount: disposableNumberCount,
                          optionsPeriod: optionsPeriod, bindingProduct0NumberCount: bindingProduct0NumberCount,
                          bindingProduct1NumberCount: bindingProduct1NumberCount, bindingProduct2NumberCount: bindingProduct2NumberCount,
-                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice, startTime: startTime
+                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice
                      },
                      success: function () {
                         location.href = '/reservation/order'

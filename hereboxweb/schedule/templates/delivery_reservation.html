@@ -55,18 +55,14 @@
             <div class="col-xs-6" style="margin-top: 10px;">
                 <div>
                     <div style="float: left; width: 68%;">
-                        {% if old_phone_number  %}
-                            <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ old_phone_number }}" disabled>
-                        {% else %}
-                            <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
-                        {% endif %}
+                        <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
                     </div>
                     <button type="button" id="btnAuthCode" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">인증번호 받기</button>
 
                     <div style="margin-top: 20px; float: left; width: 68%;">
                         <input type="text" class="form-control" id="inputCode" placeholder="인증번호를 입력해주세요">
                     </div>
-                    <button type="button" id="btnAuthCode" class="btn btn-hbprimary" style="float: left; margin-top: 20px; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">확인</button>
+                    <button type="button" id="btnAuthCodeCheck" class="btn btn-hbprimary" style="float: left; margin-top: 20px; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">확인</button>
                 </div>
             </div>
         </div>
@@ -107,9 +103,9 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
+                <input type="text" class="form-control" id="inputDeliveryDate" placeholder="날짜를 선택하세요 (2주 이내)">
 
-                <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                <select id="inputDeliveryTime" style="margin-top: 20px;" class="form-control">
                     <option value="1">10:00-12:00</option>
                     <option value="2">12:00-14:00</option>
                     <option value="3">14:00-16:00</option>
@@ -138,8 +134,7 @@
         </div>
 
         <div style="margin: 80px 0 100px 0; text-align: center;">
-            <button id="btnNextStep" onclick="location.href='/delivery/review';" class="btn btn-hbprimary">다음 단계</button>
-            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
         </div>
     </div>
 
@@ -187,40 +182,18 @@
                 dateTimePickerOptions['maxDate'] = moment().add(17, 'd');
             }
 
-            $('#inputVisitDate').datetimepicker(dateTimePickerOptions);
-            $('#inputRevisitDate').datetimepicker(dateTimePickerOptions);
+            $('#inputDeliveryDate').datetimepicker(dateTimePickerOptions);
 
-            $(":radio[name='optionsRevisit']").change(function() {
-                switch($(this).val()) {
-                     case 'immediate':
-                         $('#revisitDatetime').fadeOut();
-                         break;
-                     case 'later':
-                         $('#revisitDatetime').fadeIn();
-                         break;
-                }
-                $(":radio[name='optionsRevisit']").val($(this).val());
+            $(":radio[name='optionsRestore']").change(function() {
+                $(":radio[name='optionsRestore']").val($(this).val());
             });
-
-            if ($(':radio[id="optionsImmediate"]:checked').val()) {
-                $('#revisitDatetime').fadeOut();
-            }
 
             var estimateInfo = Cookies.get('estimate');
-{#            if (!estimateInfo) {#}
-{#                allowUnload = true;#}
-{#                purchaseCookieClear();#}
-{#                location.href = '/my_stuff';#}
-{#            }#}
-{##}
-{#            estimateInfo = $.parseJSON(decode_cookie(estimateInfo));#}
-
-            $('#btnPrevStep').click(function() {
-                if (errorCheck())
-                    return ;
+            if (!estimateInfo) {
                 allowUnload = true;
-                go('estimate');
-            });
+                purchaseCookieClear();
+                location.href = '/my_stuff';
+            }
 
             $('#btnNextStep').click(function() {
                 if (errorCheck()) {
@@ -246,34 +219,82 @@
             if (orderInfo && orderInfo['inputAddress2']) {
                 $('#inputAddress2').val("{{ address2 }}");
             }
-            if (orderInfo && orderInfo['inputVisitDate']) {
-                $('#inputVisitDate').val(orderInfo['inputVisitDate']);
+            if (orderInfo && orderInfo['inputDeliveryDate']) {
+                $('#inputDeliveryDate').val(orderInfo['inputDeliveryDate']);
             }
             if (orderInfo && orderInfo['inputVisitTime']) {
-                $('#inputVisitTime').val(orderInfo['inputVisitTime']);
+                $('#inputDeliveryTime').val(orderInfo['inputDeliveryTime']);
             }
-            if (orderInfo && orderInfo['optionsRevisit']) {
-                var oldOptionsRevisit = orderInfo['optionsRevisit'];
+            if (orderInfo && orderInfo['optionsDelivery']) {
+                var oldOptionsRevisit = orderInfo['optionsDelivery'];
                 switch (oldOptionsRevisit) {
-                     case 'immediate':
-                         $(":radio[id='optionsImmediate']").attr("checked", true);
-                         $(":radio[id='optionsLater']").attr("checked", false);
+                     case 'restore':
+                         $(":radio[id='optionsRestore']").attr("checked", true);
+                         $(":radio[id='optionsExpire']").attr("checked", false);
                          break;
-                     case 'later':
-                         $(":radio[id='optionsImmediate']").attr("checked", false);
-                         $(":radio[id='optionsLater']").attr("checked", true);
+                     case 'expire':
+                         $(":radio[id='optionsRestore']").attr("checked", false);
+                         $(":radio[id='optionsExpire']").attr("checked", true);
                          break;
                  }
-            }
-            if (orderInfo && orderInfo['inputRevisitDate']) {
-                $('#inputRevisitDate').val(orderInfo['inputRevisitDate']);
-            }
-            if (orderInfo && orderInfo['inputRevisitTime']) {
-                $('#inputRevisitTime').val(orderInfo['inputRevisitTime']);
             }
             if (orderInfo && orderInfo['textareaMemo']) {
                 $('#textareaMemo').val("{{ user_memo }}");
             }
+
+            $("#btnAuthCode").click(function () {
+                var newUserPhone = $("#inputPhoneNumber").val();
+                var phoneRegex = /^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$/;
+                if (!phoneRegex.test(newUserPhone)) {
+                    alert("핸드폰 번호를 하이픈(-) 없이 입력해주세요.");
+                    return ;
+                }
+
+                $.ajax({
+                     type: "POST",
+                     url: "/authentication_code",
+                     data: {phone: newUserPhone
+                     },
+                     success: function () {
+                        alert("인증번호를 발송했습니다.");
+                        isBtnAuthCode = true;
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+
+            var isBtnAuthCode = false;
+
+            $("#btnAuthCodeCheck").click(function () {
+                if (!isBtnAuthCode) {
+                    alert("인증번호 받기 버튼을 먼저 눌러주세요.");
+                    return ;
+                }
+
+                var userAuthCode = $("#inputCode").val();
+                var authCodeRegex = /^([0-9]{4})$/;
+                if (!authCodeRegex.test(userAuthCode)) {
+                    alert("올바른 인증코드를 입력해주세요.");
+                    return ;
+                }
+
+                $.ajax({
+                     type: "GET",
+                     url: "/authentication_code",
+                     data: {authCode: userAuthCode
+                     },
+                     success: function () {
+                        alert("인증에 성공했습니다.");
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
         });
 
         function go(dest) {
@@ -281,21 +302,19 @@
             var inputPostCode = $('#inputPostCode').val();
             var inputAddress1 = $('#inputAddress1').val();
             var inputAddress2 = $('#inputAddress2').val();
-            var inputVisitDate = $('#inputVisitDate').val();
-            var inputVisitTime = $('#inputVisitTime').val();
-            var optionsRevisit = $(":radio[name='optionsRevisit']").val();
-            var inputRevisitDate = $('#inputRevisitDate').val();
-            var inputRevisitTime = $('#inputRevisitTime').val();
+            var inputDeliveryDate = $('#inputDeliveryDate').val();
+            var inputDeliveryTime = $('#inputDeliveryTime').val();
+            var optionsDelivery= $(":radio[name='optionsDelivery']").val();
             var textareaMemo = $('#textareaMemo').val();
             $.ajax({
                  type: "POST",
-                 url: "/reservation/" + dest,
+                 url: "/delivery/" + dest,
                  data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
-                    inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputVisitDate: inputVisitDate,
-                     inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
-                     inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo
+                    inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputDeliveryDate: inputDeliveryDate,
+                     inputDeliveryTime: inputDeliveryTime, optionsDelivery: optionsDelivery, textareaMemo: textareaMemo
                  },
                  success: function () {
+
                     location.href = '/delivery/' + dest;
                  },
                  error: function(request, status, error) {

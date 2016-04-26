@@ -9,7 +9,7 @@ from flask.ext.login import login_required, current_user
 from hereboxweb import database, response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book
-from hereboxweb.schedule.models import Reservation
+from hereboxweb.schedule.models import NewReservation, DeliveryReservation, RestoreReservation, Reservation
 from hereboxweb.utils import staff_required, add_months
 
 STUFF_LIST_MAX_COUNT = 10
