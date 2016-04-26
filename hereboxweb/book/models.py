@@ -86,12 +86,12 @@ class Goods(database.Model, JsonSerializable):
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     box_id = database.Column(database.Integer, database.ForeignKey('box.id'), nullable=True)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    reservations = relationship("Reservation", order_by="Reservation.id", backref="goods")
     expired_at = database.Column(database.Date)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
 
-    def __init__(self, goods_type, name, memo, in_store, user_id, reservations, expired_at, box_id=None):
+    def __init__(self, goods_type, name, memo, in_store, user_id, expired_at=None, reservations=None,
+                                                box_id=None):
         self.goods_id = self._generate_goods_id(goods_type)
         self.goods_type = goods_type
         self.name = name

@@ -82,18 +82,18 @@
 
             $('#btnPrevStep').click(function() {
                 allowUnload = true;
-                location.href = "/reservation/review";
+                location.href = "/delivery/review";
             });
 
             $('#btnNextStep').click(function() {
                 allowUnload = true;
                 $.ajax({
                      type: "POST",
-                     url: "/reservation/payment",
+                     url: "/delivery/payment",
                      data: {optionsPayType: $(":radio[name='optionsPayType']:checked").val()
                      },
                      success: function () {
-                        location.href = '/reservation/completion';
+                        location.href = '/delivery/completion';
                      },
                      error: function(request, status, error) {
                         var parsedBody = $.parseJSON(request.responseText);
@@ -111,7 +111,7 @@
 
             purchaseCookieClear();
             allowUnload = true;
-            location.href = '/reservation/estimate';
+            location.href = '/';
         });
     </script>
 {% endblock %}

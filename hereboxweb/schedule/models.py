@@ -19,6 +19,12 @@ class ReservationType(object):
     PICKUP_AGAIN = 'R'  # 재보관
     DELIVERY = 'D'      # 배송
 
+    table_name_map = {
+        PICKUP_NEW: 'new_reservation',
+        PICKUP_AGAIN: 'restore_reservation',
+        DELIVERY: 'delivery_reservation',
+    }
+
 
 # 예약 상태
 class ReservationStatus(object):
@@ -26,51 +32,171 @@ class ReservationStatus(object):
     ACCEPTED = 1    # 접수
 
 
-# 예약
-class Reservation(database.Model, JsonSerializable):
+class ReservationRevisitType(object):
+    IMMEDIATE = 0               # 즉시 가능
+    LATER = 1                   # 재방문 신청
+
+
+class ReservationDeliveryType(object):
+    RESTORE = 0         # 재보관 가능
+    EXPIRE = 1          # 보관 종료
+
+class ReservationUtils(object):
+    def _get_today_reservation_count(self, cls):
+        today = datetime.date.today()
+        return cls.query.filter(and_(cls.created_at >= today.strftime('%Y-%m-%d 00:00:00'),
+                                     cls.created_at <= today.strftime(
+                                                    '%Y-%m-%d 23:59:59'))).count()
+
+    def _generate_reservation_id(self, first_char, cls):
+        today = datetime.date.today()
+        day_number = today.strftime('%y%m%d')
+        init_number = self._get_reservation_init_number()[first_char]
+        serial_number = init_number + self._get_today_reservation_count(cls)
+        return '%c%s00%s' % (first_char, day_number, serial_number)
+
+    def _get_reservation_init_number(self):
+        return {
+            ReservationType.PICKUP_NEW: 20,
+            ReservationType.PICKUP_AGAIN: 21,
+            ReservationType.DELIVERY: 22
+        }
+
+
+reservation_goods = database.Table(
+                        'reservation_goods',
+                            database.Column('reservation', database.Integer, database.ForeignKey('reservation.id')),
+                            database.Column('goods', database.Integer, database.ForeignKey('goods.id'))
+                    )
+
+
+class Reservation(database.Model, JsonSerializable, ReservationUtils):
 
     __tablename__ = 'reservation'
 
     id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     reservation_id = database.Column(database.String(11), unique=True)
-    reservation_type = database.Column(database.String(1))                      # 예약 종류
-    status = database.Column(database.SmallInteger)                             # 예약 접수 상태
-    standard_box_count = database.Column(database.SmallInteger)                 # 규격박스 갯수
-    nonstandard_goods_count = database.Column(database.SmallInteger)            # 비규격물품 갯수
-    period = database.Column(database.SmallInteger)                             # 계약 월수
-    pay_type = database.Column(database.SmallInteger)                           # 결제 방법
-    fixed_rate = database.Column(database.SmallInteger)                         # 자동결제 여부
-    promotion = database.Column(database.SmallInteger)                          # 프로모션 여부
-    binding_products = database.Column(database.Text)                           # 포장용품
-    contact = database.Column(database.Text)                                    # 연락처
-    address = database.Column(database.Text)                                    # 방문주소
-    delivery_date = database.Column(database.Date)                              # 방문일시(배달)
+    reservation_type = database.Column(database.String(30))                         # 예약 종류
+    status = database.Column(database.SmallInteger)                                 # 예약 접수 상태
+    pay_type = database.Column(database.SmallInteger)                               # 결제 방법
+    contact = database.Column(database.Text)                                        # 연락처
+    address = database.Column(database.Text)                                        # 방문주소
+    delivery_date = database.Column(database.Date)                                  # 방문일시(배달)
     delivery_time = database.Column(database.Integer,
                                     database.ForeignKey('visit_time.id'), nullable=True)
-    recovery_date = database.Column(database.Date)                              # 방문일시(회수)
-    recovery_time = database.Column(database.Integer,
-                                    database.ForeignKey('visit_time.id'), nullable=True)
-    revisit_option = database.Column(database.SmallInteger)                     # 재방문 여부(배달날짜 != 회수날짜)
-    user_memo = database.Column(database.Text)                                  # 남기실말씀
+    user_memo = database.Column(database.Text)                                      # 남기실말씀
     purchase_id = database.Column(database.Integer,
                                   database.ForeignKey('purchase.id'), nullable=True)
     user_id = database.Column(database.Integer,
                               database.ForeignKey('user.uid'), nullable=False)
-    promotion_id = database.Column(database.Integer,
-                                  database.ForeignKey('promotion.id'), nullable=True)
-    goods_id = database.Column(database.Integer,
-                                   database.ForeignKey('goods.id'), nullable=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
     schedules = database.relationship('Schedule', backref='reservation', lazy='dynamic')
+    goods = database.relationship('Goods', secondary=reservation_goods,
+                           backref=database.backref('reservations', lazy='dynamic'))
 
-    def __init__(self, reservation_type, status, standard_box_count, nonstandard_goods_count,
+    __mapper_args__ = {
+        'polymorphic_on': reservation_type,
+        'polymorphic_identity': 'reservation',
+        'with_polymorphic': '*'
+    }
+
+
+# 배달 예약
+class DeliveryReservation(Reservation):
+
+    __tablename__ = 'delivery_reservation'
+
+    id = database.Column(database.Integer, database.ForeignKey('reservation.id'), primary_key=True)
+    delivery_option = database.Column(database.SmallInteger)
+
+    __mapper_args__ = {'polymorphic_identity': 'delivery_reservation'}
+
+    def __init__(self, status, user_id, contact, address, delivery_option,
+                 delivery_date, delivery_time, user_memo,
+                 pay_type, purchase_id=None, goods_id=None):
+        self.reservation_type = ReservationType.table_name_map[ReservationType.DELIVERY]
+        self.reservation_id = self._generate_reservation_id(ReservationType.DELIVERY, DeliveryReservation)
+        self.status = status
+        self.pay_type = pay_type
+        self.contact = contact
+        self.address = address
+        self.delivery_option = delivery_option
+        self.delivery_date = delivery_date
+        self.delivery_time = delivery_time
+        self.user_memo = user_memo
+        self.purchase_id = purchase_id
+        self.user_id = user_id
+        self.goods_id = goods_id
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
+
+
+# 재보관 예약
+class RestoreReservation(Reservation):
+
+    __tablename__ = 'restore_reservation'
+
+    id = database.Column(database.Integer, database.ForeignKey('reservation.id'), primary_key=True)
+    fixed_rate = database.Column(database.SmallInteger)                                 # 자동결제 여부
+    recovery_date = database.Column(database.Date)                                      # 방문일시(회수)
+    recovery_time = database.Column(database.Integer,
+                                    database.ForeignKey('visit_time.id'), nullable=True)
+    revisit_option = database.Column(database.SmallInteger)                             # 재방문 여부(배달날짜 != 회수날짜)
+
+    __mapper_args__ = {'polymorphic_identity': 'restore_reservation'}
+
+    def __init__(self, status, user_id, contact, address,
+                 delivery_date, delivery_time, recovery_date,
+                 recovery_time, revisit_option, user_memo,
+                 pay_type, purchase_id=None, goods_id=None):
+        self.reservation_type = ReservationType.table_name_map[ReservationType.PICKUP_AGAIN]
+        self.reservation_id = self._generate_reservation_id(ReservationType.PICKUP_AGAIN, RestoreReservation)
+        self.status = status
+        self.pay_type = pay_type
+        self.contact = contact
+        self.address = address
+        self.delivery_date = delivery_date
+        self.delivery_time = delivery_time
+        self.recovery_date = recovery_date
+        self.recovery_time = recovery_time
+        self.revisit_option = revisit_option
+        self.user_memo = user_memo
+        self.purchase_id = purchase_id
+        self.user_id = user_id
+        self.goods_id = goods_id
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
+
+
+
+# 신규 예약
+class NewReservation(Reservation):
+
+    __tablename__ = 'new_reservation'
+
+    id = database.Column(database.Integer, database.ForeignKey('reservation.id'), primary_key=True)
+    standard_box_count = database.Column(database.SmallInteger)                 # 규격박스 갯수
+    nonstandard_goods_count = database.Column(database.SmallInteger)            # 비규격물품 갯수
+    period = database.Column(database.SmallInteger)                             # 계약 월수
+    fixed_rate = database.Column(database.SmallInteger)                         # 자동결제 여부
+    promotion = database.Column(database.SmallInteger)                          # 프로모션 여부
+    binding_products = database.Column(database.Text)                           # 포장용품
+    recovery_date = database.Column(database.Date)                              # 방문일시(회수)
+    recovery_time = database.Column(database.Integer,
+                                    database.ForeignKey('visit_time.id'), nullable=True)
+    revisit_option = database.Column(database.SmallInteger)                     # 재방문 여부(배달날짜 != 회수날짜)
+    promotion_id = database.Column(database.Integer,
+                                   database.ForeignKey('promotion.id'), nullable=True)
+    __mapper_args__ = {'polymorphic_identity': 'new_reservation'}
+
+    def __init__(self, status, standard_box_count, nonstandard_goods_count,
                                     period, fixed_rate, binding_products, user_id, promotion, contact,
                                     address, delivery_date, delivery_time, recovery_date,
                                     recovery_time, revisit_option, user_memo,
                                     pay_type, purchase_id=None, goods_id=None):
-        self.reservation_id = self._generate_reservation_id(reservation_type)
-        self.reservation_type = reservation_type
+        self.reservation_type = ReservationType.table_name_map[ReservationType.PICKUP_NEW]
+        self.reservation_id = self._generate_reservation_id(ReservationType.PICKUP_NEW, NewReservation)
         self.status = status
         self.standard_box_count = standard_box_count
         self.nonstandard_goods_count = nonstandard_goods_count
@@ -96,24 +222,6 @@ class Reservation(database.Model, JsonSerializable):
     def parse_binding_products(self, binding_products):
         return json.dumps(binding_products)
 
-    def _get_today_reservation_count(self):
-        today = datetime.date.today()
-        return Reservation.query.filter(and_(Reservation.created_at >= today.strftime('%Y-%m-%d 00:00:00'),
-                                                               Reservation.created_at <= today.strftime('%Y-%m-%d 23:59:59'))).count()
-
-    def _generate_reservation_id(self, first_char):
-        today = datetime.date.today()
-        day_number = today.strftime('%y%m%d')
-        init_number = self._get_reservation_init_number()[first_char]
-        serial_number = init_number + self._get_today_reservation_count()
-        return '%c%s00%s' % (first_char, day_number, serial_number)
-
-    def _get_reservation_init_number(self):
-        return {
-            ReservationType.PICKUP_NEW: 20,
-            ReservationType.PICKUP_AGAIN: 21,
-            ReservationType.DELIVERY: 22
-        }
 
 
 class ScheduleType(object):
@@ -147,8 +255,9 @@ class Schedule(database.Model, JsonSerializable):
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=True)
     schedule_date = database.Column(database.DateTime)
     schedule_time_id = database.Column(database.Integer, database.ForeignKey('visit_time.id'), nullable=False)
+    reservation_type = database.Column(database.String(50))
     reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('reservation.id'), nullable=False)
+                                     database.ForeignKey('new_reservation.id'), nullable=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
     staff = relationship(User,
@@ -158,8 +267,13 @@ class Schedule(database.Model, JsonSerializable):
                             primaryjoin="Schedule.customer_id==User.uid",
                             foreign_keys=User.uid)
 
-    def __init__(self, status, schedule_type, customer_id, reservation_id, schedule_date, schedule_time_id,
-                        staff_id=None, goods_id=None):
+    __mapper_args__ = {
+        'polymorphic_identity': 'schedule',
+        'polymorphic_on': reservation_type
+    }
+
+    def __init__(self, status, schedule_type, customer_id, schedule_date, schedule_time_id,
+                        reservation_id=None, staff_id=None, goods_id=None):
         self.status = status
         self.schedule_type = schedule_type
         self.staff_id = staff_id
@@ -181,17 +295,24 @@ class CompletedSchedule(database.Model, JsonSerializable):
     staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
-    reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('reservation.id'), nullable=True)
+    new_reservation_id = database.Column(database.Integer,
+                                         database.ForeignKey('new_reservation.id'), nullable=True)
+    restore_reservation_id = database.Column(database.Integer,
+                                         database.ForeignKey('restore_reservation.id'), nullable=True)
+    delivery_reservation_id = database.Column(database.Integer,
+                                          database.ForeignKey('delivery_reservation.id'), nullable=True)
     scheduled_at = database.Column(database.DateTime)       # 예약된 시간
     created_at = database.Column(database.DateTime)         # 완료된 시간
 
-    def __init__(self, purchase_id, staff_id, customer_id, goods_id, reservation_id, scheduled_at):
+    def __init__(self, purchase_id, staff_id, customer_id, goods_id, new_reservation_id,
+                                        restore_reservation_id, delivery_reservation_id, scheduled_at):
         self.purchase_id = purchase_id
         self.staff_id = staff_id
         self.customer_id = customer_id
         self.goods_id = goods_id
-        self.reservation_id = reservation_id
+        self.new_reservation_id = new_reservation_id
+        self.restore_reservation_id = restore_reservation_id
+        self.delivery_reservation_id = delivery_reservation_id
         self.scheduled_at = scheduled_at
         self.created_at = datetime.datetime.now()
 
@@ -207,18 +328,25 @@ class CanceledSchedule(database.Model, JsonSerializable):
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
     reason = database.Column(database.Text)
-    reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('reservation.id'), nullable=True)
+    new_reservation_id = database.Column(database.Integer,
+                                         database.ForeignKey('new_reservation.id'), nullable=True)
+    restore_reservation_id = database.Column(database.Integer,
+                                         database.ForeignKey('restore_reservation.id'), nullable=True)
+    delivery_reservation_id = database.Column(database.Integer,
+                                          database.ForeignKey('delivery_reservation.id'), nullable=True)
     scheduled_at = database.Column(database.DateTime)   # 예약된 시간
     created_at = database.Column(database.DateTime)     # 취소된 시간
 
-    def __init__(self, purchase_id, staff_id, customer_id, goods_id, reason, reservation_id, scheduled_at):
+    def __init__(self, purchase_id, staff_id, customer_id, goods_id, reason, new_reservation_id,
+                                        restore_reservation_id, delivery_reservation_id, scheduled_at):
         self.purchase_id = purchase_id
         self.staff_id = staff_id
         self.customer_id = customer_id
         self.goods_id = goods_id
         self.reason = reason
-        self.reservation_id = reservation_id
+        self.new_reservation_id = new_reservation_id
+        self.restore_reservation_id = restore_reservation_id
+        self.delivery_reservation_id = delivery_reservation_id
         self.scheduled_at = scheduled_at
         self.created_at = datetime.datetime.now()
 

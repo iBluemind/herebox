@@ -33,12 +33,12 @@
             var orderInfo = Cookies.get('order');
             if (!orderInfo) {
                 purchaseCookieClear();
-                location.href = '/extended/estimate';
+                location.href = '/';
             }
             orderInfo = $.parseJSON(decode_cookie(orderInfo));
             if (!orderInfo['total_price']) {
                 purchaseCookieClear();
-                location.href = '/extended/estimate';
+                location.href = '/';
             }
         });
     </script>
