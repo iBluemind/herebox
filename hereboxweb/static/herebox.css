@@ -809,7 +809,7 @@ dl, ul, ol, menu, li {
   background-color: #fafafa;
 }
 
-.my-stuff-title > span {
+.my-stuff-title span {
   font-size: 20px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';

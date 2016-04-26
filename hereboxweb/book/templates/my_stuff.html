@@ -4,6 +4,7 @@
     <div>
         <div class="my-stuff-title">
             <span>히어박스 창고에 보관 중인 물품 ({{ packed_my_herebox_stuffs | length }})</span>
+            <img style="float: right;" src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
         </div>
 
         {% if packed_my_herebox_stuffs | length < 3 %}
@@ -54,6 +55,7 @@
     <div>
         <div class="my-stuff-title">
             <span>내가 보관 중인 물품 ({{ packed_my_stuffs | length }})</span>
+            <img style="float: right;" src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
         </div>
         {% if packed_my_stuffs | length < 3 %}
             <div class="my-stuff-items" style="margin-left: 71px;">
