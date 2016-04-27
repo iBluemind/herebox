@@ -13,7 +13,7 @@
                   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                   <span class="sr-only">오류:</span>
                     {% for error in form.errors[field] %}
-                        {{ form[field].label }}: {{ error }}
+                        {{ error }}
                     {% endfor %}
                 </div>
             {% endfor %}

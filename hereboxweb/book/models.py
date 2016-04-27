@@ -56,14 +56,12 @@ class Box(database.Model, JsonSerializable):
     box_id = database.Column(database.String(5))
     in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
     status = database.Column(database.SmallInteger)     # 박스의 사용여부
-    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=True)
     created_at = database.Column(database.DateTime)
 
-    def __init__(self, box_id, in_store, status, goods_id=None):
+    def __init__(self, box_id, in_store, status):
         self.box_id = box_id
         self.in_store = in_store
         self.status = status
-        self.goods_id = goods_id
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
 

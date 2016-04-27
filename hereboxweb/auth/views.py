@@ -57,9 +57,10 @@ def login():
                 login_user(user)
                 return redirect(request.args.get('next') or url_for('index'))
             else:
-                raise Exception(u'잘못된 로그인 시도입니다')
+                raise
         except:
-            return unauthorized(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
+            form.email.data = ''
+            form.email.errors.append(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
     return render_template('login.html', form=form, jsessionid=rsa_public_key)
 
 
@@ -79,10 +80,11 @@ def signup():
         try:
             database.session.add(new_user)
             database.session.commit()
+            return redirect(url_for('index'))
         except IntegrityError, e:
             if '1062' in e.message:
-                return response_template(u'이미 가입된 회원입니다.', 400)
-        return redirect(url_for('index'))
+                form.email.data = ''
+                form.email.errors.append(u'이미 존재하는 이메일 주소입니다.')
     return render_template('signup.html', form=form)
 
 
