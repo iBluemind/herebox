@@ -72,7 +72,7 @@
                     <br>
                     최대 무게 25kg
                     <br><br>
-                    <a style="color: #ffa000;">박스 크기 영상으로 보기 ></a>
+                    <a style="color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#boxSize">박스 크기 영상으로 보기 ></a>
                 </p>
 
                 <p class="price">
@@ -121,7 +121,7 @@
         <div class="row">
             <h1>서비스 지역</h1>
             <p>현재 서울시 전 지역 서비스 가능합니다</p>
-            <div class="try">우리 동네 신청하기 ></div>
+            <div class="try" data-toggle="modal" data-target="#requestArea">우리 동네 신청하기 ></div>
         </div>
 
         <img src="{{ url_for('static', filename='assets/img/img-seoul.png') }}">
@@ -173,4 +173,30 @@
         </div>
     </div>
 
+    {% include "dialog_box_size.html" %}
+    {% include "dialog_request.html" %}
+{% endblock %}
+{% block jscript %}
+
+    <script src="{{ url_for('static', filename='libs/jquery-form/jquery.form.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#btnAreaAlert').click(function () {
+                $.ajax({
+                     type: "POST",
+                     url: "/alert_new_area",
+                     data: {area: $('#area').val(), contact: $('#contact').val()
+                     },
+                     success: function () {
+                        alert("감사합니다!");
+                        $('#requestArea').modal('hide');
+                     },
+                     error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
+            });
+        });
+    </script>
 {% endblock %}

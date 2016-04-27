@@ -169,11 +169,20 @@
                 }
             });
 
-            var dateTimePickerOptions = {
+            var dateTimePickerVisitDateOptions = {
                 format: 'YYYY-MM-DD',
                 dayViewHeaderFormat:'YYYY MMMM',
                 minDate: moment().add(1, 'd'),
                 maxDate: moment().add(15, 'd'),
+                locale: 'ko'
+            };
+            var dateTimePickerRevisitDateOptions = {
+                format: 'YYYY-MM-DD',
+                dayViewHeaderFormat:'YYYY MMMM',
+                useCurrent: false,
+                defaultDate: moment().add(2, 'd'),
+                minDate: moment().add(2, 'd'),
+                maxDate: moment().add(9, 'd'),
                 locale: 'ko'
             };
 
@@ -182,12 +191,23 @@
             var borderTime1 = moment(todayDateOnly + " 17:00:00");
             var borderTime2 = moment(todayDateOnly + " 23:59:59");
             if (current > borderTime1 && current <= borderTime2) {
-                dateTimePickerOptions['minDate'] = moment().add(2, 'd');
-                dateTimePickerOptions['maxDate'] = moment().add(17, 'd');
+                dateTimePickerVisitDateOptions['minDate'] = moment().add(2, 'd');
+                dateTimePickerVisitDateOptions['maxDate'] = moment().add(17, 'd');
+                dateTimePickerRevisitDateOptions['minDate'] = moment().add(3, 'd');
+                dateTimePickerRevisitDateOptions['maxDate'] = moment().add(11, 'd');
             }
 
-            $('#inputVisitDate').datetimepicker(dateTimePickerOptions);
-            $('#inputRevisitDate').datetimepicker(dateTimePickerOptions);
+            $('#inputVisitDate').datetimepicker(dateTimePickerVisitDateOptions);
+            $('#inputRevisitDate').datetimepicker(dateTimePickerRevisitDateOptions);
+
+            $('#inputVisitDate').on('dp.change', function (e) {
+                var visitDate = e.date.toString();
+                dateTimePickerRevisitDateOptions['minDate'] = moment(visitDate).add(1, 'd');
+                dateTimePickerRevisitDateOptions['maxDate'] = moment(visitDate).add(7, 'd');
+                dateTimePickerRevisitDateOptions['defaultDate'] = moment(visitDate).add(1, 'd');
+                dateTimePickerRevisitDateOptions['date'] = moment(visitDate).add(1, 'd');
+                $('#inputRevisitDate').data('DateTimePicker').options(dateTimePickerRevisitDateOptions);
+            });
 
             $('input[type=radio][name=optionsRevisit]').change(function() {
                 if (this.value == "immediate") {

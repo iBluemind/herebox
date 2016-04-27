@@ -253,6 +253,7 @@ class Schedule(database.Model, JsonSerializable):
     schedule_time_id = database.Column(database.Integer, database.ForeignKey('visit_time.id'), nullable=False)
     reservation_id = database.Column(database.Integer,
                                      database.ForeignKey('reservation.id'), nullable=True)
+    schedule_id = database.Column(database.String(13), unique=True)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
     staff = relationship(User,
@@ -271,8 +272,20 @@ class Schedule(database.Model, JsonSerializable):
         self.schedule_date = schedule_date
         self.schedule_time_id = schedule_time_id
         self.reservation_id = reservation_id
+        self.schedule_id = self._generate_schedule_id(schedule_type, reservation_id)
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
+
+    def _generate_schedule_id(self, schedule_type, reservation_id):
+        reservation = Reservation.query.get(reservation_id)
+        postfix = ''
+        if (schedule_type == ScheduleType.PICKUP_DELIVERY) or\
+                            (schedule_type == ScheduleType.RESTORE_DELIVERY):
+            postfix = '_0'
+        elif (schedule_type == ScheduleType.PICKUP_RECOVERY) or \
+                (schedule_type == ScheduleType.RESTORE_RECOVERY):
+            postfix = '_1'
+        return '%s%s' % (reservation.reservation_id, postfix)
 
 
 class CompletedSchedule(database.Model, JsonSerializable):

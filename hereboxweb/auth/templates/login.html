@@ -7,16 +7,24 @@
             <span style="display: block; font-size: 20px; margin-top: 20px;">로그인</span>
         </div>
 
-        <div style="margin: 30px 400px 40px;">
+        <div id="login" style="margin: 30px 400px 40px;">
             {% for field in form.errors %}
                 <div class="alert alert-danger" role="alert">
                   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
                   <span class="sr-only">오류:</span>
                     {% for error in form.errors[field] %}
-                        {{ form[field].label }}: {{ error }}
+                        {{ error }}
                     {% endfor %}
                 </div>
             {% endfor %}
+
+            {% if form.message %}
+                <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">오류:</span>
+                {{ form.message }}
+                </div>
+            {% endif %}
 
             <form id="frmLogin" action="{{url_for('auth.login')}}" method="POST">
                 {{ form.csrf_token }}
@@ -58,6 +66,10 @@
 
     <script>
         $(document).ready(function() {
+            login();
+        });
+
+        function login() {
             var userEmail = '';
             $('#frmLogin').ajaxForm({
                 beforeSubmit: function(formData, jqForm, options) {
@@ -107,15 +119,15 @@
                 },
                 success: function(data, status, xhr) {
                     var html = $.parseHTML(data);
-                    $(html).find('#email').val(userEmail);
-                    $(html).find('#password').val('');
-                    $(document.body).html(html);
-                },
-                error: function(xhr, status, error) {
-                    var parsedBody = $.parseJSON(xhr.responseText);
-                    alert(parsedBody['message']);
+                    var loginHtml = $(html).find('#login').html();
+                    if (loginHtml) {
+                        $('#login').html(loginHtml);
+                        login();
+                    } else {
+                        location.href = '/';
+                    }
                 }
             });
-        });
+        }
     </script>
 {% endblock %}

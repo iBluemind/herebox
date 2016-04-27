@@ -54,6 +54,7 @@ def initialize_db():
     from hereboxweb.admin.models import VisitTime
     from hereboxweb.auth.models import User, UserStatus
 
+    # database.drop_all()
     database.create_all()
 
     database.session.add(VisitTime(start_time='10:00', end_time='12:00'))

@@ -95,7 +95,7 @@ def get_stuffs():
 @login_required
 def extended_estimate():
     if request.method == 'POST':
-        return save_stuffs('/reservation/')
+        return save_stuffs('/extended/')
 
     packed_stuffs = get_stuffs()
     if not packed_stuffs or len(packed_stuffs) == 0:
