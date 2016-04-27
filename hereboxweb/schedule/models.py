@@ -261,7 +261,6 @@ class Schedule(database.Model, JsonSerializable):
     customer = relationship(User,
                             primaryjoin="Schedule.customer_id==User.uid",
                             foreign_keys=User.uid)
-    reservations = relationship("Reservation", backref='schedule')
 
     def __init__(self, status, schedule_type, customer_id, schedule_date, schedule_time_id,
                                             reservation_id=None, staff_id=None, goods_id=None):

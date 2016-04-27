@@ -36,7 +36,8 @@ def my_schedule():
         or_(Schedule.schedule_type == ScheduleType.PICKUP_DELIVERY,
             Schedule.schedule_type == ScheduleType.PICKUP_RECOVERY,
             Schedule.schedule_type == ScheduleType.RESTORE_DELIVERY,
-            Schedule.schedule_type == ScheduleType.RESTORE_RECOVERY,)
+            Schedule.schedule_type == ScheduleType.RESTORE_RECOVERY,),
+        Schedule.status == ScheduleStatus.WAITING
     ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
 
     packed_my_pickup = []
@@ -50,7 +51,8 @@ def my_schedule():
                                                    (customer, Schedule.customer)
                                                    ).filter(
         Schedule.customer_id == current_user.uid,
-        Schedule.schedule_type == ScheduleType.DELIVERY
+        Schedule.schedule_type == ScheduleType.DELIVERY,
+        Schedule.status == ScheduleStatus.WAITING
     ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
 
     packed_my_delivery = []
@@ -555,3 +557,25 @@ def pickup_review():
 @login_required
 def pickup_completion():
     return render_template('completion.html', active_menu='reservation')
+
+
+@schedule.route('/schedule/cancel', methods=['DELETE'])
+@login_required
+def cancel_schedule():
+    schedule_id = request.form.get('schedule_id')
+
+    schedule = Schedule.query.filter(Schedule.reservation_id == schedule_id,
+                                     Schedule.customer_id == current_user.uid).first()
+
+    if not schedule:
+        return bad_request(u'찾을 수 없는 주문입니다.')
+
+    schedule.status = ScheduleStatus.CANCELED
+
+    try:
+        database.session.commit()
+    except:
+        return response_template(u'문제가 발생했습니다. 나중에 다시시도 해주세요.', status=500)
+    return response_template(u'정상적으로 처리되었습니다.')
+
+
