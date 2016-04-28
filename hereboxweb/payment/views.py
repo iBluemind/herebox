@@ -415,8 +415,17 @@ def reservation_payment():
             total_storage_price = total_storage_price + (7500 * regular_item_count)
             total_storage_price = total_storage_price + (9900 * irregular_item_count)
         else:
-            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+            if promotion == 'HELLOHB':
+                if regular_item_count + irregular_item_count <= 10:
+                    total_storage_price = total_storage_price + (7500 * (period - 1) * regular_item_count)
+                    total_storage_price = total_storage_price + (9900 * (period - 1) * irregular_item_count)
+                else:
+                    total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+                    total_storage_price = total_storage_price + (9900 * (period - 1) * 10)
+                    total_storage_price = total_storage_price + (9900 * period * (irregular_item_count - 10))
+            else:
+                total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+                total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
 
         total_binding_products_price = 0
         total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
@@ -580,6 +589,7 @@ def reservation_payment():
     irregular_item_count = estimate_info.get('irregularItemNumberCount')
     period = estimate_info.get('disposableNumberCount')
     period_option = estimate_info.get('optionsPeriod')
+    promotion = estimate_info.get('inputPromotion')
     binding_product0_count = estimate_info.get('bindingProduct0NumberCount')
     binding_product1_count = estimate_info.get('bindingProduct1NumberCount')
     binding_product2_count = estimate_info.get('bindingProduct2NumberCount')
