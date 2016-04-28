@@ -332,8 +332,16 @@ def review():
     if revisit_time:
         revisit_time = VisitTime.query.get(revisit_time)
 
+    promotion_name = None
     promotion_code = PromotionCode.query.filter(PromotionCode.code == promotion).first()
-    promotion_name = promotion_code.promotion.name
+    if promotion_code:
+        promotion_name = promotion_code.promotion.name
+        promotion_history = PromotionHistory(current_user.uid, promotion_code.id)
+        database.session.add(promotion_history)
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다.', status=500)
 
     response = make_response(render_template('review.html', active_menu='reservation',
                                              standard_box_count=regular_item_count,
