@@ -308,8 +308,17 @@ def review():
             total_storage_price = total_storage_price + (7500 * regular_item_count)
             total_storage_price = total_storage_price + (9900 * irregular_item_count)
         else:
-            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+            if promotion == 'HELLOHB':
+                if regular_item_count + irregular_item_count <= 10:
+                    total_storage_price = total_storage_price + (7500 * (period - 1) * regular_item_count)
+                    total_storage_price = total_storage_price + (9900 * (period - 1) * irregular_item_count)
+                else:
+                    total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+                    total_storage_price = total_storage_price + (9900 * (period - 1) * 10)
+                    total_storage_price = total_storage_price + (9900 * period * (irregular_item_count - 10))
+            else:
+                total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+                total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
 
         total_binding_products_price = 0
         total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
@@ -323,6 +332,9 @@ def review():
     if revisit_time:
         revisit_time = VisitTime.query.get(revisit_time)
 
+    promotion_code = PromotionCode.query.filter(PromotionCode.code == promotion).first()
+    promotion_name = promotion_code.promotion.name
+
     response = make_response(render_template('review.html', active_menu='reservation',
                                              standard_box_count=regular_item_count,
                                              nonstandard_goods_count=irregular_item_count,
@@ -332,7 +344,7 @@ def review():
                                                                u'실리카겔 (제습제) 50g': binding_product1_count,
                                                                u'압축팩 40cm x 60cm': binding_product2_count,
                                                                u'테이프 48mm x 40m': binding_product3_count},
-                                             promotion=promotion,
+                                             promotion=promotion_name,
                                              total_price=u'{:,d}원'.format(calculate_total_price()),
                                              phone=phone_number,
                                              address='%s %s' % (address1, address2),
@@ -577,5 +589,19 @@ def cancel_schedule():
     except:
         return response_template(u'문제가 발생했습니다. 나중에 다시시도 해주세요.', status=500)
     return response_template(u'정상적으로 처리되었습니다.')
+
+
+@schedule.route('/promotion/<code>', methods=['GET'])
+@login_required
+def check_promotion(code):
+    promotion = PromotionCode.query.filter(PromotionCode.code == code).first()
+    if not promotion:
+        return bad_request(u'유효하지 않는 프로모션입니다.')
+
+    import flask
+    response = flask.jsonify(content = {'message': u'정상 처리되었습니다'})
+    response.set_cookie('promotion', promotion.code, path='/reservation/')
+    return response
+
 
 

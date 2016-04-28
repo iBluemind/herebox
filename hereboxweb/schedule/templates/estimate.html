@@ -201,6 +201,7 @@
             <div style="font-size: 14px; color: #727272;">
                 총 보관 비용 : <span id="totalStoragePrice"></span><br>
                 포장 용품 비용 : <span id="totalBindingProductPrice"></span><br>
+                <span id="promotionDiscount" style="visibility: hidden;">프로모션 할인: </span><br>
 
                 <br>
                 <p><a style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#discountManual">할인 정책 알아보기 ></a></p>
@@ -356,11 +357,15 @@
             };
 
             var changeTotalPrice = function(direction, count) {
-                var totalPrice = calculateStoragePrice() + calculateBindingProductPrice();
-                if (totalPrice < 0) {
-                    totalPrice = 0;
+                if (Cookies.get('promotion') && Cookies.get('promotion') == 'HELLOHB') {
+                    applyHELLOHBPromotion();
+                } else {
+                    var totalPrice = calculateStoragePrice() + calculateBindingProductPrice();
+                    if (totalPrice < 0) {
+                        totalPrice = 0;
+                    }
+                    $('#totalPrice').text(numeral(totalPrice).format('0,0'));
                 }
-                $('#totalPrice').text(numeral(totalPrice).format('0,0'));
             };
 
             changeTotalPrice();
@@ -392,7 +397,20 @@
             });
 
             $('#btnCheckPromotion').click(function() {
-                alert("해당되는 프로모션이 없습니다.");
+                $.ajax({
+                    type: "GET",
+                    url: "/promotion/" + $('#inputPromotion').val(),
+                    success: function () {
+                        alert("프로모션 코드가 확인되었습니다");
+                        if ("HELLOHB" === $('#inputPromotion').val()) {
+                            applyHELLOHBPromotion();
+                        }
+                    },
+                    error: function(request, status, error) {
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                    }
+                });
             });
 
             $('#btnNextStep').click(function() {
@@ -407,6 +425,7 @@
                 var bindingProduct2NumberCount = bindingProduct2Number.text();
                 var bindingProduct3NumberCount = bindingProduct3Number.text();
                 var totalPrice = calculateStoragePrice() + calculateBindingProductPrice();
+                var promotion = $('#inputPromotion').val();
 
                 $.ajax({
                      type: "POST",
@@ -415,10 +434,10 @@
                          irregularItemNumberCount: irregularItemNumberCount, disposableNumberCount: disposableNumberCount,
                          optionsPeriod: optionsPeriod, bindingProduct0NumberCount: bindingProduct0NumberCount,
                          bindingProduct1NumberCount: bindingProduct1NumberCount, bindingProduct2NumberCount: bindingProduct2NumberCount,
-                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice
+                         bindingProduct3NumberCount: bindingProduct3NumberCount, totalPrice: totalPrice, inputPromotion: promotion
                      },
                      success: function () {
-                        location.href = '/reservation/order'
+                        location.href = '/reservation/order';
                      },
                      error: function(request, status, error) {
                         var parsedBody = $.parseJSON(request.responseText);
@@ -426,6 +445,38 @@
                      }
                 });
             });
+
+            function applyHELLOHBPromotion() {
+                if ($(":radio[name='optionsPeriod']:checked").val() == 'disposable') {
+                    var totalStroagePrice = 0;
+                    var totalPrice = calculateBindingProductPrice();
+                    if (totalPrice < 0) {
+                        totalPrice = 0;
+                    }
+                    var regularItemNumberCount = Number(regularItemNumber.text());
+                    var irregularItemNumberCount = Number(irregularItemNumber.text());
+                    var disposableNumberCount = Number(disposableNumber.text());
+                    var promotionItem = $('#promotionDiscount').text();
+                    if (regularItemNumberCount + irregularItemNumberCount <= 10) {
+                        totalStroagePrice = totalStroagePrice + (7500 * regularItemNumberCount * (disposableNumberCount - 1));
+                        totalStroagePrice = totalStroagePrice + (9900 * irregularItemNumberCount * (disposableNumberCount - 1));
+                        totalPrice = totalStroagePrice + totalPrice;
+
+                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStroagePrice).format('0,0'));
+                        $('#promotionDiscount').css({'visibility': 'visible'});
+                        $('#totalPrice').text(numeral(totalPrice).format('0,0'));
+                    } else {
+                        totalStroagePrice = totalStroagePrice + (7500 * regularItemNumberCount * disposableNumberCount);
+                        totalStroagePrice = totalStroagePrice + (9900 * 10 * (disposableNumberCount - 1));
+                        totalStroagePrice = totalStroagePrice + (9900 * (irregularItemNumberCount - 10) * disposableNumberCount);
+                        totalPrice = totalStroagePrice + totalPrice;
+
+                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStroagePrice).format('0,0'));
+                        $('#promotionDiscount').css({'visibility': 'visible'});
+                        $('#totalPrice').text(numeral(totalPrice).format('0,0'));
+                    }
+                }
+            }
         });
     </script>
 

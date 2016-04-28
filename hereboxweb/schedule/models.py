@@ -356,16 +356,14 @@ class Promotion(database.Model, JsonSerializable):
     name = database.Column(database.String(15))
     description = database.Column(database.Text)
     promotion_type = database.Column(database.SmallInteger)
-    user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     codes = database.relationship('PromotionCode', backref='promotion', lazy='dynamic')
     expired_at = database.Column(database.DateTime)
     created_at = database.Column(database.DateTime)
 
-    def __init__(self, name, description, promotion_type, user_id, expired_at):
+    def __init__(self, name, description, promotion_type, expired_at):
         self.name = name
         self.description = description
         self.promotion_type = promotion_type
-        self.user_id = user_id
         self.expired_at = expired_at
         self.created_at = datetime.datetime.now()
 
@@ -382,5 +380,20 @@ class PromotionCode(database.Model, JsonSerializable):
     def __init__(self, code, promotion_id):
         self.code = code
         self.promotion_id = promotion_id
+        self.created_at = datetime.datetime.now()
+
+
+class PromotionHistory(database.Model, JsonSerializable):
+
+    __tablename__ = 'promotion_history'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
+    code = database.Column(database.Integer, database.ForeignKey('promotion_code.id'), nullable=False)
+    created_at = database.Column(database.DateTime)
+
+    def __init__(self, user_id, code):
+        self.user_id = user_id
+        self.code = code
         self.created_at = datetime.datetime.now()
 

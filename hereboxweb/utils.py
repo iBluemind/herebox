@@ -53,6 +53,7 @@ def initialize_db():
     from hereboxweb import database
     from hereboxweb.admin.models import VisitTime
     from hereboxweb.auth.models import User, UserStatus
+    from hereboxweb.schedule.models import PromotionType, PromotionCode, Promotion
 
     # database.drop_all()
     database.create_all()
@@ -66,11 +67,18 @@ def initialize_db():
     database.session.add(User(email='contact@herebox.kr', name='구본준', status=UserStatus.ADMIN,
                               password='akswhddk8', phone='01064849686'))
 
+    promotion = Promotion(u'첫 달 무료', u'첫달무료 10개 한정 프로모션', PromotionType.ALLOW_TO_ALL, '2016-05-31')
+    database.session.add(promotion)
+
     from hereboxweb.book.models import Box, BoxStatus, InStoreStatus
     for i in xrange(1, 10):
         database.session.add(Box(box_id='1A%03d' % i, in_store=InStoreStatus.IN_STORE,
                                                         status=BoxStatus.AVAILABLE))
 
+    database.session.commit()
+
+    promotion_code = PromotionCode("HELLOHB", promotion.id)
+    database.session.add(promotion_code)
     database.session.commit()
 
 
