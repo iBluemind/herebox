@@ -24,3 +24,9 @@ def send_sms_to_user(uid, message):
 def send_sms(phone, message):
     cool = coolsms.rest(COOLSMS_API_KEY, COOLSMS_API_KEY_SECRET)
     status = cool.send(phone, message, '16002964')
+
+
+@tasks.task
+def send_mms(phone, message, subject):
+    cool = coolsms.rest(COOLSMS_API_KEY, COOLSMS_API_KEY_SECRET)
+    status = cool.send(phone, message, '16002964', mtype='lms', subject=subject)
