@@ -107,23 +107,7 @@
         $(document).ready(function () {
             $(".schedule-cancel").each(function () {
                 $(this).click(function () {
-                    if (confirm("정말 취소하시겠습니까?")) {
-                        var id = $(this).parent().data("id");
-                        $.ajax({
-                             type: "DELETE",
-                             url: "/schedule/cancel",
-                             data: {schedule_id: id
-                             },
-                             success: function () {
-                                alert("취소되었습니다.");
-                                location.reload();
-                             },
-                             error: function(request, status, error) {
-                                var parsedBody = $.parseJSON(request.responseText);
-                                alert(parsedBody['message']);
-                             }
-                        });
-                    }
+                    alert('스케줄 취소는 고객센터로 문의해주시기 바랍니다.');
                 });
             });
         });
