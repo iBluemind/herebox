@@ -32,7 +32,7 @@
                         <div class="count" style="margin: 20px auto 0;">
                             <div class="count-row">
                                 <div class="count-item subtract">-</div>
-                                <div class="count-item number" style="color: #ffc107;">2</div>
+                                <div class="count-item number" style="color: #ffc107;">0</div>
                                 <div class="count-item add">+</div>
                             </div>
                         </div>
@@ -61,7 +61,7 @@
                         <div class="count" style="margin: 20px auto 0;">
                             <div class="count-row">
                                 <div class="count-item subtract">-</div>
-                                <div class="count-item number" style="color: #ffc107;">2</div>
+                                <div class="count-item number" style="color: #ffc107;">0</div>
                                 <div class="count-item add">+</div>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
                         <div class="count" style="margin: 20px 0;">
                             <div class="count-row">
                                 <div class="count-item subtract">-</div>
-                                <div class="count-item number" style="color: #ffc107;">2</div>
+                                <div class="count-item number" style="color: #ffc107;">0</div>
                                 <div class="count-item add">+</div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -141,7 +141,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -156,7 +156,7 @@
                             <div class="count">
                                 <div class="count-row">
                                     <div class="count-item subtract">-</div>
-                                    <div class="count-item number" style="color: #ffc107;">2</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
                                     <div class="count-item add">+</div>
                                 </div>
                             </div>
@@ -201,7 +201,7 @@
             <div style="font-size: 14px; color: #727272;">
                 총 보관 비용 : <span id="totalStoragePrice"></span><br>
                 포장 용품 비용 : <span id="totalBindingProductPrice"></span><br>
-                <span id="promotionDiscount" style="visibility: hidden;">프로모션 할인: </span><br>
+                <span id="promotionDiscount" style="visibility: hidden;"></span><br>
 
                 <br>
                 <p><a style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#discountManual">할인 정책 알아보기 ></a></p>
@@ -448,30 +448,35 @@
 
             function applyHELLOHBPromotion() {
                 if ($(":radio[name='optionsPeriod']:checked").val() == 'disposable') {
-                    var totalStroagePrice = 0;
+                    var totalStoragePrice = 0;
                     var totalPrice = calculateBindingProductPrice();
-                    if (totalPrice < 0) {
-                        totalPrice = 0;
-                    }
                     var regularItemNumberCount = Number(regularItemNumber.text());
                     var irregularItemNumberCount = Number(irregularItemNumber.text());
                     var disposableNumberCount = Number(disposableNumber.text());
-                    var promotionItem = $('#promotionDiscount').text();
+                    var promotionItem = '프로모션 할인: ';
                     if (regularItemNumberCount + irregularItemNumberCount <= 10) {
-                        totalStroagePrice = totalStroagePrice + (7500 * regularItemNumberCount * (disposableNumberCount - 1));
-                        totalStroagePrice = totalStroagePrice + (9900 * irregularItemNumberCount * (disposableNumberCount - 1));
-                        totalPrice = totalStroagePrice + totalPrice;
+                        totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * (disposableNumberCount - 1));
+                        totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount * (disposableNumberCount - 1));
+                        totalPrice = totalStoragePrice + totalPrice;
+                        if (totalPrice < 0) {
+                            totalPrice = 0;
+                        }
 
-                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStroagePrice).format('0,0'));
+                        $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
+                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStoragePrice).format('0,0'));
                         $('#promotionDiscount').css({'visibility': 'visible'});
                         $('#totalPrice').text(numeral(totalPrice).format('0,0'));
                     } else {
-                        totalStroagePrice = totalStroagePrice + (7500 * regularItemNumberCount * disposableNumberCount);
-                        totalStroagePrice = totalStroagePrice + (9900 * 10 * (disposableNumberCount - 1));
-                        totalStroagePrice = totalStroagePrice + (9900 * (irregularItemNumberCount - 10) * disposableNumberCount);
-                        totalPrice = totalStroagePrice + totalPrice;
+                        totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
+                        totalStoragePrice = totalStoragePrice + (9900 * 10 * (disposableNumberCount - 1));
+                        totalStoragePrice = totalStoragePrice + (9900 * (irregularItemNumberCount - 10) * disposableNumberCount);
+                        totalPrice = totalStoragePrice + totalPrice;
+                        if (totalPrice < 0) {
+                            totalPrice = 0;
+                        }
 
-                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStroagePrice).format('0,0'));
+                        $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
+                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStoragePrice).format('0,0'));
                         $('#promotionDiscount').css({'visibility': 'visible'});
                         $('#totalPrice').text(numeral(totalPrice).format('0,0'));
                     }

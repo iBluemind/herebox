@@ -585,25 +585,25 @@ def reservation_payment():
 
         visit_time = VisitTime.query.get(visit_time)
         pay_type = u'현장' if new_reservation.pay_type == PayType.DIRECT else u'온라인'
-        send_mms.apply_async(args=['01088018572', u'[히어박스] 주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
+        send_mms.apply_async(args=['01064849686', u'주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
                                                   u' / 주소: %s / 연락처: %s / 규격(갯수): %s / 비규격(갯수): %s'
                                                   u' / 보관기간: %s개월 / 남길말: %s ' % (
                                        new_visit_schedule.schedule_id, current_user.name, visit_date, visit_time,
                                        pay_type, new_reservation.address, current_user.phone,
                                        new_reservation.standard_box_count,
                                        new_reservation.nonstandard_goods_count, new_reservation.period,
-                                       new_reservation.user_memo)])
+                                       new_reservation.user_memo), u'[히어박스]'])
 
         if new_revisit_schedule:
             revisit_time = VisitTime.query.get(revisit_time)
-            send_mms.apply_async(args=['01088018572', u'[히어박스] 주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
+            send_mms.apply_async(args=['01064849686', u'주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
                                                       u' / 주소: %s / 연락처: %s / 규격(갯수): %s / 비규격(갯수): %s'
                                                       u' / 보관기간: %s개월 / 남길말: %s ' % (
                                            new_revisit_schedule.schedule_id, current_user.name, revisit_date, revisit_time,
                                            pay_type, new_reservation.address, current_user.phone,
                                            new_reservation.standard_box_count,
                                            new_reservation.nonstandard_goods_count, new_reservation.period,
-                                           new_reservation.user_memo)])
+                                           new_reservation.user_memo), u'[히어박스]'])
         return response_template(u'정상 처리되었습니다', 200)
 
     estimate_info = get_estimate()
