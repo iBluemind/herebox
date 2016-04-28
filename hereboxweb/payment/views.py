@@ -524,7 +524,7 @@ def reservation_payment():
         database.session.add(purchase)
 
         new_reservation = NewReservation(
-            status=ReservationStatus.WAITING,
+            status=ReservationStatus.ACCEPTED,
             standard_box_count=regular_item_count,
             nonstandard_goods_count=irregular_item_count,
             period=period,
