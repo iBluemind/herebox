@@ -409,7 +409,7 @@ def extended_payment():
 @payment.route('/reservation/payment', methods=['GET', 'POST'])
 @login_required
 def reservation_payment():
-    def calculate_total_price():
+    def calculate_total_price(regular_item_count, irregular_item_count, period, period_option, promotion):
         total_storage_price = 0
         if period_option == 'subscription':
             # 매월 자동 결제일 경우!
@@ -417,13 +417,21 @@ def reservation_payment():
             total_storage_price = total_storage_price + (9900 * irregular_item_count)
         else:
             if promotion == 'HELLOHB':
-                if regular_item_count + irregular_item_count <= 10:
-                    total_storage_price = total_storage_price + (7500 * (period - 1) * regular_item_count)
-                    total_storage_price = total_storage_price + (9900 * (period - 1) * irregular_item_count)
+                discount_count = 10
+                discount_count = discount_count - irregular_item_count
+                if discount_count >= 0:
+                    total_storage_price = total_storage_price + (9900 * irregular_item_count * (period - 1))
                 else:
-                    total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-                    total_storage_price = total_storage_price + (9900 * (period - 1) * 10)
-                    total_storage_price = total_storage_price + (9900 * period * (irregular_item_count - 10))
+                    total_storage_price = total_storage_price + (9900 * 10 * (period - 1))
+                    total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
+
+                if discount_count > 0:
+                    regular_item_count -= discount_count
+                    total_storage_price = total_storage_price + (7500 * discount_count * (period - 1))
+                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+                else:
+                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+
             else:
                 total_storage_price = total_storage_price + (7500 * period * regular_item_count)
                 total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
@@ -510,7 +518,9 @@ def reservation_payment():
                 return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
 
         user_total_price = int(request.cookies.get('totalPrice'))
-        total_price = calculate_total_price()
+        total_price = calculate_total_price(
+            regular_item_count, irregular_item_count, period, period_option, promotion
+        )
 
         if user_total_price != total_price:
             return redirect(url_for('schedule.estimate'))
@@ -636,7 +646,9 @@ def reservation_payment():
         return redirect(url_for('schedule.estimate'))
 
     user_total_price = int(request.cookies.get('totalPrice'))
-    total_price = calculate_total_price()
+    total_price = calculate_total_price(
+        regular_item_count, irregular_item_count, period, period_option, promotion
+    )
 
     if user_total_price != total_price:
         return redirect(url_for('schedule.estimate'))

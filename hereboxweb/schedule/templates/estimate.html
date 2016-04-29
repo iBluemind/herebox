@@ -336,6 +336,7 @@
                     totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount);
                     totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount);
                 }
+
                 $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
                 return totalStoragePrice;
             };
@@ -414,6 +415,11 @@
             });
 
             $('#btnNextStep').click(function() {
+                if (calculateStoragePrice() == 0) {
+                    alert("규격박스 또는 비규격 물품을 1개월 이상 주문해주셔야 합니다!");
+                    return ;
+                }
+
                 allowUnload = true;
 
                 var regularItemNumberCount = regularItemNumber.text();
@@ -454,32 +460,32 @@
                     var irregularItemNumberCount = Number(irregularItemNumber.text());
                     var disposableNumberCount = Number(disposableNumber.text());
                     var promotionItem = '프로모션 할인: ';
-                    if (regularItemNumberCount + irregularItemNumberCount <= 10) {
-                        totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * (disposableNumberCount - 1));
+                    var discountCount = 10;
+                    discountCount -= irregularItemNumberCount;
+                    if (discountCount >= 0) {
                         totalStoragePrice = totalStoragePrice + (9900 * irregularItemNumberCount * (disposableNumberCount - 1));
-                        totalPrice = totalStoragePrice + totalPrice;
-                        if (totalPrice < 0) {
-                            totalPrice = 0;
-                        }
+                    } else {
+                        totalStoragePrice = totalStoragePrice + (9900 * 10 * (disposableNumberCount - 1));
+                        totalStoragePrice = totalStoragePrice + (9900 * (discountCount * -1) * disposableNumberCount);
+                    }
 
-                        $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
-                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStoragePrice).format('0,0'));
-                        $('#promotionDiscount').css({'visibility': 'visible'});
-                        $('#totalPrice').text(numeral(totalPrice).format('0,0'));
+                    if (discountCount > 0) {
+                        regularItemNumberCount -= discountCount;
+                        totalStoragePrice = totalStoragePrice + (7500 * discountCount * (disposableNumberCount - 1));
+                        totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
                     } else {
                         totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
-                        totalStoragePrice = totalStoragePrice + (9900 * 10 * (disposableNumberCount - 1));
-                        totalStoragePrice = totalStoragePrice + (9900 * (irregularItemNumberCount - 10) * disposableNumberCount);
-                        totalPrice = totalStoragePrice + totalPrice;
-                        if (totalPrice < 0) {
-                            totalPrice = 0;
-                        }
-
-                        $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
-                        $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStoragePrice).format('0,0'));
-                        $('#promotionDiscount').css({'visibility': 'visible'});
-                        $('#totalPrice').text(numeral(totalPrice).format('0,0'));
                     }
+
+                    totalPrice = totalStoragePrice + totalPrice;
+                    if (totalPrice < 0) {
+                        totalPrice = 0;
+                    }
+
+                    $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
+                    $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStoragePrice).format('0,0'));
+                    $('#promotionDiscount').css({'visibility': 'visible'});
+                    $('#totalPrice').text(numeral(totalPrice).format('0,0'));
                 }
             }
         });
