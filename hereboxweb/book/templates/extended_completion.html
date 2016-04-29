@@ -25,21 +25,8 @@
 
 {% block jscript %}
 
-    <script src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/extended_completion.js') }}"></script>
 
-    <script>
-        $(document).ready(function() {
-            var orderInfo = Cookies.get('order');
-            if (!orderInfo) {
-                purchaseCookieClear();
-                location.href = '/';
-            }
-            orderInfo = $.parseJSON(decode_cookie(orderInfo));
-            if (!orderInfo['total_price']) {
-                purchaseCookieClear();
-                location.href = '/';
-            }
-        });
-    </script>
 {% endblock %}
