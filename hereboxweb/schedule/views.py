@@ -222,8 +222,8 @@ def order():
     if request.method == 'POST':
         return save_estimate()
 
+    estimate_info = get_estimate()
     try:
-        estimate_info = get_estimate()
         estimate_info['regularItemNumberCount']
         estimate_info['irregularItemNumberCount']
         estimate_info['optionsPeriod']
@@ -234,6 +234,26 @@ def order():
     except:
         return redirect(url_for('index'))
 
+    def calculate_storage_price(regular_item_count, irregular_item_count, period_option, period):
+        total_storage_price = 0
+        if period_option == 'subscription':
+            # 매월 자동 결제일 경우!
+            total_storage_price = total_storage_price + (7500 * regular_item_count)
+            total_storage_price = total_storage_price + (9900 * irregular_item_count)
+        else:
+            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+        return total_storage_price
+
+    standard_box_count = estimate_info['regularItemNumberCount']
+    nonstandard_goods_count = estimate_info['irregularItemNumberCount']
+    period = estimate_info['disposableNumberCount']
+    peroid_option = estimate_info['disposableNumberCount']
+
+    if calculate_storage_price(standard_box_count, nonstandard_goods_count,
+                               peroid_option, period) <= 0:
+        return bad_request(u'하나 이상의 상품을 구매하셔야 합니다.')
+
     response = make_response(
         render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone))
 
@@ -241,9 +261,9 @@ def order():
     if order_info:
         response = make_response(
             render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone,
-                                                address1=order_info.get('inputAddress1'),
-                                                address2=order_info.get('inputAddress2'),
-                                                user_memo=order_info.get('textareaMemo')))
+                            address1=order_info.get('inputAddress1'),
+                            address2=order_info.get('inputAddress2'),
+                            user_memo=order_info.get('textareaMemo')))
     return response
 
 
@@ -301,7 +321,7 @@ def review():
     except:
         return redirect(url_for('index'))
 
-    def calculate_total_price():
+    def calculate_total_price(regular_item_count, irregular_item_count, period, period_option, promotion):
         total_storage_price = 0
         if period_option == 'subscription':
             # 매월 자동 결제일 경우!
@@ -309,13 +329,21 @@ def review():
             total_storage_price = total_storage_price + (9900 * irregular_item_count)
         else:
             if promotion == 'HELLOHB':
-                if regular_item_count + irregular_item_count <= 10:
-                    total_storage_price = total_storage_price + (7500 * (period - 1) * regular_item_count)
-                    total_storage_price = total_storage_price + (9900 * (period - 1) * irregular_item_count)
+                discount_count = 10
+                discount_count = discount_count - irregular_item_count
+                if discount_count >= 0:
+                    total_storage_price = total_storage_price + (9900 * irregular_item_count * (period - 1))
                 else:
-                    total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-                    total_storage_price = total_storage_price + (9900 * (period - 1) * 10)
-                    total_storage_price = total_storage_price + (9900 * period * (irregular_item_count - 10))
+                    total_storage_price = total_storage_price + (9900 * 10 * (period - 1))
+                    total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
+
+                if discount_count > 0:
+                    regular_item_count -= discount_count
+                    total_storage_price = total_storage_price + (7500 * discount_count * (period - 1))
+                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+                else:
+                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+
             else:
                 total_storage_price = total_storage_price + (7500 * period * regular_item_count)
                 total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
@@ -353,7 +381,10 @@ def review():
                                                                u'압축팩 40cm x 60cm': binding_product2_count,
                                                                u'테이프 48mm x 40m': binding_product3_count},
                                              promotion=promotion_name,
-                                             total_price=u'{:,d}원'.format(calculate_total_price()),
+                                             total_price=u'{:,d}원'.format(calculate_total_price(
+                                                 regular_item_count, irregular_item_count, period, period_option,
+                                                 promotion
+                                             )),
                                              phone=phone_number,
                                              address='%s %s' % (address1, address2),
                                              visit_date=visit_date,
@@ -363,7 +394,9 @@ def review():
                                              revisit_time=revisit_time,
                                              user_memo=user_memo)
                                             )
-    response.set_cookie('totalPrice', '%d' % (calculate_total_price()), path='/reservation/')
+    response.set_cookie('totalPrice', '%d' % (calculate_total_price(
+                    regular_item_count, irregular_item_count, period, period_option, promotion
+                        )), path='/reservation/')
     return response
 
 

@@ -113,9 +113,6 @@ def add_months(src_date, months):
 
 
 class RequiredIf(Required):
-    # a validator which makes a field required if
-    # another field is set and has a truthy value
-
     def __init__(self, other_field_name, *args, **kwargs):
         self.other_field_name = other_field_name
         super(RequiredIf, self).__init__(*args, **kwargs)

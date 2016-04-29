@@ -180,8 +180,8 @@
                 format: 'YYYY-MM-DD',
                 dayViewHeaderFormat:'YYYY MMMM',
                 useCurrent: false,
-                defaultDate: moment().add(2, 'd'),
                 minDate: moment().add(2, 'd'),
+                defaultDate: moment().add(2, 'd'),
                 maxDate: moment().add(9, 'd'),
                 locale: 'ko'
             };
@@ -195,6 +195,7 @@
                 dateTimePickerVisitDateOptions['maxDate'] = moment().add(17, 'd');
                 dateTimePickerRevisitDateOptions['minDate'] = moment().add(3, 'd');
                 dateTimePickerRevisitDateOptions['maxDate'] = moment().add(11, 'd');
+                dateTimePickerRevisitDateOptions['defaultDate'] = moment().add(3, 'd');
             }
 
             $('#inputVisitDate').datetimepicker(dateTimePickerVisitDateOptions);
