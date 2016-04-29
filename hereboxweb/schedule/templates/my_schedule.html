@@ -101,15 +101,5 @@
 
 {% endblock %}
 {% block jscript %}
-
-    <script>
-
-        $(document).ready(function () {
-            $(".schedule-cancel").each(function () {
-                $(this).click(function () {
-                    alert('스케줄 취소는 고객센터로 문의해주시기 바랍니다.');
-                });
-            });
-        });
-    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_schedule.js') }}"></script>
 {% endblock %}
