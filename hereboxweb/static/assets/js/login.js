@@ -9,7 +9,7 @@ function login() {
             var key = forge.random.getBytesSync(16);
             var iv = forge.random.getBytesSync(16);
             var cipher = forge.cipher.createCipher('AES-CBC', key);
-            var jsessionid = "{{ jsessionid }}";
+            var jsessionid = Cookies.get('jsessionid');
 
             for (var index in formData) {
                 if (formData.hasOwnProperty(index)) {
@@ -53,6 +53,7 @@ function login() {
         success: function(data, status, xhr) {
             var html = $.parseHTML(data);
             var loginHtml = $(html).find('#login').html();
+            Cookies.remove('jesseionid', {path: '/login'});
             if (loginHtml) {
                 $('#login').html(loginHtml);
                 login();

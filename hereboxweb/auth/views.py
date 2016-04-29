@@ -6,7 +6,7 @@ import re
 
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
-from flask import request, render_template
+from flask import request, render_template, make_response
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 from flask import request, url_for, redirect, flash, session, escape
@@ -61,7 +61,10 @@ def login():
         except:
             form.email.data = ''
             form.email.errors.append(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
-    return render_template('login.html', form=form, jsessionid=rsa_public_key)
+
+    response = make_response(render_template('login.html', form=form))
+    response.set_cookie('jsessionid', rsa_public_key, path='/login')
+    return response
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
