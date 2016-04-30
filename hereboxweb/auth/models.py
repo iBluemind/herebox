@@ -23,7 +23,7 @@ class User(database.Model, UserMixin, JsonSerializable):
     uid = database.Column(database.Integer, primary_key=True, autoincrement=True)
     phone = database.Column(database.String(20), nullable=True)
     name = database.Column(database.String(20), nullable=False)
-    email = database.Column(database.String(30), unique=True, nullable=False)
+    email = database.Column(database.String(30), unique=True)
     password = database.Column(database.Text, nullable=False)
     address1 = database.Column(database.String(200), nullable=True)
     address2 = database.Column(database.String(200), nullable=True)
@@ -34,7 +34,7 @@ class User(database.Model, UserMixin, JsonSerializable):
     goods = database.relationship('Goods', backref='user', lazy='dynamic')
     reservations = database.relationship('Reservation', backref='user', lazy='dynamic')
 
-    def __init__(self, email, name, fb_user_id=None, fb_access_token=None,
+    def __init__(self, name, email=None, fb_user_id=None, fb_access_token=None,
                         address1=None, address2=None, status=UserStatus.NORMAL, password=None, phone=None):
         self.phone = phone
         self.password = self.encrypt_password(password) if password != None else ''
