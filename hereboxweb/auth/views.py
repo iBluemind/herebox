@@ -188,7 +188,6 @@ def my_info():
 def authentication_code():
     if request.method == 'GET':
         user_auth_code = request.args.get('authCode')
-        print user_auth_code
         if not re.match('^([0-9]{4})$', user_auth_code):
             return bad_request(u'올바른 인증코드를 입력해주세요.')
 

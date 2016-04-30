@@ -146,21 +146,7 @@
     <script src="{{ url_for('static', filename='libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
-
-    <script>
-        $(document).ready(function(){
-            $(window).scroll(function(){
-                var y = $(window).scrollTop();
-                if (y > 0) {
-                  $("#top-shadow").css({'display':'block', 'z-index': 0});
-                  $(".navbar-brand").css({'z-index': 100, 'position': 'relative'});
-                  $(".navbar li").css({'z-index': 100});
-                } else {
-                  $("#top-shadow").css({'display':'none'});
-                }
-            });
-        })
-    </script>
+    <script src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
 
     {% block jscript %}{% endblock %}
   </body>
