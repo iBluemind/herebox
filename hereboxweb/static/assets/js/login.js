@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    facebookSDKInit();
     login();
 });
 
@@ -61,5 +62,41 @@ function login() {
                 location.href = '/';
             }
         }
+    });
+    
+    $('#btnFacebookLogin').click(function () {
+        FB.getLoginStatus(statusChangeCallback);
+    });
+}
+
+function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+}
+
+function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    if (response.status === 'connected') {
+        testAPI();
+    } else {
+        FB.login(function (response) {
+            console.log(response);
+        }, {scope: 'public_profile,email'});
+    }
+}
+
+function facebookSDKInit() {
+    $.getScript('//connect.facebook.net/en_US/sdk.js', function(){
+        FB.init({
+            appId: '1192468164126169',
+            status : true,
+            cookie : true,
+            version: 'v2.6'
+        });
     });
 }

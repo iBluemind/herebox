@@ -85,8 +85,8 @@
                     </div>
                     <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">우편번호 찾기</button>
                 </div>
-                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요">
-                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요">
+                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" value="{{ address1 }}">
+                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" value="{{ address2 }}">
             </div>
         </div>
 
@@ -129,7 +129,7 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요"></textarea>
+                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요">{{ user_memo }}</textarea>
             </div>
         </div>
 
