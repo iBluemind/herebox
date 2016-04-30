@@ -66,3 +66,16 @@ function decode_cookie(val) {
     });
 	return val.replace('\\\\', '\\');
 }
+
+$(document).ready(function(){
+    $(window).scroll(function(){
+        var y = $(window).scrollTop();
+        if (y > 0) {
+          $("#top-shadow").css({'display':'block', 'z-index': 0});
+          $(".navbar-brand").css({'z-index': 100, 'position': 'relative'});
+          $(".navbar li").css({'z-index': 100});
+        } else {
+          $("#top-shadow").css({'display':'none'});
+        }
+    });
+});
