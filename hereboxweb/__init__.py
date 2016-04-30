@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from flask import Flask
+from flask import Flask, render_template
 from flask.ext.login import LoginManager
 
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
@@ -61,6 +61,16 @@ def internal_error(message=u'점검 중이거나 내부 문제가 발생했습�
     if type(message) is not unicode:
         message = str(message)
     return response_template(message, 500)
+
+
+@app.errorhandler(404)
+def not_found_template(error=None):
+    return render_template('404.html')
+
+
+@app.errorhandler(403)
+def forbidden_template(error=None):
+    return render_template('403.html')
 
 
 from hereboxweb import views

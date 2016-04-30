@@ -21,7 +21,7 @@
                                 <br>
                                 최대 무게 25kg
                                 <br><br>
-                                <a style="color: #ffa000;">박스 크기 영상으로 보기 ></a>
+                                <a style="color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#boxSize">박스 크기 영상으로 보기 ></a>
                             </p>
 
                             <p class="price">
@@ -213,6 +213,7 @@
 
     {% include "dialog_dcp.html" %}
     {% include "dialog_binding_product.html" %}
+    {% include "dialog_box_size.html" %}
 
 {% endblock %}
 {% block jscript %}

@@ -23,7 +23,7 @@ class User(database.Model, UserMixin, JsonSerializable):
     uid = database.Column(database.Integer, primary_key=True, autoincrement=True)
     phone = database.Column(database.String(20), nullable=True)
     name = database.Column(database.String(20), nullable=False)
-    email = database.Column(database.String(30), unique=True)
+    email = database.Column(database.String(30), unique=True, nullable=True)
     password = database.Column(database.Text, nullable=False)
     address1 = database.Column(database.String(200), nullable=True)
     address2 = database.Column(database.String(200), nullable=True)
@@ -55,7 +55,7 @@ class User(database.Model, UserMixin, JsonSerializable):
         return check_password_hash(self.password, password)
 
     def get_id(self):
-        return unicode(self.email) or self.fb_user_id
+        return self.email or self.fb_user_id
 
     @property
     def is_active(self):
