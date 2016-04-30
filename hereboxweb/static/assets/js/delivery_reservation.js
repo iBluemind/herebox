@@ -57,12 +57,12 @@ $(document).ready(function() {
     if (orderInfo && orderInfo['inputPostCode']) {
         $('#inputPostCode').val(orderInfo['inputPostCode']);
     }
-    if (orderInfo && orderInfo['inputAddress1']) {
-        $('#inputAddress1').val("{{ address1 }}");
-    }
-    if (orderInfo && orderInfo['inputAddress2']) {
-        $('#inputAddress2').val("{{ address2 }}");
-    }
+    // if (orderInfo && orderInfo['inputAddress1']) {
+    //     $('#inputAddress1').val("{{ address1 }}");
+    // }
+    // if (orderInfo && orderInfo['inputAddress2']) {
+    //     $('#inputAddress2').val("{{ address2 }}");
+    // }
     if (orderInfo && orderInfo['inputDeliveryDate']) {
         $('#inputDeliveryDate').val(orderInfo['inputDeliveryDate']);
     }
@@ -82,9 +82,9 @@ $(document).ready(function() {
                  break;
          }
     }
-    if (orderInfo && orderInfo['textareaMemo']) {
-        $('#textareaMemo').val("{{ user_memo }}");
-    }
+    // if (orderInfo && orderInfo['textareaMemo']) {
+    //     $('#textareaMemo').val("{{ user_memo }}");
+    // }
 
     $("#btnAuthCode").click(function () {
         var newUserPhone = $("#inputPhoneNumber").val();

@@ -6,7 +6,7 @@ import re
 from datetime import timedelta
 from flask import request, render_template, redirect, url_for, make_response, session, escape
 from flask.ext.login import login_required, current_user
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 from sqlalchemy.orm import aliased, with_polymorphic
 
 from hereboxweb import database, response_template, bad_request, forbidden
@@ -338,9 +338,13 @@ def review():
                     total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
 
                 if discount_count > 0:
-                    regular_item_count -= discount_count
-                    total_storage_price = total_storage_price + (7500 * discount_count * (period - 1))
-                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+                    if regular_item_count > 0:
+                        discount_count = discount_count - regular_item_count
+                        if discount_count >= 0:
+                            total_storage_price = total_storage_price + (7500 * regular_item_count * (period - 1))
+                        else:
+                            total_storage_price = total_storage_price + (7500 * 10 * (period - 1))
+                            total_storage_price = total_storage_price + (7500 * (discount_count * -1) * period)
                 else:
                     total_storage_price = total_storage_price + (7500 * regular_item_count * period)
 
@@ -635,7 +639,7 @@ def cancel_schedule():
 @schedule.route('/promotion/<code>', methods=['GET'])
 @login_required
 def check_promotion(code):
-    promotion = PromotionCode.query.filter(PromotionCode.code == code).first()
+    promotion = PromotionCode.query.filter(PromotionCode.code == func.binary(code)).first()
     if not promotion:
         return bad_request(u'유효하지 않는 프로모션입니다.')
 

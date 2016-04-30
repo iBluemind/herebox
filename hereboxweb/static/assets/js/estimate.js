@@ -175,7 +175,7 @@ $(document).ready(function() {
         $.ajax({
             type: "GET",
             url: "/promotion/" + $('#inputPromotion').val(),
-            success: function () {
+            success: function (data, textStatus, xhr) {
                 alert("프로모션 코드가 확인되었습니다");
                 if ("HELLOHB" === $('#inputPromotion').val()) {
                     applyHELLOHBPromotion();
@@ -244,9 +244,15 @@ $(document).ready(function() {
             }
 
             if (discountCount > 0) {
-                regularItemNumberCount -= discountCount;
-                totalStoragePrice = totalStoragePrice + (7500 * discountCount * (disposableNumberCount - 1));
-                totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
+                if (regularItemNumberCount > 0) {
+                    discountCount -= regularItemNumberCount;
+                    if (discountCount >= 0) {
+                        totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * (disposableNumberCount - 1));
+                    } else {
+                        totalStoragePrice = totalStoragePrice + (7500 * 10 * (disposableNumberCount - 1));
+                        totalStoragePrice = totalStoragePrice + (7500 * (discountCount * -1) * disposableNumberCount);
+                    }
+                }
             } else {
                 totalStoragePrice = totalStoragePrice + (7500 * regularItemNumberCount * disposableNumberCount);
             }
@@ -256,8 +262,11 @@ $(document).ready(function() {
                 totalPrice = 0;
             }
 
+            var oldTotalStoragePrice = calculateStoragePrice();
+            var subtractDiscount = oldTotalStoragePrice - totalStoragePrice;
+
             $('#totalStoragePrice').text(numeral(totalStoragePrice).format('0,0'));
-            $('#promotionDiscount').text(promotionItem + "-" + numeral(calculateStoragePrice() - totalStoragePrice).format('0,0'));
+            $('#promotionDiscount').text(promotionItem + "-" + numeral(subtractDiscount).format('0,0'));
             $('#promotionDiscount').css({'visibility': 'visible'});
             $('#totalPrice').text(numeral(totalPrice).format('0,0'));
         }

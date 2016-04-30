@@ -426,9 +426,13 @@ def reservation_payment():
                     total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
 
                 if discount_count > 0:
-                    regular_item_count -= discount_count
-                    total_storage_price = total_storage_price + (7500 * discount_count * (period - 1))
-                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+                    if regular_item_count > 0:
+                        discount_count = discount_count - regular_item_count
+                        if discount_count >= 0:
+                            total_storage_price = total_storage_price + (7500 * regular_item_count * (period - 1))
+                        else:
+                            total_storage_price = total_storage_price + (7500 * 10 * (period - 1))
+                            total_storage_price = total_storage_price + (7500 * (discount_count * -1) * period)
                 else:
                     total_storage_price = total_storage_price + (7500 * regular_item_count * period)
 

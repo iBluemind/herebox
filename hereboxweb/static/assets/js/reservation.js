@@ -93,12 +93,12 @@ $(document).ready(function() {
     if (orderInfo && orderInfo['inputPostCode']) {
         $('#inputPostCode').val(orderInfo['inputPostCode']);
     }
-    if (orderInfo && orderInfo['inputAddress1']) {
-        $('#inputAddress1').val("{{ address1 }}");
-    }
-    if (orderInfo && orderInfo['inputAddress2']) {
-        $('#inputAddress2').val("{{ address2 }}");
-    }
+    // if (orderInfo && orderInfo['inputAddress1']) {
+    //     $('#inputAddress1').val(orderInfo['inputAddress1']);
+    // }
+    // if (orderInfo && orderInfo['inputAddress2']) {
+    //     $('#inputAddress2').val(orderInfo['inputAddress2']);
+    // }
     if (orderInfo && orderInfo['inputVisitDate']) {
         $('#inputVisitDate').val(orderInfo['inputVisitDate']);
     }
@@ -124,9 +124,9 @@ $(document).ready(function() {
     if (orderInfo && orderInfo['inputRevisitTime']) {
         $('#inputRevisitTime').val(orderInfo['inputRevisitTime']);
     }
-    if (orderInfo && orderInfo['textareaMemo']) {
-        $('#textareaMemo').val("{{ user_memo }}");
-    }
+    // if (orderInfo && orderInfo['textareaMemo']) {
+    //     $('#textareaMemo').val(orderInfo['textareaMemo']);
+    // }
 });
 
 $(window).load(function() {
