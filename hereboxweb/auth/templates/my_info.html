@@ -47,13 +47,13 @@
         <div class="form-group col-xs-12">
             <label for="inputAddress" class="col-xs-4 control-label">주소</label>
             <div class="col-xs-8" style="padding-right: 0;">
-                {{ form.address1(placeholder="주소를 입력해주세요", class="form-control", value=current_user.address1) }}
+                {{ form.address1(placeholder="주소를 입력해주세요", class="form-control", value=(current_user.address1 if current_user.address1)) }}
             </div>
         </div>
         <div class="form-group col-xs-12">
             <label for="inputAddressDetail" class="col-xs-4 control-label">상세주소</label>
             <div class="col-xs-8" style="padding-right: 0;">
-                {{ form.address2(placeholder="상세주소를 입력해주세요", class="form-control", value=current_user.address2) }}
+                {{ form.address2(placeholder="상세주소를 입력해주세요", class="form-control", value=(current_user.address2 if current_user.address2)) }}
             </div>
         </div>
 

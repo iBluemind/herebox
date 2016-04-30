@@ -29,11 +29,13 @@ class User(database.Model, UserMixin, JsonSerializable):
     address2 = database.Column(database.String(200), nullable=True)
     status = database.Column(database.SmallInteger, nullable=False)
     created_at = database.Column(database.DateTime)
+    fb_user_id = database.Column(database.String(100), nullable=True)
+    fb_access_token = database.Column(database.String(200), nullable=True)
     goods = database.relationship('Goods', backref='user', lazy='dynamic')
     reservations = database.relationship('Reservation', backref='user', lazy='dynamic')
 
-    def __init__(self, email, name, address1=None, address2=None,
-                 status=UserStatus.NORMAL, password=None, phone=None):
+    def __init__(self, email, name, fb_user_id=None, fb_access_token=None,
+                        address1=None, address2=None, status=UserStatus.NORMAL, password=None, phone=None):
         self.phone = phone
         self.password = self.encrypt_password(password) if password != None else ''
         self.name = name
@@ -41,6 +43,8 @@ class User(database.Model, UserMixin, JsonSerializable):
         self.status = status
         self.address1 = address1
         self.address2 = address2
+        self.fb_user_id = fb_user_id
+        self.fb_access_token = fb_access_token
         self.created_at = datetime.datetime.now()
 
     @staticmethod
@@ -51,7 +55,7 @@ class User(database.Model, UserMixin, JsonSerializable):
         return check_password_hash(self.password, password)
 
     def get_id(self):
-        return unicode(self.email)
+        return unicode(self.email) or self.fb_user_id
 
     @property
     def is_active(self):
@@ -60,5 +64,8 @@ class User(database.Model, UserMixin, JsonSerializable):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return database.session.query(User).filter(User.email == user_id).first()
+    login_user = database.session.query(User).filter(User.email == user_id).first()
+    if not login_user:
+        login_user = database.session.query(User).filter(User.fb_user_id == user_id).first()
+    return login_user
 
