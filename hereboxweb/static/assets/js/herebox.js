@@ -1,4 +1,46 @@
 
+function facebookSDKInit() {
+    $.getScript('//connect.facebook.net/en_US/sdk.js', function(){
+        FB.init({
+            appId: '1192468164126169',
+            status : true,
+            cookie : true,
+            version: 'v2.6'
+        });
+    });
+}
+
+function requestUserProfile(accessToken) {
+    FB.api('/me', { fields: 'name, email' }, function(response) {
+        $.ajax({
+             type: "POST",
+             url: "/fb_login",
+             data: {user_id: response.id, access_token: accessToken,
+                 email: response.email, name: response.name
+             },
+             success: function () {
+                location.href = '/';
+             },
+             error: function(request, status, error) {
+                var parsedBody = $.parseJSON(request.responseText);
+                alert(parsedBody['message']);
+             }
+        });
+    });
+}
+
+function statusChangeCallback(response) {
+    if (response.status === 'connected') {
+        var accessToken = response.authResponse.accessToken;
+        requestUserProfile(accessToken);
+    } else {
+        FB.login(function (response) {
+            var accessToken = response.authResponse.accessToken;
+            requestUserProfile(accessToken);
+        }, {scope: 'public_profile,email'});
+    }
+}
+
 function purchaseCookieClear() {
 	Cookies.remove('estimate', { path: '/reservation/' });
     Cookies.remove('order', { path: '/reservation/' });
@@ -13,7 +55,6 @@ function purchaseCookieClear() {
     Cookies.remove('order', { path: '/pickup/' });
     Cookies.remove('totalPrice', { path: '/pickup/' });
 }
-
 
 function decode_cookie(val) {
     if (val.indexOf('\\') === -1) {

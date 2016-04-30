@@ -3,6 +3,9 @@
 
 import base64
 import re
+import urllib
+import urllib2
+import urlparse
 
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
@@ -89,6 +92,47 @@ def signup():
                 form.email.data = ''
                 form.email.errors.append(u'이미 존재하는 이메일 주소입니다.')
     return render_template('signup.html', form=form)
+
+
+@auth.route('/fb_login', methods=['POST'])
+def fb_login():
+    def exchange_access_token(short_access_token):
+        args = {}
+        args['client_id'] = '1192468164126169'
+        args['client_secret'] = 'adc3015c15af6235f1fd3ba3f29ab1a6'
+        args['grant_type'] = 'fb_exchange_token'
+        args['fb_exchange_token'] = short_access_token
+
+        url = 'https://graph.facebook.com/oauth/access_token'
+        encoded_args = urllib.urlencode(args)
+        fb_api = '%s?%s' % (url, encoded_args)
+        response = urllib2.urlopen(fb_api).read()
+
+        decoded_response = dict(urlparse.parse_qsl(response))
+        return decoded_response['access_token']
+
+    user_id = request.form.get('user_id')
+    access_token = request.form.get('access_token')
+    email = request.form.get('email')
+    name = request.form.get('name')
+
+    if not user_id or not access_token:
+        return bad_request()
+
+    user = User.query.filter(User.fb_user_id == user_id).first()
+    if not user:
+        long_lived_access_token = exchange_access_token(access_token)
+        if not long_lived_access_token:
+            return bad_request(u'잘못된 액세스 토큰입니다')
+        new_user = User(email, name, fb_user_id=user_id, fb_access_token=long_lived_access_token)
+        try:
+            database.session.add(new_user)
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요', status=500)
+
+    login_user(user)
+    return redirect(request.args.get('next') or url_for('index'))
 
 
 @auth.route('/findpw', methods=['GET'])
