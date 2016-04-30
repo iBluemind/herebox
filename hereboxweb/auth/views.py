@@ -128,9 +128,10 @@ def fb_login():
         try:
             database.session.add(new_user)
             database.session.commit()
+            login_user(new_user)
+            return redirect(request.args.get('next') or url_for('index'))
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요', status=500)
-
     login_user(user)
     return redirect(request.args.get('next') or url_for('index'))
 
