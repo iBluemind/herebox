@@ -65,7 +65,7 @@ def login():
             form.email.errors.append(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
 
     form.email.data = ''
-    response = make_response(render_template('login.html', form=form))
+    response = make_response(render_template('login.html', form=form, active_menu='login'))
     response.set_cookie('jsessionid', rsa_public_key, path='/login')
     return response
 
