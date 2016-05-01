@@ -3,6 +3,7 @@ import re
 
 from flask import redirect, url_for, render_template, request
 from flask.ext.login import current_user
+from flask.ext.mobility.decorators import mobile_template
 
 from config import response_template
 from hereboxweb import app, database, bad_request
@@ -10,14 +11,20 @@ from hereboxweb.models import AlertNewArea
 
 
 @app.route('/', methods=['GET'])
-def index():
+@mobile_template('{mobile/}index.html')
+def index(template):
     if current_user.is_authenticated:
         return redirect(url_for('book.my_stuff'))
-    return render_template('index.html')
+    if request.MOBILE:
+        return render_template(template)
+    return render_template('index.html', active_menu='introduce')
 
 
 @app.route('/introduce', methods=['GET'])
-def introduce():
+@mobile_template('{mobile/}index.html')
+def introduce(template):
+    if request.MOBILE:
+        return render_template(template)
     return render_template('index.html', active_menu='introduce')
 
 
