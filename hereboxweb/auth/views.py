@@ -158,12 +158,16 @@ def logout():
 def my_info():
     form = ChangeForm()
     if form.validate_on_submit():
+        email = form.email.data
         password = form.password.data
         address1 = form.address1.data
         address2 = form.address2.data
         phone = form.phone.data
 
         user = User.query.get(current_user.uid)
+        if email and not current_user.email:
+            user.email = email
+
         if current_user.phone != phone if phone else False:
             if not session.pop('phone_authentication', False):
                 form.phone.errors.append(u'휴대폰 번호 인증을 먼저 받아주세요')
@@ -180,8 +184,11 @@ def my_info():
 
         try:
             database.session.commit()
-        except:
+        except IntegrityError, e:
             form.message = u'문제가 발생했습니다. 잠시후 다시 시도해주세요'
+            if '1062' in e.message:
+                form.message = u'이미 가입된 적이 있는 이메일 주소입니다. 다른 이메일 주소를 입력해주세요'
+
     return render_template('my_info.html', active_my_index='my_info', form=form)
 
 
