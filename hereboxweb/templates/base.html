@@ -54,7 +54,7 @@
               </ul>
             </li>
           {% else %}
-            <li><a href="../login">로그인</a></li>
+            <li {% if active_menu == 'login' %}class="active"{% endif %}><a href="../login">로그인</a></li>
           {% endif %}
         </ul>
       </div>
