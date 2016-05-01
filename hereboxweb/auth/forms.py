@@ -28,6 +28,7 @@ class SignupForm(Form):
 
 
 class ChangeForm(Form):
+    email = StringField(u'이메일 주소', validators=[Email(message=u'올바른 이메일 주소를 입력해주세요'), Optional()])
     password = PasswordField(u'비밀번호', validators=[Length(
                     min=6, max=16, message=u'비밀번호는 최소 6자, 최대 16자 입력 가능합니다'
                 ), Optional()])
