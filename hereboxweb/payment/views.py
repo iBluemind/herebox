@@ -15,7 +15,7 @@ from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
 from hereboxweb.schedule.models import NewReservation, ReservationStatus, ReservationType, Schedule, \
     ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation, PromotionCode, \
-    PromotionHistory
+    PromotionHistory, Promotion
 from hereboxweb.schedule.views import get_order, get_estimate
 from hereboxweb.tasks import send_sms, send_mms
 from hereboxweb.utils import add_months
@@ -545,8 +545,9 @@ def reservation_payment():
 
         promotion_id = None
         if promotion:
-            promotion_code = PromotionCode.query.filter(PromotionCode.code == promotion).first()
+            promotion_code = PromotionCode.query.join(Promotion).filter(PromotionCode.code == promotion).first()
             if promotion_code:
+                promotion_id = promotion_code.promotion.id
                 promotion_history = PromotionHistory(current_user.uid, promotion_code.id)
                 database.session.add(promotion_history)
                 try:
