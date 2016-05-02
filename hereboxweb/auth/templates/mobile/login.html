@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "mobile/base.html" %}
 {% block content %}
 
     <div class="container">
@@ -7,7 +7,7 @@
             <span style="display: block; font-size: 20px; margin-top: 20px;">로그인</span>
         </div>
 
-        <div id="login" style="margin: 30px 400px 40px;">
+        <div id="login" style="margin: 30px auto 40px;">
             {% for field in form.errors %}
                 <div class="alert alert-danger" role="alert">
                   <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>

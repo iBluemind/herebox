@@ -11,6 +11,7 @@ from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 from flask import request, render_template, make_response
 from flask.ext.login import login_required, login_user, logout_user, current_user
+from flask.ext.mobility.decorators import mobile_template
 from sqlalchemy.exc import IntegrityError
 from flask import request, url_for, redirect, flash, session, escape
 from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis, forbidden
@@ -24,7 +25,8 @@ from hereboxweb.tasks import send_sms
 
 
 @auth.route('/login', methods=['GET', 'POST'])
-def login():
+@mobile_template('{mobile/}login.html')
+def login(template):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
@@ -66,12 +68,15 @@ def login():
 
     form.email.data = ''
     response = make_response(render_template('login.html', form=form, active_menu='login'))
+    if request.MOBILE:
+        response = make_response(render_template(template, form=form, active_menu='login'))
     response.set_cookie('jsessionid', rsa_public_key, path='/login')
     return response
 
 
 @auth.route('/signup', methods=['GET', 'POST'])
-def signup():
+@mobile_template('{mobile/}signup.html')
+def signup(template):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
 
@@ -91,6 +96,8 @@ def signup():
             if '1062' in e.message:
                 form.email.data = ''
                 form.email.errors.append(u'이미 존재하는 이메일 주소입니다.')
+    if request.MOBILE:
+        return render_template(template, form=form)
     return render_template('signup.html', form=form)
 
 

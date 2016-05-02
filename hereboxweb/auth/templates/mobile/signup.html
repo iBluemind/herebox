@@ -1,0 +1,59 @@
+{% extends "mobile/base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div style="text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/mark-join.png') }}">
+            <span style="display: block; font-size: 20px; margin-top: 20px;">회원가입</span>
+        </div>
+
+        <div style="margin: 30px auto 40px;">
+            {% for field in form.errors %}
+                <div class="alert alert-danger" role="alert">
+                  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                  <span class="sr-only">오류:</span>
+                    {% for error in form.errors[field] %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <form action="{{url_for('auth.signup')}}" method="POST">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.email(placeholder="이메일 주소", class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.name(placeholder="이름", class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password(placeholder="비밀번호", class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password_check(placeholder="비밀번호 확인", class="form-control") }}
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="btnSignup" style="margin: 10px 20px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">가입하기를 누르시면 <a href="/terms" style="color: #ffc107;">이용약관</a>과 <a href="/privacy" style="color: #ffc107;">개인정보취급방침</a>에 동의한 것으로 간주합니다</label>
+                    <button id="btnSignup" type="submit" class="btn btn-hbprimary btn-block">가입하기</button>
+                </div>
+
+                <img class="center-block" style="margin: 20px auto 20px auto;" src="{{ url_for('static', filename='assets/img/or.png') }}">
+
+                <div class="form-group">
+                    <button type="button" id="btnFacebookSignup" class="btn btn-hbfb btn-block" style="padding: 12px 0 12px 0;">페이스북으로 가입하기</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row" style="margin-bottom: 100px;">
+            <div class="center-block text-center">
+                <span><a href="/login">이미 회원이세요? 로그인하기</a></span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/signup.js') }}"></script>
+{% endblock %}
