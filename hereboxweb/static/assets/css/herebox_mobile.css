@@ -739,46 +739,33 @@ dl, ul, ol, menu, li {
   color: #212121;
 }
 
-.estimate-goods-items {
-  display: table;
-  overflow: hidden;
-  margin: 0 auto;
-  border-spacing: 10px;
-}
-
-.estimate-goods-items-row {
-  display: table-row;
-}
-
-.estimate-goods-items .item {
-  display:table-cell;
-  width: 306px;
+.estimate-item {
   text-align: center;
 }
 
-.estimate-goods-items .item .item-box {
-  width: 306px;
+.estimate-item .item-box {
   height: 430px;
   padding: 26px;
   border: solid 1px #c4c4c4;
   border-radius: 4px;
   text-align: center;
+  margin: 30px 20px;
 }
 
-.estimate-goods-items .item .item-box h2 {
+.estimate-item .item-box h2 {
   font-size: 20px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }
 
-.estimate-goods-items .item .item-box p {
+.estimate-item .item-box p {
   text-align: left;
   font-size: 14px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }
 
-.estimate-goods-items .item .item-box .price {
+.estimate-item .item-box .price {
   font-size: 14px;
   text-align: center;
 }

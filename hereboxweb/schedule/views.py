@@ -198,14 +198,17 @@ def save_order(template, api_endpoint):
 
 
 @schedule.route('/reservation/estimate', methods=['GET', 'POST'])
+@mobile_template('{mobile/}estimate.html')
 @login_required
-def estimate():
+def estimate(template):
     if request.method == 'POST':
         return save_order('reservation.html', '/reservation/')
 
     estimate_info = get_estimate()
     if not estimate_info:
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        if request.MOBILE:
+            return render_template(template, active_menu='reservation')
         return render_template('estimate.html', active_menu='reservation')
 
     response = make_response(render_template('estimate.html', active_menu='reservation',
@@ -219,12 +222,25 @@ def estimate():
                                              binding_product3_count=estimate_info.get('bindingProduct3NumberCount'),
                                              promotion=estimate_info.get('inputPromotion'))
                              )
+    if request.MOBILE:
+        response = make_response(render_template(template, active_menu='reservation',
+                                                 regular_item_count=estimate_info.get('regularItemNumberCount'),
+                                                 irregular_item_count=estimate_info.get('irregularItemNumberCount'),
+                                                 period=estimate_info.get('disposableNumberCount'),
+                                                 period_option=estimate_info.get('optionsPeriod'),
+                                                 binding_product0_count=estimate_info.get('bindingProduct0NumberCount'),
+                                                 binding_product1_count=estimate_info.get('bindingProduct1NumberCount'),
+                                                 binding_product2_count=estimate_info.get('bindingProduct2NumberCount'),
+                                                 binding_product3_count=estimate_info.get('bindingProduct3NumberCount'),
+                                                 promotion=estimate_info.get('inputPromotion'))
+                                 )
     return response
 
 
 @schedule.route('/reservation/order', methods=['GET', 'POST'])
+@mobile_template('{mobile/}reservation.html')
 @login_required
-def order():
+def order(template):
     if request.method == 'POST':
         return save_estimate()
 
@@ -263,6 +279,10 @@ def order():
     response = make_response(
         render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone))
 
+    if request.MOBILE:
+        response = make_response(
+            render_template(template, active_menu='reservation', old_phone_number=current_user.phone))
+
     order_info = get_order()
     if order_info:
         response = make_response(
@@ -270,12 +290,19 @@ def order():
                             address1=order_info.get('inputAddress1'),
                             address2=order_info.get('inputAddress2'),
                             user_memo=order_info.get('textareaMemo')))
+        if request.MOBILE:
+            response = make_response(
+                render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
+                                address1=order_info.get('inputAddress1'),
+                                address2=order_info.get('inputAddress2'),
+                                user_memo=order_info.get('textareaMemo')))
     return response
 
 
 @schedule.route('/reservation/review', methods=['GET', 'POST'])
+@mobile_template('{mobile/}review.html')
 @login_required
-def review():
+def review(template):
     if request.method == 'POST':
         return save_order('reservation.html', '/reservation/')
 
@@ -398,6 +425,30 @@ def review():
                                              revisit_time=revisit_time,
                                              user_memo=user_memo)
                                             )
+    if request.MOBILE:
+        response = make_response(render_template(template, active_menu='reservation',
+                                                 standard_box_count=regular_item_count,
+                                                 nonstandard_goods_count=irregular_item_count,
+                                                 period_option=True if period_option == 'subscription' else False,
+                                                 period=period,
+                                                 binding_products={u'포장용 에어캡 1m': binding_product0_count,
+                                                                   u'실리카겔 (제습제) 50g': binding_product1_count,
+                                                                   u'압축팩 40cm x 60cm': binding_product2_count,
+                                                                   u'테이프 48mm x 40m': binding_product3_count},
+                                                 promotion=promotion_name,
+                                                 total_price=u'{:,d}원'.format(calculate_total_price(
+                                                     regular_item_count, irregular_item_count, period, period_option,
+                                                     promotion
+                                                 )),
+                                                 phone=phone_number,
+                                                 address='%s %s' % (address1, address2),
+                                                 visit_date=visit_date,
+                                                 visit_time=visit_time,
+                                                 revisit_option=1 if revisit_option == 'later' else 0,
+                                                 revisit_date=revisit_date,
+                                                 revisit_time=revisit_time,
+                                                 user_memo=user_memo)
+                                 )
     response.set_cookie('totalPrice', '%d' % (calculate_total_price(
                     regular_item_count, irregular_item_count, period, period_option, promotion
                         )), path='/reservation/')
@@ -405,8 +456,11 @@ def review():
 
 
 @schedule.route('/reservation/completion', methods=['GET'])
+@mobile_template('{mobile/}completion.html')
 @login_required
-def completion():
+def completion(template):
+    if request.MOBILE:
+        return render_template(template, active_menu='reservation')
     return render_template('completion.html', active_menu='reservation')
 
 
