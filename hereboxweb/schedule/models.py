@@ -173,7 +173,7 @@ class NewReservation(Reservation):
     nonstandard_goods_count = database.Column(database.SmallInteger)            # 비규격물품 갯수
     period = database.Column(database.SmallInteger)                             # 계약 월수
     fixed_rate = database.Column(database.SmallInteger)                         # 자동결제 여부
-    promotion = database.Column(database.SmallInteger)                          # 프로모션 여부
+    promotion = database.Column(database.TEXT)                                  # 프로모션 코드
     binding_products = database.Column(database.Text)                           # 포장용품
     recovery_date = database.Column(database.Date)                              # 방문일시(회수)
     recovery_time = database.Column(database.Integer,
@@ -188,7 +188,7 @@ class NewReservation(Reservation):
                                     period, fixed_rate, binding_products, user_id, promotion, contact,
                                     address, delivery_date, delivery_time, recovery_date,
                                     recovery_time, revisit_option, user_memo,
-                                    pay_type, purchase_id=None, goods_id=None):
+                                    pay_type, purchase_id=None, goods_id=None, promotion_id=None):
         self.reservation_type = ReservationType.table_name_map[ReservationType.PICKUP_NEW]
         self.reservation_id = self._generate_reservation_id(ReservationType.PICKUP_NEW, NewReservation)
         self.status = status
@@ -210,6 +210,7 @@ class NewReservation(Reservation):
         self.purchase_id = purchase_id
         self.user_id = user_id
         self.goods_id = goods_id
+        self.promotion_id = promotion_id
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
 

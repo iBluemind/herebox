@@ -559,8 +559,8 @@ def reservation_payment():
             standard_box_count=regular_item_count,
             nonstandard_goods_count=irregular_item_count,
             period=period,
+            promotion=promotion,
             fixed_rate=1 if period_option == 'subscription' else 0,
-            promotion=promotion_id,
             binding_products={u'포장용 에어캡 1m': binding_product0_count, u'실리카겔 (제습제) 50g': binding_product1_count,
                               u'압축팩 40cm x 60cm': binding_product2_count, u'테이프 48mm x 40m': binding_product3_count},
             contact=phone_number,
@@ -573,7 +573,8 @@ def reservation_payment():
             user_memo=user_memo,
             pay_type=pay_types[user_pay_type],
             user_id=current_user.uid,
-            purchase_id=purchase.id
+            purchase_id=purchase.id,
+            promotion_id=promotion_id
         )
 
         database.session.add(new_reservation)
