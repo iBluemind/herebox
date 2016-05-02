@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div style="text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/mark-login.png') }}">
+            <span style="display: block; font-size: 20px; margin-top: 20px;">로그인</span>
+        </div>
+
+        <div id="login" style="margin: 30px 400px 40px;">
+            {% for field in form.errors %}
+                <div class="alert alert-danger" role="alert">
+                  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                  <span class="sr-only">오류:</span>
+                    {% for error in form.errors[field] %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            {% if form.message %}
+                <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">오류:</span>
+                {{ form.message }}
+                </div>
+            {% endif %}
+
+            <form id="frmLogin" action="{{url_for('auth.login')}}" method="POST">
+                {{ form.csrf_token }}
+                <div class="form-group">
+                    {{ form.email(placeholder="이메일 주소", class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password(placeholder="비밀번호", class="form-control") }}
+                </div>
+                <input type="hidden" name="decryptKey">
+                <input type="hidden" name="iv">
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-hbprimary btn-block">로그인</button>
+                </div>
+
+                <img class="center-block" style="margin: 20px auto 20px auto;" src="{{ url_for('static', filename='assets/img/or.png') }}">
+
+                <div class="form-group">
+                    <button type="button" id="btnFacebookLogin" class="btn btn-hbfb btn-block" style="padding: 12px 0 12px 0;">페이스북으로 로그인</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row" style="margin-bottom: 100px;">
+            <div class="center-block text-center">
+                <span><a href="/findpw">비밀번호를 잊으셨나요?</a></span>
+            </div>
+            <div class="center-block text-center" style="margin-top: 16px;">
+                <span><a href="/signup">처음 오셨나요? 회원가입하기</a></span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery-form/jquery.form.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/forge/js/forge.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/login.js') }}"></script>
+{% endblock %}
