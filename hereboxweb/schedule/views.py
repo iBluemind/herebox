@@ -368,12 +368,6 @@ def review():
     promotion_code = PromotionCode.query.filter(PromotionCode.code == promotion).first()
     if promotion_code:
         promotion_name = promotion_code.promotion.name
-        promotion_history = PromotionHistory(current_user.uid, promotion_code.id)
-        database.session.add(promotion_history)
-        try:
-            database.session.commit()
-        except:
-            return response_template(u'문제가 발생했습니다.', status=500)
 
     response = make_response(render_template('review.html', active_menu='reservation',
                                              standard_box_count=regular_item_count,
@@ -644,6 +638,12 @@ def check_promotion(code):
         return bad_request(u'유효하지 않는 프로모션입니다.')
 
     import flask
+
+    promotion_history = PromotionHistory.query.filter(PromotionHistory.code == promotion.id,
+                                            PromotionHistory.user_id == current_user.uid).first()
+    if promotion_history:
+        return forbidden(u'이미 사용한 적이 있는 프로모션입니다.')
+
     response = flask.jsonify(content = {'message': u'정상 처리되었습니다'})
     response.set_cookie('promotion', promotion.code, path='/reservation/')
     return response
