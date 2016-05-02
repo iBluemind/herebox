@@ -1,0 +1,88 @@
+{% extends "mobile/index_logged_in.html" %}
+{% block my_index_body %}
+
+    <form class="my-info-form form-horizontal" action="{{url_for('auth.my_info')}}" method="POST">
+        {% for field in form.errors %}
+            <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">오류:</span>
+            {% for error in form.errors[field] %}
+                {{ form[field].label }}: {{ error }}
+            {% endfor %}
+            </div>
+        {% endfor %}
+
+        {% if form.message %}
+            <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">오류:</span>
+            {{ form.message }}
+            </div>
+        {% endif %}
+        {{ form.csrf_token }}
+        <div class="form-group">
+            <label for="inputName">이름</label>
+            <input type="text" class="form-control" id="inputName" placeholder="이름을 입력해주세요" value="{{ current_user.name }}" disabled>
+        </div>
+        <div class="form-group">
+            <label for="inputEmail">이메일 주소</label>
+            {% if current_user.email %}
+                {{ form.email(placeholder="이메일 주소를 입력해주세요", class="form-control", value=current_user.email, disabled=True) }}
+            {% else %}
+                {{ form.email(placeholder="이메일 주소를 입력해주세요", class="form-control") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="inputPassword">새 비밀번호</label>
+            {{ form.password(placeholder="비밀번호 변경을 원하시면 입력하세요", class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="inputPasswordCheck">새 비밀번호 확인</label>
+            {{ form.password_check(placeholder="비밀번호 변경을 원하시면 입력하세요", class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="inputAddress">주소</label>
+            {{ form.address1(placeholder="주소를 입력해주세요", class="form-control", value=(current_user.address1 if current_user.address1)) }}
+        </div>
+        <div class="form-group">
+            <label for="inputAddressDetail">상세주소</label>
+            {{ form.address2(placeholder="상세주소를 입력해주세요", class="form-control", value=(current_user.address2 if current_user.address2)) }}
+        </div>
+
+        {% if current_user.phone %}
+            <div class="form-group">
+                <label for="inputPhone">핸드폰 번호</label>
+                <input id="inputPhone" type="tel" class="form-control" placeholder="핸드폰 번호를 입력해주세요" value="{{ current_user.phone }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="inputNewPhone"></label>
+                <div class="col-xs-8" style="padding-left: 0;">
+                    {{ form.phone(placeholder="변경하려는 핸드폰 번호를 입력해주세요", class="form-control") }}
+                </div>
+                <button type="button" id="btnAuthCode" class="col-xs-4 btn btn-hbprimary" style="height: 34px; font-size: 12px; padding: 8px 11px;">인증번호 받기</button>
+            </div>
+        {% else %}
+            <div class="form-group">
+                <label for="inputNewPhone">핸드폰 번호</label>
+                <div class="col-xs-8" style="padding-left: 0;">
+                    {{ form.phone(placeholder="핸드폰 번호를 입력해주세요", class="form-control") }}
+                </div>
+                <button type="button" id="btnAuthCode" class="col-xs-4 btn btn-hbprimary" style="height: 34px; font-size: 12px; padding: 8px 11px;">인증번호 받기</button>
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="inputCode"></label>
+            <div class="col-xs-8" style="padding-left: 0;">
+                <input type="text" class="form-control" id="inputCode" placeholder="인증번호를 입력하세요">
+            </div>
+            <button id="btnAuthCodeCheck" type="button" class="col-xs-4 btn btn-hbprimary" style="height: 34px; font-size: 12px; padding: 8px 11px;">확인</button>
+        </div>
+
+        <button type="submit" class="btn btn-hbprimary" style="margin: 60px 0 50px;">수정하기</button>
+    </form>
+
+{% endblock %}
+{% block jscript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_info.js') }}"></script>
+{% endblock %}

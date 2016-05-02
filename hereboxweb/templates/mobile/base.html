@@ -47,12 +47,12 @@
     <nav class="drawer-nav" role="navigation">
       <ul class="drawer-menu">
       {% if current_user.is_authenticated %}
-        <li><a class="drawer-menu-item" style="font-size: 24px; margin-top: 50px;">반갑습니다! {{ current_user.name }} 님</a></li>
+        <li><a class="drawer-menu-item" style="font-size: 24px; padding-top: 50px;">반갑습니다! {{ current_user.name }} 님</a></li>
         <li><a class="drawer-menu-item" style="font-size: 16px; color: #727272;">{{ current_user.email }}</a></li>
           <li><div style="height: 1px; border: solid 1px #c4c4c4; margin: 30px 20px 30px 20px;"></div></li>
           <li><a class="drawer-menu-item" href="/introduce">소개</a></li>
       {% else %}
-          <li><a class="drawer-menu-item" href="/introduce" style="margin-top: 50px;">소개</a></li>
+          <li><a class="drawer-menu-item" href="/introduce" style="padding-top: 50px;">소개</a></li>
       {% endif %}
         <li><a class="drawer-menu-item" href="/faq">자주하는 질문</a></li>
         <li><a class="drawer-menu-item" href="/event">이벤트</a></li>

@@ -6,6 +6,7 @@ import re
 from datetime import timedelta
 from flask import request, render_template, redirect, url_for, make_response, session, escape
 from flask.ext.login import login_required, current_user
+from flask.ext.mobility.decorators import mobile_template
 from sqlalchemy import or_, func
 from sqlalchemy.orm import aliased, with_polymorphic
 
@@ -21,8 +22,9 @@ SCHEDULE_LIST_MAX_COUNT = 10
 
 
 @schedule.route('/my_schedule', methods=['GET'])
+@mobile_template('{mobile/}my_schedule.html')
 @login_required
-def my_schedule():
+def my_schedule(template):
     staff = aliased(User, name="staff")
     customer = aliased(User, name="customer")
 
@@ -59,6 +61,10 @@ def my_schedule():
     for item in my_delivery_schedules:
         packed_my_delivery.append(item[0])
 
+    if request.MOBILE:
+        return render_template(template, active_my_index='my_schedule',
+                               packed_my_pickup=packed_my_pickup,
+                               packed_my_delivery=packed_my_delivery)
     return render_template('my_schedule.html', active_my_index='my_schedule',
                            packed_my_pickup=packed_my_pickup,
                            packed_my_delivery=packed_my_delivery)
