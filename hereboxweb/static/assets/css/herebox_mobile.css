@@ -23,6 +23,7 @@ a:focus {
   background-color: #fff;
   padding-top: 10px;
   padding-bottom: 10px;
+  z-index: 100;
 }
 
 .nav > li > a:focus, .nav > li > a:hover {
@@ -278,7 +279,7 @@ dl, ul, ol, menu, li {
 
 .navbar-brand {
   vertical-align: middle;
-  padding: 10px;
+  padding: 10px 10px 10px 20px;
 }
 
 .section {
