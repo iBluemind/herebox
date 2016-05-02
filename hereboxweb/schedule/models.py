@@ -173,7 +173,7 @@ class NewReservation(Reservation):
     nonstandard_goods_count = database.Column(database.SmallInteger)            # 비규격물품 갯수
     period = database.Column(database.SmallInteger)                             # 계약 월수
     fixed_rate = database.Column(database.SmallInteger)                         # 자동결제 여부
-    promotion = database.Column(database.TEXT)                                  # 프로모션 코드
+    promotion = database.Column(database.Text)                                  # 프로모션 코드
     binding_products = database.Column(database.Text)                           # 포장용품
     recovery_date = database.Column(database.Date)                              # 방문일시(회수)
     recovery_time = database.Column(database.Integer,
