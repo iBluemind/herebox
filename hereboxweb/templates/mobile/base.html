@@ -21,8 +21,7 @@
     {% block head %}{% endblock %}
   </head>
 
-  <body class="drawer drawer--right drawer--sidebar">
-
+  <body class="drawer drawer--right">
     <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM59LG"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -34,9 +33,12 @@
     <nav class="navbar navbar-herebox navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/">
               <img src="{{ url_for('static', filename='assets/img/top-logo.png') }}">
-          </a>
+            </a>
+            <button type="button" class="drawer-toggle drawer-hamburger">
+              <span class="drawer-hamburger-icon"></span>
+            </button>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
@@ -62,6 +64,21 @@
         </div>
       </div>
       <div id="top-shadow"></div>
+    </nav>
+
+    <nav class="drawer-nav" role="navigation">
+      <ul class="drawer-menu">
+        <li><a class="drawer-brand">반갑습니다! {{ current_user.name }} 님</a></li>
+        <li><a class="drawer-menu-item">{{ current_user.email }}</a></li>
+        <li><a class="drawer-menu-item" href="/introduce">소개</a></li>
+        <li><a class="drawer-menu-item" href="/faq">자주하는 질문</a></li>
+        <li><a class="drawer-menu-item" href="/event">이벤트</a></li>
+        <li><a class="drawer-menu-item" href="/reservation/estimate">지금 예약하기</a></li>
+        <li><a class="drawer-menu-item" href="/my_stuff">보관중인 물품</a></li>
+        <li><a class="drawer-menu-item" href="/my_schedule">내 스케줄</a></li>
+        <li><a class="drawer-menu-item" href="/my_info">내 정보</a></li>
+        <li><a class="drawer-menu-item" href="/logout">로그아웃</a></li>
+      </ul>
     </nav>
 
     {% block content %}{% endblock %}
@@ -149,10 +166,10 @@
     <script src="{{ url_for('static', filename='libs/jquery/dist/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/css/drawer.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/drawer/dist/css/drawer.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/iScroll/5.1.3/iscroll.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/js/drawer.min.js"></script>
+    <script src="{{ url_for('static', filename='libs/drawer/dist/js/drawer.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='assets/js/herebox.js') }}"></script>
 
     <script>
