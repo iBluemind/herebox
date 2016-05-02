@@ -571,7 +571,7 @@ dl, ul, ol, menu, li {
 }
 
 .my-index-menu {
-  margin: 50px 0 60px;
+  margin-bottom: 50px;
 }
 
 .my-index-menu > div {
@@ -579,7 +579,7 @@ dl, ul, ol, menu, li {
 }
 
 .my-index-menu > div > a {
-  font-size: 18px;
+  font-size: 14px;
   color: #c4c4c4;
 }
 
@@ -590,7 +590,7 @@ dl, ul, ol, menu, li {
 .my-index-menu > .active > a,
 .my-index-menu > div > a:hover,
 .my-index-menu > div > a:focus {
-  font-size: 18px;
+  font-size: 14px;
   color: #ffc107;
   text-decoration: none;
 }
@@ -598,7 +598,7 @@ dl, ul, ol, menu, li {
 .my-stuff-title {
   padding: 14px 20px 14px 20px;
   background-color: #fafafa;
-  font-size: 20px;
+  font-size: 16px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }
@@ -658,11 +658,12 @@ dl, ul, ol, menu, li {
   text-align: center;
 }
 
-.my-stuff-btn-group > span {
+.my-stuff-btn-group > div {
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
   font-size: 20px;
   margin-right: 10px;
+  margin-bottom: 20px;
 }
 
 .my-schedule {
@@ -711,20 +712,24 @@ dl, ul, ol, menu, li {
   display: inline-block;
   overflow: hidden;
   font-family: "Nanum Barun Gothic Light", "sans-serif";
-  font-size: 14px;
+  font-size: 10px;
   color: #212121;
 }
 
 .my-info-form {
   width: 100%;
-  margin: 0 auto;
+  padding-left: 30px;
+  padding-right: 30px;
   text-align: center;
 }
 
-.my-info-form > div > .control-label {
+.my-info-form > div {
   text-align: left;
+}
+
+.my-info-form > div > label {
   font-family: "Nanum Barun Gothic Light", "sans-serif";
-  font-size: 20px;
+  font-size: 16px;
   color: #212121;
 }
 

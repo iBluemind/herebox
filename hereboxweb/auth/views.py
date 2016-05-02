@@ -161,8 +161,9 @@ def logout():
 
 
 @auth.route('/my_info', methods=['GET', 'POST'])
+@mobile_template('{mobile/}my_info.html')
 @login_required
-def my_info():
+def my_info(template):
     form = ChangeForm()
     if form.validate_on_submit():
         email = form.email.data
@@ -196,6 +197,8 @@ def my_info():
             if '1062' in e.message:
                 form.message = u'이미 가입된 적이 있는 이메일 주소입니다. 다른 이메일 주소를 입력해주세요'
 
+    if request.MOBILE:
+        return render_template(template, active_my_index='my_info', form=form)
     return render_template('my_info.html', active_my_index='my_info', form=form)
 
 

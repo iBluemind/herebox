@@ -1,0 +1,82 @@
+{% extends "mobile/index_logged_in.html" %}
+{% block my_index_body %}
+
+
+    <div class="my-schedule">
+        <div class="my-schedule-title">픽업 스케줄 ({{ packed_my_pickup|length }})</div>
+            {% for my_schedule in packed_my_pickup %}
+                <div data-id="{{ my_schedule.id }}" style="margin-top: 6px; text-align: left; font-size: 14px; color: #212121; font-family: 'Nanum Barun Gothic Light', 'sans-serif';">
+                    <div style="background-color: #ffecb3; padding: 12px 20px;">주문번호: {{ my_schedule.schedule_id }}</div>
+                    <div style="background-color: #fafafa; padding: 20px;">
+                        <div style="padding-top: 10px;">예약시간: {{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
+                        <div style="padding-top: 10px;">유형: {% if my_schedule.reservation.reservation_type == 'new_reservation' %}신규
+                            {% elif my_schedule.reservation.reservation_type == 'restore_reservation' %}재보관
+                            {% endif %}</div>
+                        <div style="padding-top: 10px;">담당자: {{ my_schedule.staff[0].name }}</div>
+                        <div style="padding-top: 10px;">결제: {% if my_schedule.reservation.pay_type == 0 %}카드
+                            {% elif my_schedule.reservation.pay_type == 1 %}현장
+                            {% elif my_schedule.reservation.pay_type == 2 %}휴대폰
+                            {% elif my_schedule.reservation.pay_type == 3 %}카카오페이
+                            {% endif %}</div>
+                        <div style="padding-top: 10px;">접수: {% if my_schedule.reservation.status == 0 %}대기
+                            {% elif my_schedule.reservation.status == 1 %}완료
+                            {% endif %}</div>
+                        <div class="row" style="text-align: center; margin: 0; padding-top: 30px;">
+                            <div class="col-xs-6 schedule-cancel">취소하기</div>
+                            <div class="col-xs-6">자세히 보기</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% if packed_my_pickup | length == 0 %}
+            <div style="background-color: #fafafa; padding: 12px;">
+                <div style="font-family: 'Nanum Barun Gothic Light', 'sans-serif'; font-size: 14px; color: #212121;">픽업 스케줄이 없습니다. <a href="/reservation/estimate" style="text-decoration: underline; cursor: pointer; color: #ffa000;">지금 예약</a>하고 공간을 더 넓게 사용하세요!</div>
+            </div>
+        {% else %}
+            <p class="my-schedule-warning">
+                * 예약한 스케줄이 불가능할 경우 최소 2일 전에는 취소해주시기 바랍니다
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="my-schedule" style="margin-top: 80px; margin-bottom: 50px;">
+        <div class="my-schedule-title">배송 스케줄 ({{ packed_my_delivery|length }})</div>
+            {% for my_schedule in packed_my_delivery %}
+                <div data-id="{{ my_schedule.id }}" style="margin-top: 6px; text-align: left; font-size: 14px; color: #212121; font-family: 'Nanum Barun Gothic Light', 'sans-serif';">
+                    <div style="background-color: #ffecb3; padding: 12px 20px;">주문번호: {{ my_schedule.schedule_id }}</div>
+                    <div style="background-color: #fafafa; padding: 20px;">
+                        <div style="padding-top: 10px;">예약시간: {{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
+                        <div style="padding-top: 10px;">유형: {% if my_schedule.reservation.delivery_option == 0 %}재보관 가능
+                        {% elif my_schedule.reservation.delivery_option == 1 %}보관 종료
+                        {% endif %}</div>
+                        <div style="padding-top: 10px;">담당자: {{ my_schedule.staff[0].name }}</div>
+                        <div style="padding-top: 10px;">결제: {% if my_schedule.reservation.pay_type == 0 %}카드
+                            {% elif my_schedule.reservation.pay_type == 1 %}현장
+                            {% elif my_schedule.reservation.pay_type == 2 %}휴대폰
+                            {% elif my_schedule.reservation.pay_type == 3 %}카카오페이
+                            {% endif %}</div>
+                        <div style="padding-top: 10px;">접수: {% if my_schedule.reservation.status == 0 %}대기
+                            {% elif my_schedule.reservation.status == 1 %}완료
+                            {% endif %}</div>
+                        <div class="row" style="text-align: center; margin: 0; padding-top: 30px;">
+                            <div class="col-xs-6 schedule-cancel">취소하기</div>
+                            <div class="col-xs-6">자세히 보기</div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% if packed_my_delivery | length == 0 %}
+            <div style="background-color: #fafafa; padding: 12px;">
+                <div style="font-family: 'Nanum Barun Gothic Light', 'sans-serif'; font-size: 14px; color: #212121;">배송 스케줄이 없습니다.</div>
+            </div>
+        {% else %}
+            <p class="my-schedule-warning">
+                * 예약한 스케줄이 불가능할 경우 최소 2일 전에는 취소해주시기 바랍니다
+            </p>
+        {% endif %}
+    </div>
+
+{% endblock %}
+{% block jscript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_schedule.js') }}"></script>
+{% endblock %}

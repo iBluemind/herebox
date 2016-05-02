@@ -6,6 +6,8 @@ import json
 
 from flask import request, render_template, make_response, redirect, url_for
 from flask.ext.login import login_required, current_user
+from flask.ext.mobility.decorators import mobile_template
+
 from hereboxweb import database, response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book
@@ -17,8 +19,9 @@ STUFF_LIST_MAX_COUNT = 10
 
 
 @book.route('/my_stuff', methods=['GET'])
+@mobile_template('{mobile/}my_stuff.html')
 @login_required
-def my_stuff():
+def my_stuff(template):
     my_herebox_stuffs = Goods.query.filter(
         Goods.user_id == current_user.uid,
         Goods.in_store == InStoreStatus.IN_STORE,
@@ -45,6 +48,10 @@ def my_stuff():
         item.remaining_day = remaining_day.days
         packed_my_stuffs.append(item)
 
+    if request.MOBILE:
+        return render_template(template, active_my_index='my_stuff',
+                               packed_my_herebox_stuffs=packed_my_herebox_stuffs,
+                               packed_my_stuffs=packed_my_stuffs)
     return render_template('my_stuff.html', active_my_index='my_stuff',
                            packed_my_herebox_stuffs=packed_my_herebox_stuffs,
                            packed_my_stuffs=packed_my_stuffs)
