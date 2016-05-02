@@ -14,7 +14,8 @@ from hereboxweb.book.views import get_stuffs
 from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
 from hereboxweb.schedule.models import NewReservation, ReservationStatus, ReservationType, Schedule, \
-    ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation
+    ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation, PromotionCode, \
+    PromotionHistory
 from hereboxweb.schedule.views import get_order, get_estimate
 from hereboxweb.tasks import send_sms, send_mms
 from hereboxweb.utils import add_months
@@ -537,13 +538,29 @@ def reservation_payment():
         )
         database.session.add(purchase)
 
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
+
+        promotion_id = None
+        if promotion:
+            promotion_code = PromotionCode.query.filter(PromotionCode.code == promotion).first()
+            if promotion_code:
+                promotion_history = PromotionHistory(current_user.uid, promotion_code.id)
+                database.session.add(promotion_history)
+                try:
+                    database.session.commit()
+                except:
+                    return response_template(u'문제가 발생했습니다.', status=500)
+
         new_reservation = NewReservation(
             status=ReservationStatus.ACCEPTED,
             standard_box_count=regular_item_count,
             nonstandard_goods_count=irregular_item_count,
             period=period,
             fixed_rate=1 if period_option == 'subscription' else 0,
-            promotion=promotion,
+            promotion=promotion_id,
             binding_products={u'포장용 에어캡 1m': binding_product0_count, u'실리카겔 (제습제) 50g': binding_product1_count,
                               u'압축팩 40cm x 60cm': binding_product2_count, u'테이프 48mm x 40m': binding_product3_count},
             contact=phone_number,
