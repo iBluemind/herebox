@@ -6,6 +6,8 @@ import time
 from datetime import timedelta
 from flask import request, render_template, escape, session, redirect, url_for, make_response
 from flask.ext.login import login_required, current_user
+from flask.ext.mobility.decorators import mobile_template
+
 from hereboxweb import database, response_template, bad_request
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
@@ -408,8 +410,9 @@ def extended_payment():
 
 
 @payment.route('/reservation/payment', methods=['GET', 'POST'])
+@mobile_template('{mobile/}reservation_payment.html')
 @login_required
-def reservation_payment():
+def reservation_payment(template):
     def calculate_total_price(regular_item_count, irregular_item_count, period, period_option, promotion):
         total_storage_price = 0
         if period_option == 'subscription':
@@ -675,5 +678,7 @@ def reservation_payment():
 
     if user_total_price != total_price:
         return redirect(url_for('schedule.estimate'))
+    if request.MOBILE:
+        return render_template(template, active_menu='reservation')
     return render_template('reservation_payment.html', active_menu='reservation')
 

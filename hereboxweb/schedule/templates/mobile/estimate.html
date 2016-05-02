@@ -1,0 +1,221 @@
+{% extends "mobile/base.html" %}
+{% block content %}
+
+    <div class="container">
+        <div style="margin-top: 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/m-5-step-1.png') }}">
+        </div>
+
+        <div class="row" style="margin: 0;">
+            <div class="estimate-title" style="margin-top: 60px;">무엇을 보관하실 건가요?</div>
+            <div id="regularItem" class="estimate-item">
+                <div class="item-box">
+                    <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
+                    <h2>규격박스</h2>
+                    <p>
+                        튼튼한 플라스틱 박스로 안전합니다
+                        <br>
+                        가로 60cm x 세로 40cm x 높이 37cm
+                        <br>
+                        최대 무게 25kg
+                        <br><br>
+                        <a style="color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#boxSize">박스 크기 영상으로 보기 ></a>
+                    </p>
+
+                    <p class="price">
+                        7,500원 / 월
+                    </p>
+                </div>
+
+                <div class="count" style="margin: 10px auto 0;">
+                    <div class="count-row">
+                        <div class="count-item subtract">-</div>
+                        <div class="count-item number" style="color: #ffc107;">0</div>
+                        <div class="count-item add">+</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="irregularItem" class="estimate-item">
+                <div class="item-box">
+                    <img src="{{ url_for('static', filename='assets/img/img-un.png') }}">
+                    <h2>비규격 물품</h2>
+                    <p>
+                        박스에 들어가지않는 큰 물건도 걱정마세요
+                        <br>
+                        자전거, 캐리어, 골프백, 스키 등 한 명이 옮길
+                        <br>
+                        수 있는 물품이라면 가능합니다
+                        <br><br>
+                    </p>
+
+                    <br>
+
+                    <p class="price">
+                        9,900원 / 월
+                    </p>
+                </div>
+
+                <div class="count" style="margin: 10px auto 0;">
+                    <div class="count-row">
+                        <div class="count-item subtract">-</div>
+                        <div class="count-item number" style="color: #ffc107;">0</div>
+                        <div class="count-item add">+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin: 80px 0 0 0; padding: 0 20px;">
+            <div id="disposable" class="estimate-title">
+                <div>몇 개월간 보관하실 건가요?</div>
+                <div id="optionsPeriod" class="radio">
+                    <label>
+                        <input type="radio" name="optionsPeriod" id="optionsDisposable" value="disposable" checked>
+                        기간 설정
+                        <p class="estimate-month-item-desc">
+                            설정한 기간만큼만 보관료를 결제합니다<br>
+                            * 기간 만료 시 직접 연장 필요
+                        </p>
+                        <div class="count" style="margin: 20px 0;">
+                            <div class="count-row">
+                                <div class="count-item subtract">-</div>
+                                <div class="count-item number" style="color: #ffc107;">0</div>
+                                <div class="count-item add">+</div>
+                            </div>
+                        </div>
+                    </label>
+                    <label>
+                        <input type="radio" name="optionsPeriod" id="optionsSubscription" value="subscription" disabled>
+                        자동 결제 (준비 중)
+                        <p class="estimate-month-item-desc">
+                            매 달 자동으로 보관료가 결제됩니다
+                        </p>
+                    </label>
+                </div>
+            </div>
+            <div class="estimate-title" style="margin-top: 60px;">
+                <div>필요한 포장 용품을 구매하세요</div>
+                <div style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#bindingProductManual">포장 용품 자세히 알아보기 ></div>
+                <div class="binding-product-item">
+                    <div id="bindingProduct0" class="row" style="margin: 12px -5px 12px;">
+                        <div class="col-xs-6" style="padding-right: 5px">
+                            포장용 에어캡 1m<br>
+                            500원 / 개
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item subtract">-</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
+                                    <div class="count-item add">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bindingProduct1" class="row" style="margin: 12px -5px 12px;">
+                        <div class="col-xs-6" style="padding-right: 5px">
+                            실리카겔 (제습제) 50g<br>
+                            500원 / 개
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item subtract">-</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
+                                    <div class="count-item add">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bindingProduct2" class="row" style="margin: 12px -5px 12px;">
+                        <div class="col-xs-6" style="padding-right: 5px">
+                            압축팩 40cm x 60cm<br>
+                            1,500원 / 개
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item subtract">-</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
+                                    <div class="count-item add">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bindingProduct3" class="row" style="margin: 12px -5px 12px;">
+                        <div class="col-xs-6" style="padding-right: 5px">
+                            테이프 48mm x 40m<br>
+                            1,000원 / 개
+                        </div>
+                        <div class="col-xs-6 ">
+                            <div class="count">
+                                <div class="count-row">
+                                    <div class="count-item subtract">-</div>
+                                    <div class="count-item number" style="color: #ffc107;">0</div>
+                                    <div class="count-item add">+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin: 80px 0 0 0; padding: 0 10px;">
+            <div>
+                <div style="white-space: nowrap;">
+                    <img src="{{ url_for('static', filename='assets/img/icon-promo.png') }}">
+                    <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                        <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">프로모션 코드</div>
+                        <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                            프로모션 코드를 가지고 계시다면 입력해주세요<br>
+                            할인 혜택을 받을 수 있습니다
+                            <p>
+                                <a style="color: #ffa000; cursor: pointer;" href="/event" target="_blank">진행 중인 이벤트 확인하기 ></a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center; padding: 10px 10px;">
+                <div class="col-xs-9" style="padding-right: 5px;">
+                    <input type="text" class="form-control" id="inputPromotion" placeholder="프로모션 코드를 입력하세요">
+                </div>
+                <button id="btnCheckPromotion" type="button" class="col-xs-2 btn btn-hbprimary" style="height: 34px; font-size: 14px; padding: 6px 4px;">확인</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 80px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; text-align: center;">
+            예상 결제 비용
+            <div>
+                <div id="totalPrice" style="display: inline-block; margin: 10px 0; padding: 15px 120px; font-family: 'Nanum Barun Gothic Bold', sans-serif; font-size: 26px; color: #ffc107; border-radius: 4px; background-color: #ffffff; border: solid 1px #ffc107;">
+                    0
+                </div>
+            </div>
+
+            <div style="font-size: 14px; color: #727272;">
+                총 보관 비용 : <span id="totalStoragePrice"></span><br>
+                포장 용품 비용 : <span id="totalBindingProductPrice"></span><br>
+                <span id="promotionDiscount" style="visibility: hidden;"></span><br>
+
+                <br>
+                <p><a style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#discountManual">할인 정책 알아보기 ></a></p>
+            </div>
+
+            <button id="btnNextStep" class="btn btn-hbprimary" style="margin: 80px 0 100px 0;">다음 단계</button>
+        </div>
+    </div>
+
+    {% include "dialog_dcp.html" %}
+    {% include "dialog_binding_product.html" %}
+    {% include "dialog_box_size.html" %}
+
+{% endblock %}
+{% block jscript %}
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/hbcounter.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/estimate.js') }}"></script>
+{% endblock %}
