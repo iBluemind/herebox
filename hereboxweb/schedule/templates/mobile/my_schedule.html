@@ -6,8 +6,12 @@
         <div class="my-schedule-title">픽업 스케줄 ({{ packed_my_pickup|length }})</div>
             {% for my_schedule in packed_my_pickup %}
                 <div data-id="{{ my_schedule.id }}" style="margin-top: 6px; text-align: left; font-size: 14px; color: #212121; font-family: 'Nanum Barun Gothic Light', 'sans-serif';">
-                    <div style="background-color: #ffecb3; padding: 12px 20px;">주문번호: {{ my_schedule.schedule_id }}</div>
-                    <div style="background-color: #fafafa; padding: 20px;">
+                    <div class="my-schedule-item-title" style="background-color: #ffecb3; padding: 12px 20px;">주문번호: {{ my_schedule.schedule_id }}
+                        <div class="btn-up">
+                            <img src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
+                        </div>
+                    </div>
+                    <div class="my-schedule-item-content" style="background-color: #fafafa; padding: 20px;">
                         <div style="padding-top: 10px;">예약시간: {{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
                         <div style="padding-top: 10px;">유형: {% if my_schedule.reservation.reservation_type == 'new_reservation' %}신규
                             {% elif my_schedule.reservation.reservation_type == 'restore_reservation' %}재보관
@@ -43,8 +47,12 @@
         <div class="my-schedule-title">배송 스케줄 ({{ packed_my_delivery|length }})</div>
             {% for my_schedule in packed_my_delivery %}
                 <div data-id="{{ my_schedule.id }}" style="margin-top: 6px; text-align: left; font-size: 14px; color: #212121; font-family: 'Nanum Barun Gothic Light', 'sans-serif';">
-                    <div style="background-color: #ffecb3; padding: 12px 20px;">주문번호: {{ my_schedule.schedule_id }}</div>
-                    <div style="background-color: #fafafa; padding: 20px;">
+                    <div class="my-schedule-item-title" style="background-color: #ffecb3; padding: 12px 20px;">주문번호: {{ my_schedule.schedule_id }}
+                        <div class="btn-up">
+                            <img src="{{ url_for('static', filename='assets/img/icon-btup.png') }}">
+                        </div>
+                    </div>
+                    <div class="my-schedule-item-content" style="background-color: #fafafa; padding: 20px;">
                         <div style="padding-top: 10px;">예약시간: {{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
                         <div style="padding-top: 10px;">유형: {% if my_schedule.reservation.delivery_option == 0 %}재보관 가능
                         {% elif my_schedule.reservation.delivery_option == 1 %}보관 종료
@@ -79,4 +87,5 @@
 {% endblock %}
 {% block jscript %}
     <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_schedule.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/mobile/my_schedule.js') }}"></script>
 {% endblock %}
