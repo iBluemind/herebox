@@ -609,25 +609,14 @@ dl, ul, ol, menu, li {
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }
 
-.my-stuff-items {
-  display: table;
-  overflow: hidden;
-  margin: 0 auto;
-  border-spacing: 10px;
-}
-
-.my-stuff-items-row {
-  display: table-row;
-}
-
-.my-stuff-items .item {
-  display:table-cell;
-  width: 306px;
+.my-stuff-item {
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
   text-align: center;
 }
 
-.my-stuff-items .item .item-box {
-  width: 306px;
+.my-stuff-item .item-box {
   height: 430px;
   padding: 26px;
   border: solid 1px #c4c4c4;
@@ -635,20 +624,20 @@ dl, ul, ol, menu, li {
   text-align: center;
 }
 
-.my-stuff-items .item .item-box h2 {
+.my-stuff-item .item-box h2 {
   font-size: 20px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }
 
-.my-stuff-items .item .item-box p {
+.my-stuff-item .item-box p {
   text-align: left;
   font-size: 14px;
   color: #212121;
   font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }
 
-.my-stuff-items .item .item-box .item-btn-group {
+.my-stuff-item .item-box .item-btn-group {
   font-size: 14px;
   text-align: center;
 }
