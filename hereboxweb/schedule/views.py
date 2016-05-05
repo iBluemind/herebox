@@ -4,7 +4,7 @@
 import re
 
 from datetime import timedelta
-from flask import request, render_template, redirect, url_for, make_response, session, escape
+from flask import request, render_template, redirect, url_for, make_response, session, escape, jsonify
 from flask.ext.login import login_required, current_user
 from flask.ext.mobility.decorators import mobile_template
 from sqlalchemy import or_, func
@@ -693,19 +693,21 @@ def cancel_schedule():
 @schedule.route('/promotion/<code>', methods=['GET'])
 @login_required
 def check_promotion(code):
-    promotion = PromotionCode.query.filter(PromotionCode.code == func.binary(code)).first()
-    if not promotion:
+    promotion_code = PromotionCode.query.join(Promotion).filter(PromotionCode.code == func.binary(code)).first()
+    if not promotion_code:
         return bad_request(u'유효하지 않는 프로모션입니다.')
 
-    import flask
+    today = datetime.datetime.now()
+    if today > promotion_code.promotion.expired_at:
+        return forbidden(u'유효 기간이 지난 프로모션입니다.')
 
-    promotion_history = PromotionHistory.query.filter(PromotionHistory.code == promotion.id,
+    promotion_history = PromotionHistory.query.filter(PromotionHistory.code == promotion_code.id,
                                             PromotionHistory.user_id == current_user.uid).first()
     if promotion_history:
         return forbidden(u'이미 사용한 적이 있는 프로모션입니다.')
 
-    response = flask.jsonify(content = {'message': u'정상 처리되었습니다'})
-    response.set_cookie('promotion', promotion.code, path='/reservation/')
+    response = jsonify(content = {'message': u'정상 처리되었습니다'})
+    response.set_cookie('promotion', promotion_code.code, path='/reservation/')
     return response
 
 
