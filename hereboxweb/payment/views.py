@@ -7,8 +7,9 @@ from datetime import timedelta
 from flask import request, render_template, escape, session, redirect, url_for, make_response
 from flask.ext.login import login_required, current_user
 from flask.ext.mobility.decorators import mobile_template
+from sqlalchemy import func
 
-from hereboxweb import database, response_template, bad_request
+from hereboxweb import database, response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.book.models import Goods
@@ -525,6 +526,19 @@ def reservation_payment(template):
             if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
                 return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
 
+        promotion_code = PromotionCode.query.join(Promotion).filter(PromotionCode.code == func.binary(promotion)).first()
+        if not promotion_code:
+            return bad_request(u'유효하지 않는 프로모션입니다.')
+
+        today = datetime.datetime.now()
+        if today > promotion_code.promotion.expired_at:
+            return forbidden(u'유효 기간이 지난 프로모션입니다.')
+
+        promotion_history = PromotionHistory.query.filter(PromotionHistory.code == promotion_code.id,
+                                                          PromotionHistory.user_id == current_user.uid).first()
+        if promotion_history:
+            return forbidden(u'이미 사용한 적이 있는 프로모션입니다.')
+
         user_total_price = int(request.cookies.get('totalPrice'))
         total_price = calculate_total_price(
             regular_item_count, irregular_item_count, period, period_option, promotion
@@ -621,25 +635,25 @@ def reservation_payment(template):
 
         visit_time = VisitTime.query.get(visit_time)
         pay_type = u'현장' if new_reservation.pay_type == PayType.DIRECT else u'온라인'
-        send_mms.apply_async(args=['01064849686', u'주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
-                                                  u' / 주소: %s / 연락처: %s / 규격(갯수): %s / 비규격(갯수): %s'
-                                                  u' / 보관기간: %s개월 / 남길말: %s ' % (
-                                       new_visit_schedule.schedule_id, current_user.name, visit_date, visit_time,
-                                       pay_type, new_reservation.address, current_user.phone,
-                                       new_reservation.standard_box_count,
-                                       new_reservation.nonstandard_goods_count, new_reservation.period,
-                                       new_reservation.user_memo), u'[히어박스]'])
+        # send_mms.apply_async(args=['01064849686', u'주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
+        #                                           u' / 주소: %s / 연락처: %s / 규격(갯수): %s / 비규격(갯수): %s'
+        #                                           u' / 보관기간: %s개월 / 남길말: %s ' % (
+        #                                new_visit_schedule.schedule_id, current_user.name, visit_date, visit_time,
+        #                                pay_type, new_reservation.address, current_user.phone,
+        #                                new_reservation.standard_box_count,
+        #                                new_reservation.nonstandard_goods_count, new_reservation.period,
+        #                                new_reservation.user_memo), u'[히어박스]'])
 
         if new_revisit_schedule:
             revisit_time = VisitTime.query.get(revisit_time)
-            send_mms.apply_async(args=['01064849686', u'주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
-                                                      u' / 주소: %s / 연락처: %s / 규격(갯수): %s / 비규격(갯수): %s'
-                                                      u' / 보관기간: %s개월 / 남길말: %s ' % (
-                                           new_revisit_schedule.schedule_id, current_user.name, revisit_date, revisit_time,
-                                           pay_type, new_reservation.address, current_user.phone,
-                                           new_reservation.standard_box_count,
-                                           new_reservation.nonstandard_goods_count, new_reservation.period,
-                                           new_reservation.user_memo), u'[히어박스]'])
+            # send_mms.apply_async(args=['01064849686', u'주문번호: %s / 이름: %s / 예약시간: %s %s / 유형: 신규 / 결제방법: %s'
+            #                                           u' / 주소: %s / 연락처: %s / 규격(갯수): %s / 비규격(갯수): %s'
+            #                                           u' / 보관기간: %s개월 / 남길말: %s ' % (
+            #                                new_revisit_schedule.schedule_id, current_user.name, revisit_date, revisit_time,
+            #                                pay_type, new_reservation.address, current_user.phone,
+            #                                new_reservation.standard_box_count,
+            #                                new_reservation.nonstandard_goods_count, new_reservation.period,
+            #                                new_reservation.user_memo), u'[히어박스]'])
         return response_template(u'정상 처리되었습니다', 200)
 
     estimate_info = get_estimate()
