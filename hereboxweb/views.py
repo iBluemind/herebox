@@ -37,7 +37,10 @@ def faq(template):
 
 
 @app.route('/event', methods=['GET'])
-def event():
+@mobile_template('{mobile/}event.html')
+def event(template):
+    if request.MOBILE:
+        return render_template(template)
     return render_template('event.html', active_menu='event')
 
 
