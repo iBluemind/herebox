@@ -326,3 +326,6 @@
 .Image_333 {background-image:url('/resource/project/icon_btup.png'); background-position:center center; height:12px; left:280px; position:absolute; top:19px; width:12px;}
 .CollapsibleContent_332 {border-color:rgb(250,250,250); border-width:2px; display:none; position:relative;}
 .Text_335 {color:rgb(33,33,33); font-family:'Noto Sans KR', sans-serif; font-size:14px; font-weight:300; padding:20px; position:relative; text-align:left; width:260px;}
+.drawer-nav {
+    width: 20rem !important;
+}
