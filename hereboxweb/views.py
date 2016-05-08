@@ -29,7 +29,10 @@ def introduce(template):
 
 
 @app.route('/faq', methods=['GET'])
-def faq():
+@mobile_template('{mobile/}faq.html')
+def faq(template):
+    if request.MOBILE:
+        return render_template(template)
     return render_template('faq.html', active_menu='faq')
 
 
