@@ -2,17 +2,14 @@
 
 
 import re
-
 from datetime import timedelta
 from flask import request, render_template, redirect, url_for, make_response, session, escape, jsonify
 from flask.ext.login import login_required, current_user
 from flask.ext.mobility.decorators import mobile_template
 from sqlalchemy import or_, func
-from sqlalchemy.orm import aliased, with_polymorphic
-
-from hereboxweb import database, response_template, bad_request, forbidden
+from sqlalchemy.orm import aliased
+from hereboxweb import response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
-from hereboxweb.auth.models import User
 from hereboxweb.book.views import save_stuffs, get_stuffs
 from hereboxweb.schedule import schedule
 from hereboxweb.schedule.models import *
@@ -197,6 +194,70 @@ def save_order(template, api_endpoint):
     return response
 
 
+def apply_hellohb_promotion(regular_item_count, irregular_item_count, period):
+    total_storage_price = 0
+    discount_count = 10
+    discount_count = discount_count - irregular_item_count
+    if discount_count >= 0:
+        total_storage_price = total_storage_price + (9900 * irregular_item_count * (period - 1))
+    else:
+        total_storage_price = total_storage_price + (9900 * 10 * (period - 1))
+        total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
+
+    if discount_count > 0:
+        if regular_item_count > 0:
+            discount_count = discount_count - regular_item_count
+            if discount_count >= 0:
+                total_storage_price = total_storage_price + (7500 * regular_item_count * (period - 1))
+            else:
+                total_storage_price = total_storage_price + (7500 * 10 * (period - 1))
+                total_storage_price = total_storage_price + (7500 * (discount_count * -1) * period)
+    else:
+        total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+
+    return total_storage_price
+
+
+def calculate_storage_price(regular_item_count, irregular_item_count, period_option, period, promotion=None):
+    total_storage_price = 0
+    if period_option == 'subscription':
+        # 매월 자동 결제일 경우!
+        total_storage_price = total_storage_price + (7500 * regular_item_count)
+        total_storage_price = total_storage_price + (9900 * irregular_item_count)
+    else:
+        if 'HELLOHB' == promotion:
+            total_storage_price = apply_hellohb_promotion(regular_item_count, irregular_item_count, period)
+        else:
+            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
+            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+    return total_storage_price
+
+
+def calculate_binding_products_price(binding_product0_count, binding_product1_count, binding_product2_count,
+                                        binding_product3_count):
+    total_binding_products_price = 0
+    total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
+    total_binding_products_price = total_binding_products_price + 500 * binding_product1_count
+    total_binding_products_price = total_binding_products_price + 1500 * binding_product2_count
+    total_binding_products_price = total_binding_products_price + 1000 * binding_product3_count
+    return total_binding_products_price
+
+
+def calculate_total_price(regular_item_count, irregular_item_count, period, period_option, promotion,
+                          binding_product0_count, binding_product1_count, binding_product2_count,
+                          binding_product3_count):
+    total_storage_price = calculate_storage_price(regular_item_count, irregular_item_count,
+                                                  period_option,
+                                                  period, promotion)
+
+    total_binding_products_price = calculate_binding_products_price(binding_product0_count,
+                                                                        binding_product1_count,
+                                                                        binding_product2_count,
+                                                                        binding_product3_count)
+
+    return total_storage_price + total_binding_products_price
+
+
 @schedule.route('/reservation/estimate', methods=['GET', 'POST'])
 @mobile_template('{mobile/}estimate.html')
 @login_required
@@ -207,23 +268,9 @@ def estimate(template):
     estimate_info = get_estimate()
     if not estimate_info:
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        if request.MOBILE:
-            return render_template(template, active_menu='reservation')
-        return render_template('estimate.html', active_menu='reservation')
+        return render_template(template, active_menu='reservation')
 
-    response = make_response(render_template('estimate.html', active_menu='reservation',
-                                             regular_item_count=estimate_info.get('regularItemNumberCount'),
-                                             irregular_item_count=estimate_info.get('irregularItemNumberCount'),
-                                             period=estimate_info.get('disposableNumberCount'),
-                                             period_option=estimate_info.get('optionsPeriod'),
-                                             binding_product0_count=estimate_info.get('bindingProduct0NumberCount'),
-                                             binding_product1_count=estimate_info.get('bindingProduct1NumberCount'),
-                                             binding_product2_count=estimate_info.get('bindingProduct2NumberCount'),
-                                             binding_product3_count=estimate_info.get('bindingProduct3NumberCount'),
-                                             promotion=estimate_info.get('inputPromotion'))
-                             )
-    if request.MOBILE:
-        response = make_response(render_template(template, active_menu='reservation',
+    return make_response(render_template(template, active_menu='reservation',
                                                  regular_item_count=estimate_info.get('regularItemNumberCount'),
                                                  irregular_item_count=estimate_info.get('irregularItemNumberCount'),
                                                  period=estimate_info.get('disposableNumberCount'),
@@ -233,8 +280,7 @@ def estimate(template):
                                                  binding_product2_count=estimate_info.get('bindingProduct2NumberCount'),
                                                  binding_product3_count=estimate_info.get('bindingProduct3NumberCount'),
                                                  promotion=estimate_info.get('inputPromotion'))
-                                 )
-    return response
+                                                )
 
 
 @schedule.route('/reservation/order', methods=['GET', 'POST'])
@@ -245,58 +291,24 @@ def order(template):
         return save_estimate()
 
     estimate_info = get_estimate()
-    try:
-        estimate_info['regularItemNumberCount']
-        estimate_info['irregularItemNumberCount']
-        estimate_info['optionsPeriod']
-        estimate_info['bindingProduct0NumberCount']
-        estimate_info['bindingProduct1NumberCount']
-        estimate_info['bindingProduct2NumberCount']
-        estimate_info['bindingProduct3NumberCount']
-    except:
-        return redirect(url_for('index'))
-
-    def calculate_storage_price(regular_item_count, irregular_item_count, period_option, period):
-        total_storage_price = 0
-        if period_option == 'subscription':
-            # 매월 자동 결제일 경우!
-            total_storage_price = total_storage_price + (7500 * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * irregular_item_count)
-        else:
-            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
-        return total_storage_price
-
-    standard_box_count = estimate_info['regularItemNumberCount']
-    nonstandard_goods_count = estimate_info['irregularItemNumberCount']
-    period = estimate_info['disposableNumberCount']
-    peroid_option = estimate_info['disposableNumberCount']
+    standard_box_count = estimate_info.get('regularItemNumberCount', 0)
+    nonstandard_goods_count = estimate_info.get('irregularItemNumberCount', 0)
+    period = estimate_info.get('disposableNumberCount', 0)
+    peroid_option = estimate_info.get('optionsPeriod', 'disposable')
 
     if calculate_storage_price(standard_box_count, nonstandard_goods_count,
                                peroid_option, period) <= 0:
         return bad_request(u'하나 이상의 상품을 구매하셔야 합니다.')
 
-    response = make_response(
-        render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone))
-
-    if request.MOBILE:
-        response = make_response(
-            render_template(template, active_menu='reservation', old_phone_number=current_user.phone))
-
     order_info = get_order()
     if order_info:
-        response = make_response(
-            render_template('reservation.html', active_menu='reservation', old_phone_number=current_user.phone,
+        return make_response(
+            render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
                             address1=order_info.get('inputAddress1'),
                             address2=order_info.get('inputAddress2'),
                             user_memo=order_info.get('textareaMemo')))
-        if request.MOBILE:
-            response = make_response(
-                render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
-                                address1=order_info.get('inputAddress1'),
-                                address2=order_info.get('inputAddress2'),
-                                user_memo=order_info.get('textareaMemo')))
-    return response
+    return make_response(
+        render_template(template, active_menu='reservation', old_phone_number=current_user.phone))
 
 
 @schedule.route('/reservation/review', methods=['GET', 'POST'])
@@ -310,15 +322,15 @@ def review(template):
     if not estimate_info:
         return redirect(url_for('index'))
 
-    regular_item_count = estimate_info.get('regularItemNumberCount')
-    irregular_item_count = estimate_info.get('irregularItemNumberCount')
-    period = estimate_info.get('disposableNumberCount')
-    period_option = estimate_info.get('optionsPeriod')
-    binding_product0_count = estimate_info.get('bindingProduct0NumberCount')
-    binding_product1_count = estimate_info.get('bindingProduct1NumberCount')
-    binding_product2_count = estimate_info.get('bindingProduct2NumberCount')
-    binding_product3_count = estimate_info.get('bindingProduct3NumberCount')
-    promotion = estimate_info.get('inputPromotion')
+    regular_item_count = estimate_info.get('regularItemNumberCount', 0)
+    irregular_item_count = estimate_info.get('irregularItemNumberCount', 0)
+    period = estimate_info.get('disposableNumberCount', 0)
+    period_option = estimate_info.get('optionsPeriod', 'disposable')
+    binding_product0_count = estimate_info.get('bindingProduct0NumberCount', 0)
+    binding_product1_count = estimate_info.get('bindingProduct1NumberCount', 0)
+    binding_product2_count = estimate_info.get('bindingProduct2NumberCount', 0)
+    binding_product3_count = estimate_info.get('bindingProduct3NumberCount', 0)
+    promotion = estimate_info.get('inputPromotion', None)
     start_time = escape(session.get('start_time'))
 
     if not start_time:
@@ -339,9 +351,6 @@ def review(template):
     address2 = order_info.get('inputAddress2')
     visit_time = order_info.get('inputVisitTime')
 
-    if not post_code:
-        return redirect(url_for('index'))
-
     try:
         regular_item_count = int(regular_item_count)
         irregular_item_count = int(irregular_item_count)
@@ -354,45 +363,6 @@ def review(template):
     except:
         return redirect(url_for('index'))
 
-    def calculate_total_price(regular_item_count, irregular_item_count, period, period_option, promotion):
-        total_storage_price = 0
-        if period_option == 'subscription':
-            # 매월 자동 결제일 경우!
-            total_storage_price = total_storage_price + (7500 * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * irregular_item_count)
-        else:
-            if promotion == 'HELLOHB':
-                discount_count = 10
-                discount_count = discount_count - irregular_item_count
-                if discount_count >= 0:
-                    total_storage_price = total_storage_price + (9900 * irregular_item_count * (period - 1))
-                else:
-                    total_storage_price = total_storage_price + (9900 * 10 * (period - 1))
-                    total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
-
-                if discount_count > 0:
-                    if regular_item_count > 0:
-                        discount_count = discount_count - regular_item_count
-                        if discount_count >= 0:
-                            total_storage_price = total_storage_price + (7500 * regular_item_count * (period - 1))
-                        else:
-                            total_storage_price = total_storage_price + (7500 * 10 * (period - 1))
-                            total_storage_price = total_storage_price + (7500 * (discount_count * -1) * period)
-                else:
-                    total_storage_price = total_storage_price + (7500 * regular_item_count * period)
-
-            else:
-                total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-                total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
-
-        total_binding_products_price = 0
-        total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
-        total_binding_products_price = total_binding_products_price + 500 * binding_product1_count
-        total_binding_products_price = total_binding_products_price + 1500 * binding_product2_count
-        total_binding_products_price = total_binding_products_price + 1000 * binding_product3_count
-
-        return total_storage_price + total_binding_products_price
-
     visit_time = VisitTime.query.get(visit_time)
     if revisit_time:
         revisit_time = VisitTime.query.get(revisit_time)
@@ -402,31 +372,7 @@ def review(template):
     if promotion_code:
         promotion_name = promotion_code.promotion.name
 
-    response = make_response(render_template('review.html', active_menu='reservation',
-                                             standard_box_count=regular_item_count,
-                                             nonstandard_goods_count=irregular_item_count,
-                                             period_option=True if period_option == 'subscription' else False,
-                                             period=period,
-                                             binding_products={u'포장용 에어캡 1m': binding_product0_count,
-                                                               u'실리카겔 (제습제) 50g': binding_product1_count,
-                                                               u'압축팩 40cm x 60cm': binding_product2_count,
-                                                               u'테이프 48mm x 40m': binding_product3_count},
-                                             promotion=promotion_name,
-                                             total_price=u'{:,d}원'.format(calculate_total_price(
-                                                 regular_item_count, irregular_item_count, period, period_option,
-                                                 promotion
-                                             )),
-                                             phone=phone_number,
-                                             address='%s %s' % (address1, address2),
-                                             visit_date=visit_date,
-                                             visit_time=visit_time,
-                                             revisit_option=1 if revisit_option == 'later' else 0,
-                                             revisit_date=revisit_date,
-                                             revisit_time=revisit_time,
-                                             user_memo=user_memo)
-                                            )
-    if request.MOBILE:
-        response = make_response(render_template(template, active_menu='reservation',
+    response = make_response(render_template(template, active_menu='reservation',
                                                  standard_box_count=regular_item_count,
                                                  nonstandard_goods_count=irregular_item_count,
                                                  period_option=True if period_option == 'subscription' else False,
@@ -448,7 +394,7 @@ def review(template):
                                                  revisit_date=revisit_date,
                                                  revisit_time=revisit_time,
                                                  user_memo=user_memo)
-                                 )
+                                                )
     response.set_cookie('totalPrice', '%d' % (calculate_total_price(
                     regular_item_count, irregular_item_count, period, period_option, promotion
                         )), path='/reservation/')
@@ -459,9 +405,11 @@ def review(template):
 @mobile_template('{mobile/}completion.html')
 @login_required
 def completion(template):
-    if request.MOBILE:
-        return render_template(template, active_menu='reservation')
-    return render_template('completion.html', active_menu='reservation')
+    return render_template(template, active_menu='reservation')
+
+
+def calculate_total_delivery_price(packed_stuffs):
+    return 2000 * len(packed_stuffs)
 
 
 @schedule.route('/delivery/order', methods=['GET', 'POST'])
@@ -568,12 +516,6 @@ def delivery_review():
     visit_date = order_info.get('inputDeliveryDate')
     visit_time = order_info.get('inputDeliveryTime')
 
-    if not post_code:
-        return redirect(url_for('index'))
-
-    def calculate_total_price():
-        return 2000 * len(packed_stuffs)
-
     visit_time = VisitTime.query.get(visit_time)
     response = make_response(render_template('delivery_review.html', active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
@@ -582,9 +524,9 @@ def delivery_review():
                                              phone_number=phone_number,
                                              visit_date_time=u'%s %s' % (visit_date, visit_time),
                                              user_memo=user_memo,
-                                             total_price=u'{:,d}원'.format(calculate_total_price()))
+                                             total_price=u'{:,d}원'.format(calculate_total_delivery_price(packed_stuffs)))
                                             )
-    response.set_cookie('totalPrice', '%d' % (calculate_total_price()), path='/delivery/')
+    response.set_cookie('totalPrice', '%d' % (calculate_total_delivery_price(packed_stuffs)), path='/delivery/')
     return response
 
 
@@ -646,9 +588,6 @@ def pickup_review():
     if not post_code:
         return redirect(url_for('index'))
 
-    def calculate_total_price():
-        return 2000 * len(packed_stuffs)
-
     visit_time = VisitTime.query.get(visit_time)
     response = make_response(render_template('pickup_review.html', active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
@@ -658,9 +597,9 @@ def pickup_review():
                                              revisit_option=1 if revisit_option == 'later' else 0,
                                              revisit_date_time=u'%s %s' % (revisit_date, revisit_time),
                                              user_memo=user_memo,
-                                             total_price=u'{:,d}원'.format(calculate_total_price()))
+                                             total_price=u'{:,d}원'.format(calculate_total_delivery_price(packed_stuffs)))
                                             )
-    response.set_cookie('totalPrice', '%d' % (calculate_total_price()), path='/pickup/')
+    response.set_cookie('totalPrice', '%d' % (calculate_total_delivery_price(packed_stuffs)), path='/pickup/')
     return response
 
 

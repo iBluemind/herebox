@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from flask import request, url_for, redirect, flash, session, escape
 from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis, forbidden
 from hereboxweb.auth import auth
-from hereboxweb.auth.crypto import AESCipher
+from hereboxweb.auth.crypto import AESCipher, RSACryptor
 from hereboxweb.auth.forms import LoginForm, SignupForm, ChangeForm
 from hereboxweb.auth.models import User
 from config import RSA_PUBLIC_KEY_BASE64
@@ -46,9 +46,9 @@ def login(template):
             aes_iv = base64.b64decode(encoded_aes_iv)
 
             decoded_private_key = base64.b64decode(RSA_PRIVATE_KEY_BASE64)
-            private_key = PKCS1_OAEP.new(RSA.importKey(decoded_private_key))
+            rsa_cipher = RSACryptor(decoded_private_key)
 
-            decrypted_aes_key = private_key.decrypt(encrypted_aes_key)
+            decrypted_aes_key = rsa_cipher.decrypt(encrypted_aes_key)
             aes_cipher = AESCipher(decrypted_aes_key)
 
             decrypted_email = aes_cipher.decrypt(encrypted_email, aes_iv)
@@ -67,9 +67,7 @@ def login(template):
             form.email.errors.append(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
 
     form.email.data = ''
-    response = make_response(render_template('login.html', form=form, active_menu='login'))
-    if request.MOBILE:
-        response = make_response(render_template(template, form=form, active_menu='login'))
+    response = make_response(render_template(template, form=form, active_menu='login'))
     response.set_cookie('jsessionid', rsa_public_key, path='/login')
     return response
 
@@ -96,9 +94,7 @@ def signup(template):
             if '1062' in e.message:
                 form.email.data = ''
                 form.email.errors.append(u'이미 존재하는 이메일 주소입니다.')
-    if request.MOBILE:
-        return render_template(template, form=form)
-    return render_template('signup.html', form=form)
+    return render_template(template, form=form)
 
 
 @auth.route('/fb_login', methods=['POST'])
@@ -197,9 +193,7 @@ def my_info(template):
             if '1062' in e.message:
                 form.message = u'이미 가입된 적이 있는 이메일 주소입니다. 다른 이메일 주소를 입력해주세요'
 
-    if request.MOBILE:
-        return render_template(template, active_my_index='my_info', form=form)
-    return render_template('my_info.html', active_my_index='my_info', form=form)
+    return render_template(template, active_my_index='my_info', form=form)
 
 
 @auth.route('/authentication_code', methods=['POST', 'GET'])
