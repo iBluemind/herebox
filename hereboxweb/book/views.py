@@ -1,19 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
-import calendar
 import json
-
 from flask import request, render_template, make_response, redirect, url_for
 from flask.ext.login import login_required, current_user
 from flask.ext.mobility.decorators import mobile_template
-
-from hereboxweb import database, response_template
+from hereboxweb import response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book
-from hereboxweb.schedule.models import NewReservation, DeliveryReservation, RestoreReservation, Reservation, Schedule, \
-    ScheduleType, ReservationStatus, ScheduleStatus
-from hereboxweb.utils import staff_required, add_months
+from hereboxweb.book.stuffs import save_stuffs, get_stuffs
+
 
 STUFF_LIST_MAX_COUNT = 10
 
@@ -51,47 +47,6 @@ def my_stuff(template):
     return render_template(template, active_my_index='my_stuff',
                            packed_my_herebox_stuffs=packed_my_herebox_stuffs,
                            packed_my_stuffs=packed_my_stuffs)
-
-
-def save_stuffs(api_endpoint):
-    stuff_ids = request.form.get('stuffIds')
-    if not stuff_ids:
-        return response_template(u'물품 아이디가 없습니다.', status=400)
-
-    stuff_ids = json.loads(stuff_ids)
-
-    stuffs = Goods.query.filter(
-        Goods.goods_id.in_(stuff_ids)
-    ).limit(10).all()
-
-    if not stuffs:
-        return response_template(u'해당되는 물품이 없습니다.', status=400)
-
-    stuff_info = {}
-    for stuff in stuffs:
-        stuff_info[str(stuff.goods_id)] = 0
-
-    response = make_response(response_template(u'정상 처리되었습니다.'))
-    response.set_cookie('estimate', json.dumps(stuff_info), path=api_endpoint)
-    return response
-
-
-def get_stuffs():
-    stuffs = request.cookies.get('estimate')
-    if stuffs:
-        stuffs = json.loads(stuffs)
-        imported_stuffs = Goods.query.filter(
-            Goods.goods_id.in_(stuffs.keys())
-        ).limit(10).all()
-
-        packed_stuffs = []
-        for item in imported_stuffs:
-            today = datetime.date.today()
-            remaining_day = item.expired_at - today
-            item.remaining_day = remaining_day.days
-            packed_stuffs.append(item)
-
-        return packed_stuffs
 
 
 @book.route('/extended/estimate', methods=['GET', 'POST'])
