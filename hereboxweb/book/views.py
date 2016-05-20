@@ -48,11 +48,7 @@ def my_stuff(template):
         item.remaining_day = remaining_day.days
         packed_my_stuffs.append(item)
 
-    if request.MOBILE:
-        return render_template(template, active_my_index='my_stuff',
-                               packed_my_herebox_stuffs=packed_my_herebox_stuffs,
-                               packed_my_stuffs=packed_my_stuffs)
-    return render_template('my_stuff.html', active_my_index='my_stuff',
+    return render_template(template, active_my_index='my_stuff',
                            packed_my_herebox_stuffs=packed_my_herebox_stuffs,
                            packed_my_stuffs=packed_my_stuffs)
 

@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
+
 import json
 import re
-import time
-
 from datetime import timedelta
-from flask import request, render_template, escape, session, redirect, url_for, make_response
+from flask import request, render_template, escape, session, redirect, url_for
 from flask.ext.login import login_required, current_user
 from flask.ext.mobility.decorators import mobile_template
 from sqlalchemy import func
-
-from hereboxweb import database, response_template, bad_request, forbidden
+from hereboxweb import response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.book.models import Goods
 from hereboxweb.book.views import get_stuffs
 from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
-from hereboxweb.schedule.models import NewReservation, ReservationStatus, ReservationType, Schedule, \
+from hereboxweb.schedule.models import NewReservation, ReservationStatus, Schedule, \
     ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation, PromotionCode, \
     PromotionHistory, Promotion
 from hereboxweb.schedule.views import get_order, get_estimate
-from hereboxweb.tasks import send_sms, send_mms
+from hereboxweb.tasks import send_mms
 from hereboxweb.utils import add_months
+
 
 pay_types = {
     'visit': PayType.DIRECT,
@@ -693,7 +692,5 @@ def reservation_payment(template):
 
     if user_total_price != total_price:
         return redirect(url_for('schedule.estimate'))
-    if request.MOBILE:
-        return render_template(template, active_menu='reservation')
-    return render_template('reservation_payment.html', active_menu='reservation')
+    return render_template(template, active_menu='reservation')
 
