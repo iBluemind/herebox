@@ -68,3 +68,7 @@ def save_delivery_order():
         order_info['textareaMemo'] = user_memo
     response.set_cookie('order', json.dumps(order_info), path='/delivery/')
     return response
+
+
+def calculate_total_delivery_price(packed_stuffs):
+    return 2000 * len(packed_stuffs)
