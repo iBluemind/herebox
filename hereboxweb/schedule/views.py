@@ -10,7 +10,7 @@ from hereboxweb import response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.book.stuffs import save_stuffs, get_stuffs
 from hereboxweb.schedule import schedule
-from hereboxweb.schedule.delivery import save_delivery_order
+from hereboxweb.schedule.delivery import save_delivery_order, calculate_total_delivery_price
 from hereboxweb.schedule.models import *
 from hereboxweb.schedule.reservation import save_order, get_estimate, save_estimate, calculate_storage_price,\
     get_order, calculate_total_price
@@ -214,10 +214,6 @@ def completion(template):
     return render_template(template, active_menu='reservation')
 
 
-def calculate_total_delivery_price(packed_stuffs):
-    return 2000 * len(packed_stuffs)
-
-
 @schedule.route('/delivery/order', methods=['GET', 'POST'])
 @login_required
 def delivery_order():
@@ -266,6 +262,7 @@ def delivery_review():
     visit_time = order_info.get('inputDeliveryTime')
 
     visit_time = VisitTime.query.get(visit_time)
+    total_price = calculate_total_delivery_price(packed_stuffs)
     response = make_response(render_template('delivery_review.html', active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
                                              delivery_option=u'재보관 가능' if delivery_option == 'restore' else u'보관 종료',
@@ -273,9 +270,9 @@ def delivery_review():
                                              phone_number=phone_number,
                                              visit_date_time=u'%s %s' % (visit_date, visit_time),
                                              user_memo=user_memo,
-                                             total_price=u'{:,d}원'.format(calculate_total_delivery_price(packed_stuffs)))
+                                             total_price=u'{:,d}원'.format(total_price))
                                             )
-    response.set_cookie('totalPrice', '%d' % (calculate_total_delivery_price(packed_stuffs)), path='/delivery/')
+    response.set_cookie('totalPrice', '%d' % (total_price), path='/delivery/')
     return response
 
 
@@ -335,6 +332,7 @@ def pickup_review():
     visit_time = order_info.get('inputVisitTime')
 
     visit_time = VisitTime.query.get(visit_time)
+    total_price = calculate_total_delivery_price(packed_stuffs)
     response = make_response(render_template('pickup_review.html', active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
                                              phone_number=phone_number,
@@ -343,9 +341,9 @@ def pickup_review():
                                              revisit_option=1 if revisit_option == 'later' else 0,
                                              revisit_date_time=u'%s %s' % (revisit_date, revisit_time),
                                              user_memo=user_memo,
-                                             total_price=u'{:,d}원'.format(calculate_total_delivery_price(packed_stuffs)))
+                                             total_price=u'{:,d}원'.format(total_price))
                                             )
-    response.set_cookie('totalPrice', '%d' % (calculate_total_delivery_price(packed_stuffs)), path='/pickup/')
+    response.set_cookie('totalPrice', '%d' % (total_price), path='/pickup/')
     return response
 
 
