@@ -16,7 +16,7 @@ from hereboxweb.schedule.delivery import calculate_total_delivery_price, Deliver
 from hereboxweb.schedule.models import NewReservation, ReservationStatus, Schedule, \
     ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation, PromotionCode, \
     PromotionHistory, Promotion
-from hereboxweb.schedule.purchase_step import CookieSerializableStoreManager
+from hereboxweb.schedule.purchase_step import CookieSerializableStoreManager, PurchaseStepManager
 from hereboxweb.schedule.reservation import ReservationSerializableFactory, calculate_total_price, PeriodOption, \
     RevisitOption, IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE
 from hereboxweb.tasks import send_mms
@@ -42,7 +42,8 @@ def pickup_payment():
 
     order_helper = ReservationSerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if not user_order:
         if request.method == 'POST':
             return bad_request()
@@ -134,7 +135,8 @@ def delivery_payment():
 
     order_helper = DeliverySerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if not user_order:
         if request.method == 'POST':
             return bad_request()
@@ -285,7 +287,8 @@ def extended_payment():
 def reservation_payment(template):
     cookie_store_manager = CookieSerializableStoreManager()
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
-    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
+    user_estimate = estimate_manager.get(request.cookies)
 
     total_price = calculate_total_price(
         user_estimate.regular_item_count, user_estimate.irregular_item_count,
@@ -302,7 +305,8 @@ def reservation_payment(template):
 
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
-        user_order = cookie_store_manager.get(order_helper, request.cookies)
+        order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+        user_order = order_manager.get(request.cookies)
 
         user_pay_type = request.form.get('optionsPayType')
 

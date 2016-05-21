@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# 디버그 여부
 import socket
+from flask import Response
+
+# 디버그 여부
 DEBUG = False if socket.gethostname().startswith('manjong') else True
 
 # 포트번호

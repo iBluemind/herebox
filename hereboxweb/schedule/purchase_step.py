@@ -45,15 +45,30 @@ class SerializableStoreManager(object):
 class CookieSerializableStoreManager(SerializableStoreManager):
 
     @classmethod
-    def get(cls, serializable, cookies):
+    def get(cls, serializable, cookies, serialize=None):
         user_data = cookies.get(serializable.__user_input_type__)
         if user_data:
-            return serializable.serialize(user_data)
+            if serialize:
+                serialize(user_data)
+            else:
+                serializable.serialize(user_data)
+            return serializable
 
     @classmethod
     def save(cls, serializable, form, **kwargs):
+        serialize = kwargs.get('serialize')
+        serialized = None
+        if serialize:
+            try:
+                serialized = serialize(form)
+            except KeyError as error:
+                return bad_request(error.message)
+            except ValueError:
+                return bad_request()
+        else:
+            serialized = serializable.serialize(form)
         kwargs['response'].set_cookie(serializable.__user_input_type__,
-                            json.dumps(serializable.serialize(form)), path=kwargs['api_endpoint'])
+                            json.dumps(serialized), path=kwargs['api_endpoint'])
         return kwargs['response']
 
 
@@ -64,25 +79,30 @@ class PurchaseStepManager(object):
         self.user_input_type = serializable.__user_input_type__
         self.store_manager = store_manager
 
-    def serialize(self):
-        estimate_keys = self.serializable.user_input_keys()
-        user_estimate = PurchaseStepManager.extract_user_input(self.user_input_type, estimate_keys)
+    def serialize(self, user_input):
+        user_input_keys = self.serializable.user_input_keys()
+        if type(user_input) is not dict:
+            user_input = json.loads(user_input)
+        user_data = PurchaseStepManager.extract_user_input(user_input, user_input_keys)
 
         try:
-            PurchaseStepManager.validate_user_input(user_estimate, estimate_keys)
-            self.serializable.deserialize(user_estimate)
-        except KeyError as error:
-            return bad_request(error.message)
-        except ValueError:
-            return bad_request()
+            PurchaseStepManager.validate_user_input(user_data, user_input_keys)
+            self.serializable.deserialize(user_data)
+        except:
+            raise
 
         return self.serializable.serialize()
 
     def get(self, cookies):
-        return self.store_manager.get(self.serializable, cookies)
+        return self.store_manager.get(self.serializable, cookies, serialize=self.serialize)
 
     def save(self, form, response, api_endpoint):
-        return self.store_manager.save(self.serializable, form, response=response, api_endpoint=api_endpoint)
+        dict_form = dict(form)
+        for key in dict_form:
+            dict_form[key] = dict_form[key][0]
+        return self.store_manager.save(self.serializable, dict_form,
+                                       response=response, api_endpoint=api_endpoint,
+                                       serialize=self.serialize)
 
     @staticmethod
     def validate_user_input(user_input, keys):

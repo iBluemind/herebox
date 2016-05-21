@@ -82,11 +82,12 @@ class DeliverySerializableFactory(UserInputSerializableFactory):
 
     @classmethod
     def serializable(cls, user_input_type):
-        serializable_cls = cls.find_delivery_serializable_by_type(cls, user_input_type)
+        serializable_cls = cls.find_delivery_serializable_by_type(user_input_type)
         return serializable_cls()
 
-    def find_delivery_serializable_by_type(self, user_input_type):
-        for delivery_serializable in self.delivery_factory:
+    @classmethod
+    def find_delivery_serializable_by_type(cls, user_input_type):
+        for delivery_serializable in cls.delivery_factory:
             if delivery_serializable.__user_input_type__ == user_input_type:
                 return delivery_serializable
         raise NotImplementedError()
