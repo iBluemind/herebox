@@ -49,7 +49,10 @@ class CookieSerializableStoreManager(SerializableStoreManager):
         user_data = cookies.get(serializable.__user_input_type__)
         if user_data:
             if serialize:
-                serialize(user_data)
+                try:
+                    serialize(user_data)
+                except:
+                    raise
             else:
                 serializable.serialize(user_data)
             return serializable

@@ -78,21 +78,26 @@ def estimate(template):
 
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
     estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
-    user_estimate = estimate_manager.get(request.cookies)
-    if user_estimate:
-        return make_response(render_template(template, active_menu='reservation',
-                                             regular_item_count=user_estimate.regular_item_count,
-                                             irregular_item_count=user_estimate.irregular_item_count,
-                                             period=user_estimate.period,
-                                             period_option=user_estimate.period_option,
-                                             binding_product0_count=user_estimate.binding_product0_count,
-                                             binding_product1_count=user_estimate.binding_product1_count,
-                                             binding_product2_count=user_estimate.binding_product2_count,
-                                             binding_product3_count=user_estimate.binding_product3_count,
-                                             promotion=user_estimate.promotion)
-                             )
-    session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    return render_template(template, active_menu='reservation')
+    try:
+        user_estimate = estimate_manager.get(request.cookies)
+        if user_estimate:
+            return make_response(render_template(template, active_menu='reservation',
+                                                 regular_item_count=user_estimate.regular_item_count,
+                                                 irregular_item_count=user_estimate.irregular_item_count,
+                                                 period=user_estimate.period,
+                                                 period_option=user_estimate.period_option,
+                                                 binding_product0_count=user_estimate.binding_product0_count,
+                                                 binding_product1_count=user_estimate.binding_product1_count,
+                                                 binding_product2_count=user_estimate.binding_product2_count,
+                                                 binding_product3_count=user_estimate.binding_product3_count,
+                                                 promotion=user_estimate.promotion)
+                                 )
+        session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return render_template(template, active_menu='reservation')
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
 
 
@@ -107,22 +112,33 @@ def order(template):
         response = make_response(response_template(u'정상 처리되었습니다'))
         return estimate_manager.save(request.form, response, '/reservation/')
 
-    user_estimate = estimate_manager.get(request.cookies)
-    if calculate_storage_price(user_estimate.regular_item_count, user_estimate.irregular_item_count,
-                               user_estimate.period_option, user_estimate.period) <= 0:
-        return bad_request(u'하나 이상의 상품을 구매하셔야 합니다.')
+    try:
+        user_estimate = estimate_manager.get(request.cookies)
+        if calculate_storage_price(user_estimate.regular_item_count, user_estimate.irregular_item_count,
+                                   user_estimate.period_option, user_estimate.period) <= 0:
+            return bad_request(u'하나 이상의 상품을 구매하셔야 합니다.')
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     order_helper = ReservationSerializableFactory.serializable('order')
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if user_order:
+
+    try:
+        user_order = order_manager.get(request.cookies)
+        if user_order:
+            return make_response(
+                render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
+                                address1=user_order.address1,
+                                address2=user_order.address2,
+                                user_memo=user_order.user_memo))
         return make_response(
-            render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
-                            address1=user_order.address1,
-                            address2=user_order.address2,
-                            user_memo=user_order.user_memo))
-    return make_response(
-        render_template(template, active_menu='reservation', old_phone_number=current_user.phone))
+            render_template(template, active_menu='reservation', old_phone_number=current_user.phone))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
 
 @schedule.route('/reservation/review', methods=['GET', 'POST'])
@@ -138,9 +154,14 @@ def review(template):
 
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
     estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
-    user_estimate = estimate_manager.get(request.cookies)
-    if not user_estimate:
-        return redirect(url_for('index'))
+    try:
+        user_estimate = estimate_manager.get(request.cookies)
+        if not user_estimate:
+            return redirect(url_for('index'))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     start_time = escape(session.get('start_time'))
     if not start_time:
@@ -148,9 +169,14 @@ def review(template):
 
     order_helper = ReservationSerializableFactory.serializable('order')
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if not user_order:
-        return redirect(url_for('index'))
+    try:
+        user_order = order_manager.get(request.cookies)
+        if not user_order:
+            return redirect(url_for('index'))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     visit_time = VisitTime.query.get(user_order.visit_time)
     revisit_time = None
@@ -212,18 +238,23 @@ def delivery_order():
     order_helper = DeliverySerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if not user_order:
-        session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        user_order = order_manager.get(request.cookies)
+        if not user_order:
+            session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            return make_response(
+                render_template('delivery_reservation.html', active_menu='reservation',
+                                                    phone_number=current_user.phone))
         return make_response(
             render_template('delivery_reservation.html', active_menu='reservation',
-                                                phone_number=current_user.phone))
-    return make_response(
-        render_template('delivery_reservation.html', active_menu='reservation',
-                        phone_number=current_user.phone,
-                        address1=user_order.address1,
-                        address2=user_order.address2,
-                        user_memo=user_order.user_memo))
+                            phone_number=current_user.phone,
+                            address1=user_order.address1,
+                            address2=user_order.address2,
+                            user_memo=user_order.user_memo))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
 
 @schedule.route('/delivery/review', methods=['GET', 'POST'])
@@ -245,9 +276,14 @@ def delivery_review():
 
     order_helper = DeliverySerializableFactory.serializable('order')
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = cookie_store_manager.get(order_manager, request.cookies)
-    if not user_order:
-        return redirect(url_for('index'))
+    try:
+        user_order = cookie_store_manager.get(order_manager, request.cookies)
+        if not user_order:
+            return redirect(url_for('index'))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     visit_time = VisitTime.query.get(user_order.visit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
@@ -283,18 +319,23 @@ def pickup_order():
     order_helper = ReservationSerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if not user_order:
-        session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        user_order = order_manager.get(request.cookies)
+        if not user_order:
+            session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            return make_response(
+                render_template('pickup_reservation.html', active_menu='reservation',
+                                                    phone_number=current_user.phone))
         return make_response(
             render_template('pickup_reservation.html', active_menu='reservation',
-                                                phone_number=current_user.phone))
-    return make_response(
-        render_template('pickup_reservation.html', active_menu='reservation',
-                        phone_number=current_user.phone,
-                        address1=user_order.address1,
-                        address2=user_order.address2,
-                        user_memo=user_order.user_memo))
+                            phone_number=current_user.phone,
+                            address1=user_order.address1,
+                            address2=user_order.address2,
+                            user_memo=user_order.user_memo))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
 
 @schedule.route('/pickup/review', methods=['GET', 'POST'])
@@ -313,9 +354,14 @@ def pickup_review():
 
     order_helper = ReservationSerializableFactory.serializable('order')
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if not user_order:
-        return redirect(url_for('index'))
+    try:
+        user_order = order_manager.get(request.cookies)
+        if not user_order:
+            return redirect(url_for('index'))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     visit_time = VisitTime.query.get(user_order.visit_time)
     revisit_time = None
