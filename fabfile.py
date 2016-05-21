@@ -1,46 +1,21 @@
 from fabric.api import *
-from contextlib import contextmanager as _contextmanager
 
-ARITAUM_SERVER_01 = '125.209.199.163'
-ARITAUM_SERVER_02 = '125.209.199.239'
+HEREBOX_AWS_EC2_01 = '52.79.141.111'
+HEREBOX_AWS_EC2_02 = '52.79.175.144'
 
-UWSGI_PATH = '/usr/local/bin/uwsgi'
-PROJECT_DIR = '/var/areumdaun_api'
+PROJECT_DIR = '/var/www/herebox'
 APP_DIR = '%s/app' % PROJECT_DIR
 
-env.user = 'root'
-env.hosts = [ARITAUM_SERVER_01, ARITAUM_SERVER_02]
-env.directory = '%s/venv' % PROJECT_DIR
-env.activate = '%s/bin/activate' % env.directory
-
-
-@_contextmanager
-def virtualenv():
-    with cd(env.directory):
-        with prefix(env.activate):
-            yield
+env.user = 'ubuntu'
+env.hosts = [HEREBOX_AWS_EC2_01, HEREBOX_AWS_EC2_02]
 
 
 def pack():
     local('git push origin master', capture=False)
 
 
-def install_new_package():
-    with cd(APP_DIR):
-        with virtualenv():
-            run('pip install -r requirements.pip')
-
-
 def deploy():
     with settings(warn_only=True):
         with cd(APP_DIR):
-            run('git pull origin master')
-
-            if run('pgrep "supervisor"'):
-                sudo('pkill -f uwsgi')
-
-            else:
-                execute(install_new_package)
-                with virtualenv():
-                    run('%s %s/app/uwsgi_config.ini' % (UWSGI_PATH, APP_DIR))
+            run('./deploy.sh')
 

@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import socket
-from flask import Response
-
 # 디버그 여부
-DEBUG = False if socket.gethostname().startswith('manjong') else True
+DEBUG = True
 
 # 포트번호
 PORT = 8801
-
-# SECRET KEY
-# GEARCOACH_SECRET_KEY = 'gERcoACHiSwiNthEgIF2015'
 
 # 기본 응답 템플릿
 def response_template(message, status=200, data=None):

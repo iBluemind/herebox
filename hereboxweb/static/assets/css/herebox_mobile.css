@@ -8,6 +8,44 @@ body,
   max-width: 767px;
 }
 
+.drawer-nav {
+  width: 30rem !important;
+}
+
+.drawer--right .drawer-nav {
+  right: -30rem;
+}
+
+.drawer-menu-item {
+  font-size: 20px !important;
+  font-family: "Nanum Barun Gothic Light", sans-serif !important;
+  padding-top: 10px;
+  padding-bottom: 10px !important;
+  padding-right: 0 !important;
+  padding-left: 40px !important;
+  color: #212121 !important;
+}
+
+.drawer-hamburger {
+  padding: 26px 20px 0 0 !important;
+}
+
+.drawer-hamburger-icon {
+  margin-top: 0 !important;
+  width: 16px !important;
+  height: 10px !important;
+  background: #fff url('/static/assets/img/m-btn-menu.png') no-repeat center bottom !important;
+}
+
+.drawer-open .drawer-hamburger-icon {
+  display: none !important;
+}
+
+.drawer-hamburger-icon:before,
+.drawer-hamburger-icon:after {
+  display: none !important;
+}
+
 a:hover,
 a:link,
 a:focus {

@@ -1,8 +1,32 @@
 #!/bin/bash
 
-UWSGI_PATH=/usr/local/bin/uwsgi
-ROOT_DIR=/var/areumdaun_api
+GIT_PATH=/usr/bin/git
+PKILL_PATH=/usr/bin/pkill
+ROOT_DIR=/var/www/herebox
+VENV_PATH=ROOT_DIR/venv
+UWSGI_PATH=$VENV_PATH/bin/uwsgi
+ACTIVATE_PATH=$VENV_PATH/bin/activate
+
+function build_forge_min_js {
+    local forge_min_js="$ROOT_DIR/app/hereboxweb/static/libs/forge/js/forge.min.js"
+    if [ -f "$file" ]
+    then
+        echo "forge_min_js is existed."
+    else
+        cd "$ROOT_DIR/app/hereboxweb/static/libs/forge"
+        npm install
+        npm run bundle
+    fi
+}
+
+cd $ROOT_DIR
+$GIT_PATH pull origin master
+
+build_forge_min_js
 
 /bin/chown -R www-data:www-data $ROOT_DIR
+
+$PKILL_PATH -f -INT uwsgi
+source $ACTIVATE_PATH
 $UWSGI_PATH $ROOT_DIR/app/uwsgi_config.ini
 
