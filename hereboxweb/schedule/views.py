@@ -10,11 +10,12 @@ from hereboxweb import response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.book.stuffs import save_stuffs, get_stuffs
 from hereboxweb.schedule import schedule
-from hereboxweb.schedule.delivery import save_delivery_order, calculate_total_delivery_price
+from hereboxweb.schedule.delivery import calculate_total_delivery_price, \
+    DeliverySerializableFactory, DeliveryOption
 from hereboxweb.schedule.models import *
-from hereboxweb.schedule.reservation import save_order, get_estimate, save_estimate, calculate_storage_price,\
-    get_order, calculate_total_price
-
+from hereboxweb.schedule.purchase_step import PurchaseStepManager, CookieSerializableStoreManager
+from hereboxweb.schedule.reservation import calculate_storage_price, calculate_total_price, \
+    ReservationSerializableFactory, RevisitOption, PeriodOption
 
 SCHEDULE_LIST_MAX_COUNT = 10
 
@@ -68,51 +69,56 @@ def my_schedule(template):
 @mobile_template('{mobile/}estimate.html')
 @login_required
 def estimate(template):
+    cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        return save_order('reservation.html', '/reservation/')
+        order_helper = ReservationSerializableFactory.serializable('order')
+        step_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+        response = make_response(response_template(u'정상 처리되었습니다'))
+        return step_manager.save(request.form, response, '/reservation/')
 
-    estimate_info = get_estimate()
-    if not estimate_info:
-        session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        return render_template(template, active_menu='reservation')
+    estimate_helper = ReservationSerializableFactory.serializable('estimate')
+    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    if user_estimate:
+        return make_response(render_template(template, active_menu='reservation',
+                                             regular_item_count=user_estimate.regular_item_count,
+                                             irregular_item_count=user_estimate.irregular_item_count,
+                                             period=user_estimate.period,
+                                             period_option=user_estimate.period_option,
+                                             binding_product0_count=user_estimate.binding_product0_count,
+                                             binding_product1_count=user_estimate.binding_product1_count,
+                                             binding_product2_count=user_estimate.binding_product2_count,
+                                             binding_product3_count=user_estimate.binding_product3_count,
+                                             promotion=user_estimate.promotion)
+                             )
+    session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return render_template(template, active_menu='reservation')
 
-    return make_response(render_template(template, active_menu='reservation',
-                                                 regular_item_count=estimate_info.get('regularItemNumberCount'),
-                                                 irregular_item_count=estimate_info.get('irregularItemNumberCount'),
-                                                 period=estimate_info.get('disposableNumberCount'),
-                                                 period_option=estimate_info.get('optionsPeriod'),
-                                                 binding_product0_count=estimate_info.get('bindingProduct0NumberCount'),
-                                                 binding_product1_count=estimate_info.get('bindingProduct1NumberCount'),
-                                                 binding_product2_count=estimate_info.get('bindingProduct2NumberCount'),
-                                                 binding_product3_count=estimate_info.get('bindingProduct3NumberCount'),
-                                                 promotion=estimate_info.get('inputPromotion'))
-                                                )
 
 
 @schedule.route('/reservation/order', methods=['GET', 'POST'])
 @mobile_template('{mobile/}reservation.html')
 @login_required
 def order(template):
+    estimate_helper = ReservationSerializableFactory.serializable('estimate')
+    cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        return save_estimate()
+        step_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
+        response = make_response(response_template(u'정상 처리되었습니다'))
+        return step_manager.save(request.form, response, '/reservation/')
 
-    estimate_info = get_estimate()
-    standard_box_count = estimate_info.get('regularItemNumberCount', 0)
-    nonstandard_goods_count = estimate_info.get('irregularItemNumberCount', 0)
-    period = estimate_info.get('disposableNumberCount', 0)
-    peroid_option = estimate_info.get('optionsPeriod', 'disposable')
-
-    if calculate_storage_price(standard_box_count, nonstandard_goods_count,
-                               peroid_option, period) <= 0:
+    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    if calculate_storage_price(user_estimate.regular_item_count, user_estimate.irregular_item_count,
+                               user_estimate.period_option, user_estimate.period) <= 0:
         return bad_request(u'하나 이상의 상품을 구매하셔야 합니다.')
 
-    order_info = get_order()
-    if order_info:
+    order_helper = ReservationSerializableFactory.serializable('order')
+    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    if user_order:
         return make_response(
             render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
-                            address1=order_info.get('inputAddress1'),
-                            address2=order_info.get('inputAddress2'),
-                            user_memo=order_info.get('textareaMemo')))
+                            address1=user_order.address1,
+                            address2=user_order.address2,
+                            user_memo=user_order.user_memo))
     return make_response(
         render_template(template, active_menu='reservation', old_phone_number=current_user.phone))
 
@@ -121,88 +127,63 @@ def order(template):
 @mobile_template('{mobile/}review.html')
 @login_required
 def review(template):
+    cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        return save_order('reservation.html', '/reservation/')
+        user_order = ReservationSerializableFactory.serializable('order')
+        step_manager = PurchaseStepManager(user_order, cookie_store_manager)
+        response = make_response(response_template(u'정상 처리되었습니다'))
+        return step_manager.save(request.form, response, '/reservation/')
 
-    estimate_info = get_estimate()
-    if not estimate_info:
+    estimate_helper = ReservationSerializableFactory.serializable('estimate')
+    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    if not user_estimate:
         return redirect(url_for('index'))
 
-    regular_item_count = estimate_info.get('regularItemNumberCount', 0)
-    irregular_item_count = estimate_info.get('irregularItemNumberCount', 0)
-    period = estimate_info.get('disposableNumberCount', 0)
-    period_option = estimate_info.get('optionsPeriod', 'disposable')
-    binding_product0_count = estimate_info.get('bindingProduct0NumberCount', 0)
-    binding_product1_count = estimate_info.get('bindingProduct1NumberCount', 0)
-    binding_product2_count = estimate_info.get('bindingProduct2NumberCount', 0)
-    binding_product3_count = estimate_info.get('bindingProduct3NumberCount', 0)
-    promotion = estimate_info.get('inputPromotion', None)
     start_time = escape(session.get('start_time'))
-
     if not start_time:
         return redirect(url_for('index'))
 
-    order_info = get_order()
-    if not order_info:
+    order_helper = ReservationSerializableFactory.serializable('order')
+    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    if not user_order:
         return redirect(url_for('index'))
 
-    revisit_option = order_info.get('optionsRevisit')
-    phone_number = order_info.get('inputPhoneNumber')
-    revisit_time = order_info.get('inputRevisitTime')
-    user_memo = order_info.get('textareaMemo')
-    revisit_date = order_info.get('inputRevisitDate')
-    visit_date = order_info.get('inputVisitDate')
-    post_code = order_info.get('inputPostCode')
-    address1 = order_info.get('inputAddress1')
-    address2 = order_info.get('inputAddress2')
-    visit_time = order_info.get('inputVisitTime')
-
-    try:
-        regular_item_count = int(regular_item_count)
-        irregular_item_count = int(irregular_item_count)
-        if period_option == 'disposable':
-            period = int(period)
-        binding_product0_count = int(binding_product0_count)
-        binding_product1_count = int(binding_product1_count)
-        binding_product2_count = int(binding_product2_count)
-        binding_product3_count = int(binding_product3_count)
-    except:
-        return redirect(url_for('index'))
-
-    visit_time = VisitTime.query.get(visit_time)
-    if revisit_time:
-        revisit_time = VisitTime.query.get(revisit_time)
+    visit_time = VisitTime.query.get(user_order.visit_time)
+    revisit_time = None
+    if user_order.revisit_option == RevisitOption.LATER:
+        revisit_time = VisitTime.query.get(user_order.revisit_time)
 
     promotion_name = None
-    promotion_code = PromotionCode.query.filter(PromotionCode.code == promotion).first()
+    promotion_code = PromotionCode.query.filter(PromotionCode.code == user_order.promotion).first()
     if promotion_code:
         promotion_name = promotion_code.promotion.name
 
     total_price = calculate_total_price(
-        regular_item_count, irregular_item_count, period, period_option, promotion,
-        binding_product0_count, binding_product1_count, binding_product2_count,
-        binding_product3_count)
+        user_estimate.regular_item_count, user_estimate.irregular_item_count, user_estimate.period,
+        user_estimate.period_option, user_estimate.promotion, user_estimate.binding_product0_count,
+        user_estimate.binding_product1_count, user_estimate.binding_product2_count,
+        user_estimate.binding_product3_count)
 
     response = make_response(render_template(template, active_menu='reservation',
-                                                 standard_box_count=regular_item_count,
-                                                 nonstandard_goods_count=irregular_item_count,
-                                                 period_option=True if period_option == 'subscription' else False,
-                                                 period=period,
-                                                 binding_products={u'포장용 에어캡 1m': binding_product0_count,
-                                                                   u'실리카겔 (제습제) 50g': binding_product1_count,
-                                                                   u'압축팩 40cm x 60cm': binding_product2_count,
-                                                                   u'테이프 48mm x 40m': binding_product3_count},
-                                                 promotion=promotion_name,
-                                                 total_price=u'{:,d}원'.format(total_price),
-                                                 phone=phone_number,
-                                                 address='%s %s' % (address1, address2),
-                                                 visit_date=visit_date,
-                                                 visit_time=visit_time,
-                                                 revisit_option=1 if revisit_option == 'later' else 0,
-                                                 revisit_date=revisit_date,
-                                                 revisit_time=revisit_time,
-                                                 user_memo=user_memo)
-                                                )
+                                             standard_box_count=user_estimate.regular_item_count,
+                                             nonstandard_goods_count=user_estimate.irregular_item_count,
+                                             period_option=True if user_estimate.period_option == PeriodOption.SUBSCRIPTION else False,
+                                             period=user_estimate.period,
+                                             binding_products={u'포장용 에어캡 1m': user_estimate.binding_product0_count,
+                                                               u'실리카겔 (제습제) 50g': user_estimate.binding_product1_count,
+                                                               u'압축팩 40cm x 60cm': user_estimate.binding_product2_count,
+                                                               u'테이프 48mm x 40m': user_estimate.binding_product3_count},
+                                             promotion=promotion_name,
+                                             total_price=u'{:,d}원'.format(total_price),
+                                             phone=user_order.phone_number,
+                                             address='%s %s' % (user_order.address1, user_order.address2),
+                                             visit_date=user_order.visit_date,
+                                             visit_time=visit_time,
+                                             revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
+                                             revisit_date=user_order.revisit_date,
+                                             revisit_time=revisit_time,
+                                             user_memo=user_order.user_memo)
+                             )
     response.set_cookie('totalPrice', '%d' % (total_price), path='/reservation/')
     return response
 
@@ -224,8 +205,10 @@ def delivery_order():
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('index'))
 
-    order_info = get_order()
-    if not order_info:
+    order_helper = DeliverySerializableFactory.serializable('order')
+    cookie_store_manager = CookieSerializableStoreManager()
+    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    if not user_order:
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return make_response(
             render_template('delivery_reservation.html', active_menu='reservation',
@@ -233,43 +216,42 @@ def delivery_order():
     return make_response(
         render_template('delivery_reservation.html', active_menu='reservation',
                         phone_number=current_user.phone,
-                        address1=order_info.get('inputAddress1'),
-                        address2=order_info.get('inputAddress2'),
-                        user_memo=order_info.get('textareaMemo')))
+                        address1=user_order.address1,
+                        address2=user_order.address2,
+                        user_memo=user_order.user_memo))
 
 
 @schedule.route('/delivery/review', methods=['GET', 'POST'])
 @login_required
 def delivery_review():
+    cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        return save_delivery_order()
+        if not session.pop('phone_authentication', False):
+            return forbidden(u'핸드폰 번호 인증을 먼저 해주세요')
+
+        user_order = DeliverySerializableFactory.serializable('order')
+        step_manager = PurchaseStepManager(user_order, cookie_store_manager)
+        response = make_response(response_template(u'정상 처리되었습니다'))
+        return step_manager.save(request.form, response, '/delivery/')
 
     packed_stuffs = get_stuffs()
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('index'))
 
-    order_info = get_order()
-    if not order_info:
+    order_helper = DeliverySerializableFactory.serializable('order')
+    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    if not user_order:
         return redirect(url_for('index'))
 
-    phone_number = order_info.get('inputPhoneNumber')
-    user_memo = order_info.get('textareaMemo')
-    post_code = order_info.get('inputPostCode')
-    address1 = order_info.get('inputAddress1')
-    address2 = order_info.get('inputAddress2')
-    delivery_option = order_info.get('optionsDelivery')
-    visit_date = order_info.get('inputDeliveryDate')
-    visit_time = order_info.get('inputDeliveryTime')
-
-    visit_time = VisitTime.query.get(visit_time)
+    visit_time = VisitTime.query.get(user_order.visit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
     response = make_response(render_template('delivery_review.html', active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
-                                             delivery_option=u'재보관 가능' if delivery_option == 'restore' else u'보관 종료',
-                                             address=u'%s %s' % (address1, address2),
-                                             phone_number=phone_number,
-                                             visit_date_time=u'%s %s' % (visit_date, visit_time),
-                                             user_memo=user_memo,
+                                             delivery_option=u'재보관 가능' if user_order.delivery_option == DeliveryOption.RESTORE else u'보관 종료',
+                                             address=u'%s %s' % (user_order.address1, user_order.address2),
+                                             phone_number=user_order.phone_number,
+                                             visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
+                                             user_memo=user_order.user_memo,
                                              total_price=u'{:,d}원'.format(total_price))
                                             )
     response.set_cookie('totalPrice', '%d' % (total_price), path='/delivery/')
@@ -292,8 +274,10 @@ def pickup_order():
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('index'))
 
-    order_info = get_order()
-    if not order_info:
+    order_helper = ReservationSerializableFactory.serializable('order')
+    cookie_store_manager = CookieSerializableStoreManager()
+    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    if not user_order:
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return make_response(
             render_template('pickup_reservation.html', active_menu='reservation',
@@ -301,46 +285,43 @@ def pickup_order():
     return make_response(
         render_template('pickup_reservation.html', active_menu='reservation',
                         phone_number=current_user.phone,
-                        address1=order_info.get('inputAddress1'),
-                        address2=order_info.get('inputAddress2'),
-                        user_memo=order_info.get('textareaMemo')))
+                        address1=user_order.address1,
+                        address2=user_order.address2,
+                        user_memo=user_order.user_memo))
 
 
 @schedule.route('/pickup/review', methods=['GET', 'POST'])
 @login_required
 def pickup_review():
+    cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        return save_order('pickup_reservation.html', '/pickup/')
+        user_order = ReservationSerializableFactory.serializable('order')
+        step_manager = PurchaseStepManager(user_order, cookie_store_manager)
+        response = make_response(response_template(u'정상 처리되었습니다'))
+        return step_manager.save(request.form, response, '/pickup/')
 
     packed_stuffs = get_stuffs()
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('index'))
 
-    order_info = get_order()
-    if not order_info:
+    order_helper = ReservationSerializableFactory.serializable('order')
+    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    if not user_order:
         return redirect(url_for('index'))
 
-    revisit_option = order_info.get('optionsRevisit')
-    phone_number = order_info.get('inputPhoneNumber')
-    revisit_time = order_info.get('inputRevisitTime')
-    user_memo = order_info.get('textareaMemo')
-    revisit_date = order_info.get('inputRevisitDate')
-    visit_date = order_info.get('inputVisitDate')
-    post_code = order_info.get('inputPostCode')
-    address1 = order_info.get('inputAddress1')
-    address2 = order_info.get('inputAddress2')
-    visit_time = order_info.get('inputVisitTime')
-
-    visit_time = VisitTime.query.get(visit_time)
+    visit_time = VisitTime.query.get(user_order.visit_time)
+    revisit_time = None
+    if user_order.revisit_option == RevisitOption.LATER:
+        revisit_time = VisitTime.query.get(user_order.revisit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
     response = make_response(render_template('pickup_review.html', active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
-                                             phone_number=phone_number,
-                                             address=u'%s %s' % (address1, address2),
-                                             visit_date_time=u'%s %s' % (visit_date, visit_time),
-                                             revisit_option=1 if revisit_option == 'later' else 0,
-                                             revisit_date_time=u'%s %s' % (revisit_date, revisit_time),
-                                             user_memo=user_memo,
+                                             phone_number=user_order.phone_number,
+                                             address=u'%s %s' % (user_order.address1, user_order.address2),
+                                             visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
+                                             revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
+                                             revisit_date_time=u'%s %s' % (user_order.revisit_date, revisit_time),
+                                             user_memo=user_order.user_memo,
                                              total_price=u'{:,d}원'.format(total_price))
                                             )
     response.set_cookie('totalPrice', '%d' % (total_price), path='/pickup/')

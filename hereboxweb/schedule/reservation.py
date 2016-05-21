@@ -1,138 +1,148 @@
 # -*- coding: utf-8 -*-
 
-import json
 import datetime
 import re
-from flask import request, make_response, render_template, escape, session
+from flask import escape, session
 from flask.ext.login import current_user
-from hereboxweb import bad_request
+from hereboxweb.schedule.purchase_step import UserInputSerializable, UserInputSerializableFactory
 
 
-def get_estimate():
-    estimate = request.cookies.get('estimate')
-    if estimate:
-        parsed_estimate = json.loads(estimate)
-        return parsed_estimate
+class PeriodOption(object):
+    DISPOSABLE = 'disposable'
+    SUBSCRIPTION = 'subscription'
 
 
-def get_order():
-    order = request.cookies.get('order')
-    if order:
-        parsed_order = json.loads(order)
-        return parsed_order
+class RevisitOption(object):
+    IMMEDIATE = 'immediate'
+    LATER = 'later'
 
 
-def save_estimate():
-    regular_item_count = request.form.get('regularItemNumberCount')
-    irregular_item_count = request.form.get('irregularItemNumberCount')
-    period = request.form.get('disposableNumberCount')
-    period_option = request.form.get('optionsPeriod')
-    binding_product0_count = request.form.get('bindingProduct0NumberCount')
-    binding_product1_count = request.form.get('bindingProduct1NumberCount')
-    binding_product2_count = request.form.get('bindingProduct2NumberCount')
-    binding_product3_count = request.form.get('bindingProduct3NumberCount')
-    promotion = request.form.get('inputPromotion')
+class ReservationEstimate(UserInputSerializable):
 
-    try:
-        regular_item_count = int(regular_item_count)
-        irregular_item_count = int(irregular_item_count)
-        if period_option == 'disposable':
-            period = int(period)
-        binding_product0_count = int(binding_product0_count)
-        binding_product1_count = int(binding_product1_count)
-        binding_product2_count = int(binding_product2_count)
-        binding_product3_count = int(binding_product3_count)
-    except:
-        return bad_request(u'잘못된 요청입니다.')
+    __user_input_type__ = 'estimate'
 
-    response = make_response(render_template('reservation.html', active_menu='reservation',
-                                             phone_number=current_user.phone))
+    def user_input_keys(self):
+        return ['regularItemNumberCount', 'irregularItemNumberCount', 'disposableNumberCount',
+         'optionsPeriod', 'bindingProduct0NumberCount', 'bindingProduct1NumberCount',
+         'bindingProduct2NumberCount', 'bindingProduct3NumberCount', 'inputPromotion']
 
-    estimate_info = {
-        'regularItemNumberCount': regular_item_count,
-        'irregularItemNumberCount': irregular_item_count,
-        'optionsPeriod': period_option,
-        'bindingProduct0NumberCount': binding_product0_count,
-        'bindingProduct1NumberCount': binding_product1_count,
-        'bindingProduct2NumberCount': binding_product2_count,
-        'bindingProduct3NumberCount': binding_product3_count,
-    }
+    def deserialize(self, user_input):
+        self.regular_item_count = int(user_input.get(self.user_input_keys()[0], 0))
+        self.irregular_item_count = int(user_input.get(self.user_input_keys()[1], 0))
+        self.period_option = user_input.get(self.user_input_keys()[3], PeriodOption.DISPOSABLE)
+        if self.period_option == PeriodOption.DISPOSABLE:
+            self.period = int(user_input.get(self.user_input_keys()[2], 0))
+        self.binding_product0_count = int(user_input.get(self.user_input_keys()[4], 0))
+        self.binding_product1_count = int(user_input.get(self.user_input_keys()[5], 0))
+        self.binding_product2_count = int(user_input.get(self.user_input_keys()[6], 0))
+        self.binding_product3_count = int(user_input.get(self.user_input_keys()[7], 0))
+        self.promotion = user_input.get(self.user_input_keys()[8], None)
 
-    if period_option == 'disposable':
-        estimate_info['disposableNumberCount'] = period
-    if promotion != None:
-        estimate_info['inputPromotion'] = promotion
-
-    response.set_cookie('estimate', json.dumps(estimate_info), path='/reservation/')
-    return response
+    def serialize(self):
+        return {
+            'regularItemNumberCount': self.regular_item_count or 0,
+            'irregularItemNumberCount': self.irregular_item_count or 0,
+            'optionsPeriod': self.period_option,
+            'bindingProduct0NumberCount': self.binding_product0_count or 0,
+            'bindingProduct1NumberCount': self.binding_product1_count or 0,
+            'bindingProduct2NumberCount': self.binding_product2_count or 0,
+            'bindingProduct3NumberCount': self.binding_product3_count or 0,
+            'disposableNumberCount': self.period or 0,
+            'inputPromotion': self.promotion,
+        }
 
 
-def save_order(template, api_endpoint):
-    revisit_option = request.form.get('optionsRevisit')
-    phone_number = request.form.get('inputPhoneNumber')
-    revisit_time = request.form.get('inputRevisitTime')
-    user_memo = request.form.get('textareaMemo')
-    revisit_date = request.form.get('inputRevisitDate')
-    visit_date = request.form.get('inputVisitDate')
-    post_code = request.form.get('inputPostCode')
-    address1 = request.form.get('inputAddress1')
-    address2 = request.form.get('inputAddress2')
-    visit_time = request.form.get('inputVisitTime')
+class ReservationOrder(UserInputSerializable):
 
-    if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', phone_number):
-        return bad_request(u'잘못된 전화번호입니다.')
+    __user_input_type__ = 'order'
 
-    if len(user_memo) > 200:
-        return bad_request(u'메모가 너무 깁니다.')
+    def user_input_keys(self):
+        return ['optionsRevisit', 'inputPhoneNumber', 'inputVisitDate',
+         'inputPostCode', 'inputVisitTime', 'inputAddress1',
+         'inputAddress2', 'inputRevisitTime', 'inputRevisitDate', 'textareaMemo']
 
-    if len(address1) > 200:
-        return bad_request(u'address1이 너무 깁니다.')
+    def deserialize(self, user_input):
+        self.revisit_option = int(user_input.get(self.user_input_keys()[0], 0))
+        self.phone_number = user_input.get(self.user_input_keys()[1], None)
+        self.visit_date = user_input.get(self.user_input_keys()[2], PeriodOption.DISPOSABLE)
+        self.post_code = user_input.get(self.user_input_keys()[3], None)
+        self.visit_time = int(user_input.get(self.user_input_keys()[4], 0))
+        self.address1 = user_input.get(self.user_input_keys()[5], None)
+        self.address2 = user_input.get(self.user_input_keys()[6], None)
+        if self.revisit_option == RevisitOption.LATER:
+            self.revisit_time = user_input.get(self.user_input_keys()[7], None)
+            self.revisit_date = user_input.get(self.user_input_keys()[8], None)
+        self.user_memo = user_input.get(self.user_input_keys()[9], None)
+        self._validate()
 
-    if len(address2) > 200:
-        return bad_request(u'address2가 너무 깁니다.')
+    def _validate(self):
+        if not re.match('^([0]{1}[1]{1}[016789]{1})([0-9]{3,4})([0-9]{4})$', self.phone_number):
+            raise ValueError(u'잘못된 전화번호입니다.')
 
-    if current_user.phone:
-        if current_user.phone != phone_number:
-            return bad_request(u'연락처 정보가 다릅니다.')
+        if len(self.user_memo) > 200:
+            raise ValueError(u'메모가 너무 깁니다.')
 
-    if revisit_option == 'immediate':
-        revisit_date = visit_date
-        revisit_time = visit_time
+        if len(self.address1) > 200:
+            raise ValueError(u'address1이 너무 깁니다.')
 
-    start_time = escape(session.get('start_time'))
-    converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
-    day_standard_time1 = converted_start_time.replace(hour=17, minute=0)  # 저녁 5시 기준
-    day_standard_time2 = converted_start_time.replace(hour=23, minute=59, second=59)
+        if len(self.address2) > 200:
+            raise ValueError(u'address2가 너무 깁니다.')
 
-    if converted_start_time > day_standard_time1 and converted_start_time <= day_standard_time2:
-        converted_visit_date = datetime.datetime.strptime(visit_date, "%Y-%m-%d")
-        converted_revisit_date = datetime.datetime.strptime(revisit_date, "%Y-%m-%d")
-        today = datetime.datetime.now()
-        tommorrow = today + datetime.timedelta(days=1)
+        if current_user.phone:
+            if current_user.phone != self.phone_number:
+                raise ValueError(u'연락처 정보가 다릅니다.')
 
-        if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
-            return bad_request(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
+        start_time = escape(session.get('start_time'))
+        converted_start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+        day_standard_time1 = converted_start_time.replace(hour=17, minute=0)  # 저녁 5시 기준
+        day_standard_time2 = converted_start_time.replace(hour=23, minute=59, second=59)
 
-    response = make_response(render_template(template, active_menu='reservation',
-                                             phone_number=current_user.phone))
+        if converted_start_time > day_standard_time1 and converted_start_time <= day_standard_time2:
+            converted_visit_date = datetime.datetime.strptime(self.visit_date, "%Y-%m-%d")
+            converted_revisit_date = datetime.datetime.strptime(self.revisit_date, "%Y-%m-%d")
+            today = datetime.datetime.now()
+            tommorrow = today + datetime.timedelta(days=1)
 
-    order_info = {
-        'optionsRevisit': revisit_option,
-        'inputPhoneNumber': phone_number,
-        'inputVisitDate': visit_date,
-        'inputPostCode': post_code,
-        'inputVisitTime': visit_time,
-        'inputAddress1': address1,
-        'inputAddress2': address2,
-    }
+            if converted_visit_date <= tommorrow or converted_revisit_date <= tommorrow:
+                raise ValueError(u'오후 5시가 넘어 내일을 방문예정일로 설정할 수 없습니다.')
 
-    if revisit_option == 'later':
-        order_info['inputRevisitTime'] = revisit_time
-        order_info['inputRevisitDate'] = revisit_date
-    if user_memo != None:
-        order_info['textareaMemo'] = user_memo
-    response.set_cookie('order', json.dumps(order_info), path=api_endpoint)
-    return response
+    def serialize(self):
+        return {
+            'optionsRevisit': self.revisit_option,
+            'inputPhoneNumber': self.phone_number,
+            'inputVisitDate': self.visit_date,
+            'inputPostCode': self.post_code,
+            'inputVisitTime': self.visit_time,
+            'inputAddress1': self.address1,
+            'inputAddress2': self.address2,
+            'inputRevisitDate': self.revisit_date,
+            'inputRevisitTime': self.revisit_time,
+            'textareaMemo': self.user_memo,
+        }
+
+
+class ReservationSerializableFactory(UserInputSerializableFactory):
+
+    reservation_factory = [ReservationEstimate, ReservationOrder]
+
+    @classmethod
+    def serializable(cls, user_input_type):
+        serializable_cls = cls.find_reservation_serializable_by_type(cls, user_input_type)
+        return serializable_cls()
+
+    def find_reservation_serializable_by_type(self, user_input_type):
+        for reservation_serializable in self.reservation_factory:
+            if reservation_serializable.__user_input_type__ == user_input_type:
+                return reservation_serializable
+        raise NotImplementedError()
+
+
+REGULAR_ITEM_PRICE = 7500
+IRREGULAR_ITEM_PRICE = 9900
+BINDING_PRODUCT_0_PRICE = 500
+BINDING_PRODUCT_1_PRICE = 500
+BINDING_PRODUCT_2_PRICE = 1500
+BINDING_PRODUCT_3_PRICE = 1000
 
 
 def apply_hellohb_promotion(regular_item_count, irregular_item_count, period):
@@ -140,47 +150,47 @@ def apply_hellohb_promotion(regular_item_count, irregular_item_count, period):
     discount_count = 10
     discount_count = discount_count - irregular_item_count
     if discount_count >= 0:
-        total_storage_price = total_storage_price + (9900 * irregular_item_count * (period - 1))
+        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * irregular_item_count * (period - 1))
     else:
-        total_storage_price = total_storage_price + (9900 * 10 * (period - 1))
-        total_storage_price = total_storage_price + (9900 * (discount_count * -1) * period)
+        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * 10 * (period - 1))
+        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * (discount_count * -1) * period)
 
     if discount_count > 0:
         if regular_item_count > 0:
             discount_count = discount_count - regular_item_count
             if discount_count >= 0:
-                total_storage_price = total_storage_price + (7500 * regular_item_count * (period - 1))
+                total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * regular_item_count * (period - 1))
             else:
-                total_storage_price = total_storage_price + (7500 * 10 * (period - 1))
-                total_storage_price = total_storage_price + (7500 * (discount_count * -1) * period)
+                total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * 10 * (period - 1))
+                total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * (discount_count * -1) * period)
     else:
-        total_storage_price = total_storage_price + (7500 * regular_item_count * period)
+        total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * regular_item_count * period)
 
     return total_storage_price
 
 
 def calculate_storage_price(regular_item_count, irregular_item_count, period_option, period, promotion=None):
     total_storage_price = 0
-    if period_option == 'subscription':
+    if period_option == PeriodOption.SUBSCRIPTION:
         # 매월 자동 결제일 경우!
-        total_storage_price = total_storage_price + (7500 * regular_item_count)
-        total_storage_price = total_storage_price + (9900 * irregular_item_count)
+        total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * regular_item_count)
+        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * irregular_item_count)
     else:
         if 'HELLOHB' == promotion:
             total_storage_price = apply_hellohb_promotion(regular_item_count, irregular_item_count, period)
         else:
-            total_storage_price = total_storage_price + (7500 * period * regular_item_count)
-            total_storage_price = total_storage_price + (9900 * period * irregular_item_count)
+            total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * period * regular_item_count)
+            total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * period * irregular_item_count)
     return total_storage_price
 
 
 def calculate_binding_products_price(binding_product0_count, binding_product1_count, binding_product2_count,
                                         binding_product3_count):
     total_binding_products_price = 0
-    total_binding_products_price = total_binding_products_price + 500 * binding_product0_count
-    total_binding_products_price = total_binding_products_price + 500 * binding_product1_count
-    total_binding_products_price = total_binding_products_price + 1500 * binding_product2_count
-    total_binding_products_price = total_binding_products_price + 1000 * binding_product3_count
+    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_0_PRICE * binding_product0_count
+    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_1_PRICE * binding_product1_count
+    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_2_PRICE * binding_product2_count
+    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_3_PRICE * binding_product3_count
     return total_binding_products_price
 
 
