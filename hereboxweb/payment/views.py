@@ -43,11 +43,16 @@ def pickup_payment():
     order_helper = ReservationSerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if not user_order:
-        if request.method == 'POST':
-            return bad_request()
-        return redirect(url_for('index'))
+    try:
+        user_order = order_manager.get(request.cookies)
+        if not user_order:
+            if request.method == 'POST':
+                return bad_request()
+            return redirect(url_for('index'))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     user_total_price = int(request.cookies.get('totalPrice'))
     total_price = calculate_total_delivery_price(packed_stuffs)
@@ -136,11 +141,16 @@ def delivery_payment():
     order_helper = DeliverySerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-    user_order = order_manager.get(request.cookies)
-    if not user_order:
-        if request.method == 'POST':
-            return bad_request()
-        return redirect(url_for('index'))
+    try:
+        user_order = order_manager.get(request.cookies)
+        if not user_order:
+            if request.method == 'POST':
+                return bad_request()
+            return redirect(url_for('index'))
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     user_total_price = int(request.cookies.get('totalPrice'))
     total_price = calculate_total_delivery_price(packed_stuffs)
@@ -288,7 +298,13 @@ def reservation_payment(template):
     cookie_store_manager = CookieSerializableStoreManager()
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
     estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
-    user_estimate = estimate_manager.get(request.cookies)
+
+    try:
+        user_estimate = estimate_manager.get(request.cookies)
+    except KeyError as error:
+        return bad_request(error.message)
+    except ValueError:
+        return bad_request()
 
     total_price = calculate_total_price(
         user_estimate.regular_item_count, user_estimate.irregular_item_count,
@@ -306,7 +322,13 @@ def reservation_payment(template):
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
         order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
-        user_order = order_manager.get(request.cookies)
+
+        try:
+            user_order = order_manager.get(request.cookies)
+        except KeyError as error:
+            return bad_request(error.message)
+        except ValueError:
+            return bad_request()
 
         user_pay_type = request.form.get('optionsPayType')
 
