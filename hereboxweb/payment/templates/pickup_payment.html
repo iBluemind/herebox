@@ -60,9 +60,5 @@
 {% block jscript %}
 
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/pickup_payment.js') }}"></script>
-
-    <script>
-
-    </script>
+    {{ compressor('pickup_payment_js_bundle', inline=False) }}
 {% endblock %}

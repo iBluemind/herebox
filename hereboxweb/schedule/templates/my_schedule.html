@@ -101,5 +101,5 @@
 
 {% endblock %}
 {% block jscript %}
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_schedule.js') }}"></script>
+    {{ compressor('my_schedule_js_bundle', inline=False) }}
 {% endblock %}

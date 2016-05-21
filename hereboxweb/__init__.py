@@ -2,18 +2,18 @@
 
 
 from flask import Flask, render_template
+from flask.ext.compressor import Compressor
 from flask.ext.login import LoginManager
 from flask.ext.mobility import Mobility
-
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
     RedisConnectHelper, RedisType
-from hereboxweb.utils import initialize_db
+from hereboxweb.utils import initialize_db, compress
 
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 mobile = Mobility(app)
-
+compressor = Compressor(app)
 
 app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'hEREboXiSthEBeST'
@@ -92,3 +92,4 @@ app.register_blueprint(book)
 
 
 # initialize_db()
+compress()

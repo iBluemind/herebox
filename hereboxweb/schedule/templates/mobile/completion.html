@@ -25,5 +25,5 @@
 
 {% block jscript %}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/completion.js') }}"></script>
+    {{ compressor('completion_js_bundle', inline=False) }}
 {% endblock %}
