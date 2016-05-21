@@ -72,12 +72,13 @@ def estimate(template):
     cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
-        step_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+        order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
         response = make_response(response_template(u'정상 처리되었습니다'))
-        return step_manager.save(request.form, response, '/reservation/')
+        return order_manager.save(request.form, response, '/reservation/')
 
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
-    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
+    user_estimate = estimate_manager.get(request.cookies)
     if user_estimate:
         return make_response(render_template(template, active_menu='reservation',
                                              regular_item_count=user_estimate.regular_item_count,
@@ -101,18 +102,19 @@ def estimate(template):
 def order(template):
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
     cookie_store_manager = CookieSerializableStoreManager()
+    estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
     if request.method == 'POST':
-        step_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
         response = make_response(response_template(u'정상 처리되었습니다'))
-        return step_manager.save(request.form, response, '/reservation/')
+        return estimate_manager.save(request.form, response, '/reservation/')
 
-    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    user_estimate = estimate_manager.get(request.cookies)
     if calculate_storage_price(user_estimate.regular_item_count, user_estimate.irregular_item_count,
                                user_estimate.period_option, user_estimate.period) <= 0:
         return bad_request(u'하나 이상의 상품을 구매하셔야 합니다.')
 
     order_helper = ReservationSerializableFactory.serializable('order')
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if user_order:
         return make_response(
             render_template(template, active_menu='reservation', old_phone_number=current_user.phone,
@@ -129,13 +131,14 @@ def order(template):
 def review(template):
     cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        user_order = ReservationSerializableFactory.serializable('order')
-        step_manager = PurchaseStepManager(user_order, cookie_store_manager)
+        order_helper = ReservationSerializableFactory.serializable('order')
+        order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
         response = make_response(response_template(u'정상 처리되었습니다'))
-        return step_manager.save(request.form, response, '/reservation/')
+        return order_manager.save(request.form, response, '/reservation/')
 
     estimate_helper = ReservationSerializableFactory.serializable('estimate')
-    user_estimate = cookie_store_manager.get(estimate_helper, request.cookies)
+    estimate_manager = PurchaseStepManager(estimate_helper, cookie_store_manager)
+    user_estimate = estimate_manager.get(request.cookies)
     if not user_estimate:
         return redirect(url_for('index'))
 
@@ -144,7 +147,8 @@ def review(template):
         return redirect(url_for('index'))
 
     order_helper = ReservationSerializableFactory.serializable('order')
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if not user_order:
         return redirect(url_for('index'))
 
@@ -154,7 +158,7 @@ def review(template):
         revisit_time = VisitTime.query.get(user_order.revisit_time)
 
     promotion_name = None
-    promotion_code = PromotionCode.query.filter(PromotionCode.code == user_order.promotion).first()
+    promotion_code = PromotionCode.query.filter(PromotionCode.code == user_estimate.promotion).first()
     if promotion_code:
         promotion_name = promotion_code.promotion.name
 
@@ -207,7 +211,8 @@ def delivery_order():
 
     order_helper = DeliverySerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if not user_order:
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return make_response(
@@ -229,17 +234,18 @@ def delivery_review():
         if not session.pop('phone_authentication', False):
             return forbidden(u'핸드폰 번호 인증을 먼저 해주세요')
 
-        user_order = DeliverySerializableFactory.serializable('order')
-        step_manager = PurchaseStepManager(user_order, cookie_store_manager)
+        order_helper = DeliverySerializableFactory.serializable('order')
+        order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
         response = make_response(response_template(u'정상 처리되었습니다'))
-        return step_manager.save(request.form, response, '/delivery/')
+        return order_manager.save(request.form, response, '/delivery/')
 
     packed_stuffs = get_stuffs()
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('index'))
 
     order_helper = DeliverySerializableFactory.serializable('order')
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = cookie_store_manager.get(order_manager, request.cookies)
     if not user_order:
         return redirect(url_for('index'))
 
@@ -276,7 +282,8 @@ def pickup_order():
 
     order_helper = ReservationSerializableFactory.serializable('order')
     cookie_store_manager = CookieSerializableStoreManager()
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if not user_order:
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return make_response(
@@ -295,17 +302,18 @@ def pickup_order():
 def pickup_review():
     cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
-        user_order = ReservationSerializableFactory.serializable('order')
-        step_manager = PurchaseStepManager(user_order, cookie_store_manager)
+        order_helper = ReservationSerializableFactory.serializable('order')
+        order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
         response = make_response(response_template(u'정상 처리되었습니다'))
-        return step_manager.save(request.form, response, '/pickup/')
+        return order_manager.save(request.form, response, '/pickup/')
 
     packed_stuffs = get_stuffs()
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('index'))
 
     order_helper = ReservationSerializableFactory.serializable('order')
-    user_order = cookie_store_manager.get(order_helper, request.cookies)
+    order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
+    user_order = order_manager.get(request.cookies)
     if not user_order:
         return redirect(url_for('index'))
 

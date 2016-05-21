@@ -62,16 +62,15 @@ class ReservationOrder(UserInputSerializable):
          'inputAddress2', 'inputRevisitTime', 'inputRevisitDate', 'textareaMemo']
 
     def deserialize(self, user_input):
-        self.revisit_option = int(user_input.get(self.user_input_keys()[0], 0))
+        self.revisit_option = user_input.get(self.user_input_keys()[0], RevisitOption.IMMEDIATE)
         self.phone_number = user_input.get(self.user_input_keys()[1], None)
         self.visit_date = user_input.get(self.user_input_keys()[2], PeriodOption.DISPOSABLE)
         self.post_code = user_input.get(self.user_input_keys()[3], None)
         self.visit_time = int(user_input.get(self.user_input_keys()[4], 0))
         self.address1 = user_input.get(self.user_input_keys()[5], None)
         self.address2 = user_input.get(self.user_input_keys()[6], None)
-        if self.revisit_option == RevisitOption.LATER:
-            self.revisit_time = user_input.get(self.user_input_keys()[7], None)
-            self.revisit_date = user_input.get(self.user_input_keys()[8], None)
+        self.revisit_time = user_input.get(self.user_input_keys()[7], None)
+        self.revisit_date = user_input.get(self.user_input_keys()[8], None)
         self.user_memo = user_input.get(self.user_input_keys()[9], None)
         self._validate()
 
@@ -127,11 +126,12 @@ class ReservationSerializableFactory(UserInputSerializableFactory):
 
     @classmethod
     def serializable(cls, user_input_type):
-        serializable_cls = cls.find_reservation_serializable_by_type(cls, user_input_type)
+        serializable_cls = cls.find_reservation_serializable_by_type(user_input_type)
         return serializable_cls()
 
-    def find_reservation_serializable_by_type(self, user_input_type):
-        for reservation_serializable in self.reservation_factory:
+    @classmethod
+    def find_reservation_serializable_by_type(cls, user_input_type):
+        for reservation_serializable in cls.reservation_factory:
             if reservation_serializable.__user_input_type__ == user_input_type:
                 return reservation_serializable
         raise NotImplementedError()
