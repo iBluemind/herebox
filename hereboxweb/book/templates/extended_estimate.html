@@ -98,6 +98,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='assets/js/hbcounter.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/extended_estimate.js') }}"></script>
+    {{ compressor('extended_estimate_js_bundle', inline=False) }}
 
 {% endblock %}

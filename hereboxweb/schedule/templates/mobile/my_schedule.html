@@ -86,6 +86,5 @@
 
 {% endblock %}
 {% block jscript %}
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_schedule.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/mobile/my_schedule.js') }}"></script>
+    {{ compressor('my_schedule_mobile_js_bundle', inline=False) }}
 {% endblock %}

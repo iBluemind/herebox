@@ -519,7 +519,7 @@ dl, ul, ol, menu, li {
 .main-index {
   height: 550px;
   padding: 30px auto 0 auto;
-  background: #fff url('../img/bg.png') no-repeat center bottom;
+  background: #fff url('/static/assets/img/bg.png') no-repeat center bottom;
   background-size: 100%;
   color: #727272;
 }

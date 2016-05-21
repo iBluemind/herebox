@@ -147,6 +147,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/delivery_reservation.js') }}"></script>
+    {{ compressor('delivery_reservation_js_bundle', inline=False) }}
 
 {% endblock %}

@@ -151,5 +151,5 @@
 
 {% endblock %}
 {% block jscript %}
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/my_stuff.js') }}"></script>
+    {{ compressor('my_stuff_js_bundle', inline=False) }}
 {% endblock %}
