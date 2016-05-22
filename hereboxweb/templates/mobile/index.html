@@ -177,5 +177,7 @@
 {% block jscript %}
 
     <script src="{{ url_for('static', filename='libs/jquery-form/jquery.form.js') }}"></script>
-    {{ compressor('introduce_js_bundle', inline=False) }}
+    {% assets "introduce_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}
