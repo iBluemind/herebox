@@ -5,15 +5,17 @@ from flask import Flask, render_template
 from flask.ext.assets import Environment
 from flask.ext.login import LoginManager
 from flask.ext.mobility import Mobility
+from flask.ext.s3 import FlaskS3
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
     RedisConnectHelper, RedisType
-from hereboxweb.utils import initialize_db, compress
+from hereboxweb.utils import initialize_db, compress, upload_to_s3, build_compressed_assets
 
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 mobile = Mobility(app)
 assets = Environment(app)
+s3 = FlaskS3(app)
 
 app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'hEREboXiSthEBeST'
@@ -32,6 +34,13 @@ database = db_helper.get_db(DBConnectorType.USE_SQLALCHEMY, DBType.MAIN_DB)
 
 # Redis
 auth_code_redis = RedisConnectHelper(RedisType.AUTH_CODE_REDIS)
+
+app.config['FLASKS3_BUCKET_NAME'] = 'hereboxweb'
+app.config['FLASKS3_REGION'] = 'ap-northeast-2'
+app.config['AWS_ACCESS_KEY_ID'] = 'AKIAJPI7VJWOYVCOG5HA'
+app.config['AWS_SECRET_ACCESS_KEY'] = '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'
+app.config['FLASKS3_FORCE_MIMETYPE'] = True
+app.config['FLASK_ASSETS_USE_S3'] = True
 
 
 # Status 400 응답
@@ -93,3 +102,5 @@ app.register_blueprint(book)
 
 # initialize_db()
 compress()
+# build_compressed_assets()
+# upload_to_s3()

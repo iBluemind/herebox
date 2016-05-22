@@ -666,7 +666,7 @@ dl, ul, ol, menu, li {
 }
 
 .main-review {
-  background: #E39129 url('../img/img-review.png') no-repeat left top;
+  background: #E39129 url('/static/assets/img/img-review.png') no-repeat left top;
   background-size: auto;
   height: 500px;
 }
