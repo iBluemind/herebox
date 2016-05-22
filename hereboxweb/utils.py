@@ -131,8 +131,8 @@ def compress():
 
     herebox_css = Bundle('assets/css/herebox.css', filters='cssmin', output='gen/herebox.min.css')
     assets.register('herebox_css', herebox_css)
-    herebox_mobile = Bundle('assets/css/herebox_mobile.css', filters='cssmin', output='gen/herebox_mobile.min.css')
-    assets.register('herebox_mobile', herebox_mobile)
+    herebox_mobile_css = Bundle('assets/css/herebox_mobile.css', filters='cssmin', output='gen/herebox_mobile.min.css')
+    assets.register('herebox_mobile_css', herebox_mobile_css)
 
     completion_js = Bundle('assets/js/completion.js', filters='jsmin', output='gen/completion.min.js')
     assets.register('completion_js', completion_js)
