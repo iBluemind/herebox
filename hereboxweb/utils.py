@@ -2,7 +2,6 @@
 
 import re
 
-from flask.ext.compressor import FileAsset, CSSBundle, JSBundle
 from sqlalchemy.sql import ClauseElement
 from wtforms.validators import Required
 
@@ -128,240 +127,60 @@ class RequiredIf(Required):
 
 
 def compress():
-    from hereboxweb import compressor
+    from flask.ext.assets import Bundle
+    from hereboxweb import assets
 
-    herebox_css = FileAsset(filename='assets/css/herebox.css', processors=['cssmin'])
-    herebox_css_bundle = CSSBundle(
-        name='herebox_css_bundle',
-        assets=[
-            herebox_css,
-        ],
-    )
-    compressor.register_bundle(herebox_css_bundle)
+    herebox_css = Bundle('assets/css/herebox.css', filters='cssmin', output='gen/herebox.min.css')
+    assets.register('herebox_css', herebox_css)
+    herebox_mobile = Bundle('assets/css/herebox_mobile.css', filters='cssmin', output='gen/herebox_mobile.min.css')
+    assets.register('herebox_mobile', herebox_mobile)
 
-    herebox_mobile_css = FileAsset(filename='assets/css/herebox_mobile.css', processors=['cssmin'])
-    herebox_mobile_css_bundle = CSSBundle(
-        name='herebox_mobile_css_bundle',
-        assets=[
-            herebox_mobile_css,
-        ],
-    )
-    compressor.register_bundle(herebox_mobile_css_bundle)
-
-    completion_js = FileAsset(filename='assets/js/completion.js', processors=['jsmin'])
-    completion_js_bundle = JSBundle(
-        name='completion_js_bundle',
-        assets=[
-            completion_js,
-        ],
-    )
-    compressor.register_bundle(completion_js_bundle)
-
-    delivery_payment_js = FileAsset(filename='assets/js/delivery_payment.js', processors=['jsmin'])
-    delivery_payment_js_bundle = JSBundle(
-        name='delivery_payment_js_bundle',
-        assets=[
-            delivery_payment_js,
-        ],
-    )
-    compressor.register_bundle(delivery_payment_js_bundle)
-
-    delivery_reservation_js = FileAsset(filename='assets/js/delivery_reservation.js', processors=['jsmin'])
-    delivery_reservation_js_bundle = JSBundle(
-        name='delivery_reservation_js_bundle',
-        assets=[
-            delivery_reservation_js,
-        ],
-    )
-    compressor.register_bundle(delivery_reservation_js_bundle)
-
-    delivery_review_js = FileAsset(filename='assets/js/delivery_review.js', processors=['jsmin'])
-    delivery_review_js_bundle = JSBundle(
-        name='delivery_review_js',
-        assets=[
-            delivery_review_js,
-        ],
-    )
-    compressor.register_bundle(delivery_review_js_bundle)
-
-    estimate_js = FileAsset(filename='assets/js/estimate.js', processors=['jsmin'])
-    estimate_js_bundle = JSBundle(
-        name='estimate_js_bundle',
-        assets=[
-            estimate_js,
-        ],
-    )
-    compressor.register_bundle(estimate_js_bundle)
-
-    extended_completion_js = FileAsset(filename='assets/js/extended_completion.js', processors=['jsmin'])
-    extended_completion_js_bundle = JSBundle(
-        name='extended_completion_js_bundle',
-        assets=[
-            extended_completion_js,
-        ],
-    )
-    compressor.register_bundle(extended_completion_js_bundle)
-
-    extended_estimate_js = FileAsset(filename='assets/js/extended_estimate.js', processors=['jsmin'])
-    extended_estimate_js_bundle = JSBundle(
-        name='extended_estimate_js_bundle',
-        assets=[
-            extended_estimate_js,
-        ],
-    )
-    compressor.register_bundle(extended_estimate_js_bundle)
-
-    extended_payment_js = FileAsset(filename='assets/js/extended_payment.js', processors=['jsmin'])
-    extended_payment_js_bundle = JSBundle(
-        name='extended_payment_js_bundle',
-        assets=[
-            extended_payment_js,
-        ],
-    )
-    compressor.register_bundle(extended_payment_js_bundle)
-
-    extended_review_js = FileAsset(filename='assets/js/extended_review.js', processors=['jsmin'])
-    extended_review_js_bundle = JSBundle(
-        name='extended_review_js_bundle',
-        assets=[
-            extended_review_js,
-        ],
-    )
-    compressor.register_bundle(extended_review_js_bundle)
-
-    hbcount_js = FileAsset(filename='assets/js/hbcount.js', processors=['jsmin'])
-    hbcount_js_bundle = JSBundle(
-        name='hbcount_js_bundle',
-        assets=[
-            hbcount_js,
-        ],
-    )
-    compressor.register_bundle(hbcount_js_bundle)
-
-    herebox_js = FileAsset(filename='assets/js/herebox.js', processors=['jsmin'])
-    herebox_js_bundle = JSBundle(
-        name='herebox_js_bundle',
-        assets=[
-            herebox_js,
-        ],
-    )
-    compressor.register_bundle(herebox_js_bundle)
-
-    introduce_js = FileAsset(filename='assets/js/introduce.js', processors=['jsmin'])
-    introduce_js_bundle = JSBundle(
-        name='introduce_js_bundle',
-        assets=[
-            introduce_js,
-        ],
-    )
-    compressor.register_bundle(introduce_js_bundle)
-
-    login_js = FileAsset(filename='assets/js/login.js', processors=['jsmin'])
-    login_js_bundle = JSBundle(
-        name='login_js_bundle',
-        assets=[
-            login_js,
-        ],
-    )
-    compressor.register_bundle(login_js_bundle)
-
-    my_info_js = FileAsset(filename='assets/js/my_info.js', processors=['jsmin'])
-    my_info_js_bundle = JSBundle(
-        name='my_info_js_bundle',
-        assets=[
-            my_info_js,
-        ],
-    )
-    compressor.register_bundle(my_info_js_bundle)
-
-    my_schedule_js = FileAsset(filename='assets/js/my_schedule.js', processors=['jsmin'])
-    my_schedule_js_bundle = JSBundle(
-        name='my_schedule_js_bundle',
-        assets=[
-            my_schedule_js,
-        ],
-    )
-    compressor.register_bundle(my_schedule_js_bundle)
-
-    my_stuff_js = FileAsset(filename='assets/js/my_stuff.js', processors=['jsmin'])
-    my_stuff_js_bundle = JSBundle(
-        name='my_stuff_js_bundle',
-        assets=[
-            my_stuff_js,
-        ],
-    )
-    compressor.register_bundle(my_stuff_js_bundle)
-
-    pickup_payment_js = FileAsset(filename='assets/js/pickup_payment.js', processors=['jsmin'])
-    pickup_payment_js_bundle = JSBundle(
-        name='pickup_payment_js_bundle',
-        assets=[
-            pickup_payment_js,
-        ],
-    )
-    compressor.register_bundle(pickup_payment_js_bundle)
-
-    pickup_reservation_js = FileAsset(filename='assets/js/pickup_reservation.js', processors=['jsmin'])
-    pickup_reservation_js_bundle = JSBundle(
-        name='pickup_reservation_js_bundle',
-        assets=[
-            pickup_reservation_js,
-        ],
-    )
-    compressor.register_bundle(pickup_reservation_js_bundle)
-
-    pickup_review_js = FileAsset(filename='assets/js/pickup_review.js', processors=['jsmin'])
-    pickup_review_js_bundle = JSBundle(
-        name='pickup_review_js_bundle',
-        assets=[
-            pickup_review_js,
-        ],
-    )
-    compressor.register_bundle(pickup_review_js_bundle)
-
-    reservation_js = FileAsset(filename='assets/js/reservation.js', processors=['jsmin'])
-    reservation_js_bundle = JSBundle(
-        name='reservation_js_bundle',
-        assets=[
-            reservation_js,
-        ],
-    )
-    compressor.register_bundle(reservation_js_bundle)
-
-    reservation_payment_js  = FileAsset(filename='assets/js/reservation_payment.js', processors=['jsmin'])
-    reservation_payment_js_bundle = JSBundle(
-        name='reservation_payment_js_bundle',
-        assets=[
-            reservation_payment_js,
-        ],
-    )
-    compressor.register_bundle(reservation_payment_js_bundle)
-
-    review_js = FileAsset(filename='assets/js/review.js', processors=['jsmin'])
-    review_js_bundle = JSBundle(
-        name='review_js_bundle',
-        assets=[
-            review_js,
-        ],
-    )
-    compressor.register_bundle(review_js_bundle)
-
-    signup_js = FileAsset(filename='assets/js/signup.js', processors=['jsmin'])
-    signup_js_bundle = JSBundle(
-        name='signup_js_bundle',
-        assets=[
-            signup_js,
-        ],
-    )
-    compressor.register_bundle(signup_js_bundle)
-
-    my_schedule_mobile_js = FileAsset(filename='assets/js/mobile/my_schedule.js', processors=['jsmin'])
-    my_schedule_mobile_js_bundle = JSBundle(
-        name='my_schedule_mobile_js_bundle',
-        assets=[
-            my_schedule_mobile_js,
-        ],
-    )
-    compressor.register_bundle(my_schedule_mobile_js_bundle)
-
+    completion_js = Bundle('assets/js/completion.js', filters='jsmin', output='gen/completion.min.js')
+    assets.register('completion_js', completion_js)
+    delivery_payment_js = Bundle('assets/js/delivery_payment.js', filters='jsmin', output='gen/delivery_payment.min.js')
+    assets.register('delivery_payment_js', delivery_payment_js)
+    delivery_reservation_js = Bundle('assets/js/delivery_reservation.js', filters='jsmin', output='gen/delivery_reservation.min.js')
+    assets.register('delivery_reservation_js', delivery_reservation_js)
+    delivery_review_js = Bundle('assets/js/delivery_review.js', filters='jsmin', output='gen/delivery_review.min.js')
+    assets.register('delivery_review_js', delivery_review_js)
+    estimate_js = Bundle('assets/js/estimate.js', filters='jsmin', output='gen/estimate.min.js')
+    assets.register('estimate_js', estimate_js)
+    extended_completion_js = Bundle('assets/js/extended_completion.js', filters='jsmin', output='gen/extended_completion.min.js')
+    assets.register('extended_completion_js', extended_completion_js)
+    extended_estimate_js = Bundle('assets/js/extended_estimate.js', filters='jsmin', output='gen/extended_estimate.min.js')
+    assets.register('extended_estimate_js', extended_estimate_js)
+    extended_payment_js = Bundle('assets/js/extended_payment.js', filters='jsmin', output='gen/extended_payment.min.js')
+    assets.register('extended_payment_js', extended_payment_js)
+    extended_review_js = Bundle('assets/js/extended_review.js', filters='jsmin', output='gen/extended_review.min.js')
+    assets.register('extended_review_js', extended_review_js)
+    hbcount_js = Bundle('assets/js/hbcount.js', filters='jsmin', output='gen/hbcount.min.js')
+    assets.register('hbcount_js', hbcount_js)
+    herebox_js = Bundle('assets/js/herebox.js', filters='jsmin', output='gen/herebox.min.js')
+    assets.register('herebox_js', herebox_js)
+    introduce_js = Bundle('assets/js/introduce.js', filters='jsmin', output='gen/introduce.min.js')
+    assets.register('introduce_js', introduce_js)
+    login_js = Bundle('assets/js/login.js', filters='jsmin', output='gen/login.min.js')
+    assets.register('login_js', login_js)
+    my_info_js = Bundle('assets/js/my_info.js', filters='jsmin', output='gen/my_info.min.js')
+    assets.register('my_info_js', my_info_js)
+    my_schedule_js = Bundle('assets/js/my_schedule.js', filters='jsmin', output='gen/my_schedule.min.js')
+    assets.register('my_schedule_js', my_schedule_js)
+    my_stuff_js = Bundle('assets/js/my_stuff.js', filters='jsmin', output='gen/my_stuff.min.js')
+    assets.register('my_stuff_js', my_stuff_js)
+    pickup_payment_js = Bundle('assets/js/pickup_payment.js', filters='jsmin', output='gen/pickup_payment.min.js')
+    assets.register('pickup_payment_js', pickup_payment_js)
+    pickup_reservation_js = Bundle('assets/js/pickup_reservation.js', filters='jsmin', output='gen/pickup_reservation.min.js')
+    assets.register('pickup_reservation_js', pickup_reservation_js)
+    pickup_review_js = Bundle('assets/js/pickup_review.js', filters='jsmin', output='gen/pickup_review.min.js')
+    assets.register('pickup_review_js', pickup_review_js)
+    reservation_js = Bundle('assets/js/reservation.js', filters='jsmin', output='gen/reservation.min.js')
+    assets.register('reservation_js', reservation_js)
+    reservation_payment_js = Bundle('assets/js/reservation_payment.js', filters='jsmin', output='gen/reservation_payment.min.js')
+    assets.register('reservation_payment_js', reservation_payment_js)
+    review_js = Bundle('assets/js/review.js', filters='jsmin', output='gen/review.min.js')
+    assets.register('review_js', review_js)
+    signup_js = Bundle('assets/js/signup.js', filters='jsmin', output='gen/signup.min.js')
+    assets.register('signup_js', signup_js)
+    my_schedule_mobile_js = Bundle('assets/js/mobile/my_schedule.js', filters='jsmin', output='gen/my_schedule_mobile.min.js')
+    assets.register('my_schedule_mobile_js', my_schedule_mobile_js)
 

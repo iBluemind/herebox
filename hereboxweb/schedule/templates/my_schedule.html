@@ -101,5 +101,7 @@
 
 {% endblock %}
 {% block jscript %}
-    {{ compressor('my_schedule_js_bundle', inline=False) }}
+    {% assets "my_schedule_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

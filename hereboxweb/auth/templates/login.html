@@ -64,5 +64,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery-form/jquery.form.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/forge/js/forge.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    {{ compressor('login_js_bundle', inline=False) }}
+    {% assets "login_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

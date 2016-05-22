@@ -55,5 +55,7 @@
 
 {% endblock %}
 {% block jscript %}
-    {{ compressor('signup_js_bundle', inline=False) }}
+    {% assets "signup_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

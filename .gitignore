@@ -7,3 +7,5 @@
 /venv
 /upload
 /hereboxweb/static/libs
+/hereboxweb/static/gen
+/hereboxweb/static/.webassets-cache/

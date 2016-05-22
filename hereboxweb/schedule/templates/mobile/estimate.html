@@ -217,5 +217,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='assets/js/hbcounter.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
-    {{ compressor('estimate_js_bundle', inline=False) }}
+    {% assets "estimate_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}
