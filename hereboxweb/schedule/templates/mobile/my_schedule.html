@@ -86,6 +86,9 @@
 
 {% endblock %}
 {% block jscript %}
+    {% assets "my_schedule_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
     {% assets "my_schedule_mobile_js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
