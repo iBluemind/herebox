@@ -58,6 +58,7 @@
 {% block jscript %}
 
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    {{ compressor('reservation_payment_js_bundle', inline=False) }}
-
+    {% assets "reservation_payment_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

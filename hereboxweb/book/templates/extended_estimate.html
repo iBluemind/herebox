@@ -95,9 +95,12 @@
 {% block jscript %}
 
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/hbcounter.js') }}"></script>
+    {% assets "hbcounter_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/numeral/min/numeral.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
-    {{ compressor('extended_estimate_js_bundle', inline=False) }}
-
+    {% assets "extended_estimate_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

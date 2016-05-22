@@ -53,5 +53,7 @@
 {% block jscript %}
 
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
-    {{ compressor('extended_payment_js_bundle', inline=False) }}
+    {% assets "extended_payment_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

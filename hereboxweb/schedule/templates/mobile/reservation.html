@@ -140,5 +140,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
-    {{ compressor('reservation_js_bundle', inline=False) }}
+    {% assets "reservation_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

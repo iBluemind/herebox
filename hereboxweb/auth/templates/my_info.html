@@ -98,5 +98,7 @@
 
 {% endblock %}
 {% block jscript %}
-    {{ compressor('my_info_js_bundle', inline=False) }}
+    {% assets "my_info_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

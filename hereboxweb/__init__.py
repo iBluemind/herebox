@@ -2,7 +2,7 @@
 
 
 from flask import Flask, render_template
-from flask.ext.compressor import Compressor
+from flask.ext.assets import Environment
 from flask.ext.login import LoginManager
 from flask.ext.mobility import Mobility
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
@@ -13,7 +13,7 @@ app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
 mobile = Mobility(app)
-compressor = Compressor(app)
+assets = Environment(app)
 
 app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'hEREboXiSthEBeST'
