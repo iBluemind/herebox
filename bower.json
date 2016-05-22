@@ -17,7 +17,7 @@
   "dependencies": {
     "jquery": "^2.2.2",
     "bootstrap": "^3.3.6",
-    "NanumBarunGothic": "git://bitbucket.org/iBluemind/NanumBarunGothic.git",
+    "NanumBarunGothic": "https://bitbucket.org/iBluemind/nanumbarungothic.git",
     "jquery-form": "^3.46.0",
     "forge": "^0.6.39",
     "numeral": "numeraljs#^1.5.3",
