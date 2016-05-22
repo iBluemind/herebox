@@ -328,7 +328,7 @@ dl, ul, ol, menu, li {
 
 .main-index {
   height: 360px; padding-top: 30px;
-  background: #fff url('../img/bg.png') no-repeat center bottom;
+  background: #fff url('/static/assets/img/bg.png') no-repeat center bottom;
   background-size: 767px;
   color: #727272;
 }
@@ -475,7 +475,7 @@ dl, ul, ol, menu, li {
 }
 
 .main-review {
-  background: #E39129 url('../img/m-img-review.png') no-repeat left top;
+  background: #E39129 url('/static/assets/img/m-img-review.png') no-repeat left top;
   background-size: auto;
   height: 180px;
 }

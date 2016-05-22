@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import re
-
 from sqlalchemy.sql import ClauseElement
 from wtforms.validators import Required
 
@@ -183,4 +182,23 @@ def compress():
     assets.register('signup_js', signup_js)
     my_schedule_mobile_js = Bundle('assets/js/mobile/my_schedule.js', filters='jsmin', output='gen/my_schedule_mobile.min.js')
     assets.register('my_schedule_mobile_js', my_schedule_mobile_js)
+
+
+def build_compressed_assets():
+    import logging
+    log = logging.getLogger('webassets')
+    log.addHandler(logging.StreamHandler())
+    log.setLevel(logging.DEBUG)
+
+    from webassets.script import CommandLineEnvironment
+    from hereboxweb import assets
+    cmdenv = CommandLineEnvironment(assets, log)
+    cmdenv.build()
+
+
+def upload_to_s3():
+    from flask.ext.s3 import create_all
+    from hereboxweb import app
+    create_all(app)
+
 
