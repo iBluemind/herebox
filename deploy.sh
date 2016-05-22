@@ -9,17 +9,17 @@ ACTIVATE_PATH=$VENV_PATH/bin/activate
 
 function build_forge_min_js {
     local forge_min_js="$ROOT_DIR/app/hereboxweb/static/libs/forge/js/forge.min.js"
-    if [ -f "$file" ]
+    if [ -f "$forge_min_js" ]
     then
         echo "forge_min_js is existed."
     else
         cd "$ROOT_DIR/app/hereboxweb/static/libs/forge"
         npm install
-        npm run bundle
+        npm run minify
     fi
 }
 
-cd $ROOT_DIR
+cd $ROOT_DIR/app
 $GIT_PATH pull origin master
 
 build_forge_min_js
