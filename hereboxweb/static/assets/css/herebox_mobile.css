@@ -61,7 +61,7 @@ a:focus {
   background-color: #fff;
   padding-top: 10px;
   padding-bottom: 10px;
-  z-index: 100;
+  z-index: 1;
 }
 
 .nav > li > a:focus, .nav > li > a:hover {
