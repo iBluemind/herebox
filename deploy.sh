@@ -3,7 +3,7 @@
 GIT_PATH=/usr/bin/git
 PKILL_PATH=/usr/bin/pkill
 ROOT_DIR=/var/www/herebox
-VENV_PATH=ROOT_DIR/venv
+VENV_PATH=$ROOT_DIR/venv
 UWSGI_PATH=$VENV_PATH/bin/uwsgi
 ACTIVATE_PATH=$VENV_PATH/bin/activate
 
