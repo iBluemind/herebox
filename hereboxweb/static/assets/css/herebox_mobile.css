@@ -32,7 +32,6 @@ body,
 
 .drawer-hamburger-icon {
   margin-top: 0 !important;
-  width: 16px !important;
   height: 10px !important;
   background: #fff url('/static/assets/img/m-btn-menu.png') no-repeat center bottom !important;
 }
