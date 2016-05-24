@@ -1,17 +1,17 @@
 {% extends "mobile/base.html" %}
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="/static/resource/common/css/reset.css">
-    <link rel="stylesheet" type="text/css" href="/static/resource/common/css/iubase.css">
-    <link rel="stylesheet" type="text/css" href="/static/resource/common/css/iu.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/common/css/reset.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/common/css/iubase.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/common/css/iu.css') }}">
     <!--[if lt IE 9]>
-      <script type="text/javascript" src="/resource/common/ie/json2.js"></script>
-      <script type="text/javascript" src="/resource/common/ie/jquery.backgroundSize.js"></script>
-      <script type="text/javascript" src="/resource/common/ie/respond.min.js"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='resource/common/ie/json2.js') }}"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='resource/common/ie/jquery.backgroundSize.js') }}"></script>
+      <script type="text/javascript" src="{{ url_for('static', filename='resource/common/ie/respond.min.js') }}"></script>
       <script>alert("인터넷 익스플로러 9이하에서는 브라우저 업데이트를 권장합니다.");</script>
     <![endif]-->
 {% endblock %}
 {% block content %}
-    <div class="container">
+    <div class="container" style="margin-top: 90px;">
         <div class="Section IUSection IUBox">
           <div class="CenterBox_12 IUCenterBox IUBox">
             <div class="Box_24 IUBox">
@@ -881,17 +881,17 @@
     </div>
 {% endblock %}
 {% block jscript %}
-    <script type="text/javascript" src="/static/resource/js/iuproj.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/js/iuproj.js') }}"></script>
     <script src="//cdn.jsdelivr.net/velocity/1.2.2/velocity.min.js"></script>
     <script src="//cdn.jsdelivr.net/velocity/1.2.2/velocity.ui.min.js"></script>
-    <script type="text/javascript" src="/static/resource/common/plugin/jquery.event.swipe.js"></script>
-    <script type="text/javascript" src="/static/resource/common/plugin/jquery.event.move.js"></script>
-    <script type="text/javascript" src="/static/resource/common/plugin/jquery.scrollto.js"></script>
-    <script type="text/javascript" src="/static/resource/common/iujs/iuframe.js"></script>
-    <script type="text/javascript" src="/static/resource/common/iujs/iuevent.js"></script>
-    <script type="text/javascript" src="/static/resource/common/iujs/iuboxes.js"></script>
-    <script type="text/javascript" src="/static/resource/common/iujs/iucarousel.js"></script>
-    <script type="text/javascript" src="/static/resource/common/iujs/iugooglemap.js"></script>
-    <script type="text/javascript" src="/static/resource/common/iujs/iu.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/resource/css/pages/faq_mobile.css">
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/plugin/jquery.event.swipe.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/plugin/jquery.event.move.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/plugin/jquery.scrollto.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iuframe.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iuevent.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iuboxes.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iucarousel.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iugooglemap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iu.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/css/pages/faq_mobile.css') }}">
 {% endblock %}

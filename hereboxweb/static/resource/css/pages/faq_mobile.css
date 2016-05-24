@@ -329,3 +329,11 @@
 .drawer-nav {
     width: 18.75rem !important;
 }
+.drawer-hamburger-icon {
+  width: auto;
+  margin-right: -10px;
+}
+
+.drawer-hamburger {
+  padding: auto auto 0 0 !important;
+}
