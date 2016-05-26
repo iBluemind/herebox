@@ -108,7 +108,7 @@ class DeliveryReservation(Reservation):
 
     def __init__(self, status, user_id, contact, address, delivery_option,
                  delivery_date, delivery_time, user_memo,
-                 pay_type, purchase_id=None, goods_id=None):
+                 pay_type, purchase_id=None, goods=None):
         self.reservation_type = ReservationType.table_name_map[ReservationType.DELIVERY]
         self.reservation_id = self._generate_reservation_id(ReservationType.DELIVERY, DeliveryReservation)
         self.status = status
@@ -121,7 +121,7 @@ class DeliveryReservation(Reservation):
         self.user_memo = user_memo
         self.purchase_id = purchase_id
         self.user_id = user_id
-        self.goods_id = goods_id
+        self.goods = goods
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
 
@@ -142,7 +142,7 @@ class RestoreReservation(Reservation):
     def __init__(self, status, user_id, contact, address,
                  delivery_date, delivery_time, recovery_date,
                  recovery_time, revisit_option, user_memo,
-                 pay_type, purchase_id=None, goods_id=None):
+                 pay_type, purchase_id=None, goods=None):
         self.reservation_type = ReservationType.table_name_map[ReservationType.PICKUP_AGAIN]
         self.reservation_id = self._generate_reservation_id(ReservationType.PICKUP_AGAIN, RestoreReservation)
         self.status = status
@@ -157,7 +157,7 @@ class RestoreReservation(Reservation):
         self.user_memo = user_memo
         self.purchase_id = purchase_id
         self.user_id = user_id
-        self.goods_id = goods_id
+        self.goods = goods
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
 
@@ -188,7 +188,7 @@ class NewReservation(Reservation):
                                     period, fixed_rate, binding_products, user_id, promotion, contact,
                                     address, delivery_date, delivery_time, recovery_date,
                                     recovery_time, revisit_option, user_memo,
-                                    pay_type, purchase_id=None, goods_id=None, promotion_id=None):
+                                    pay_type, purchase_id=None, goods=None, promotion_id=None):
         self.reservation_type = ReservationType.table_name_map[ReservationType.PICKUP_NEW]
         self.reservation_id = self._generate_reservation_id(ReservationType.PICKUP_NEW, NewReservation)
         self.status = status
@@ -209,7 +209,6 @@ class NewReservation(Reservation):
         self.user_memo = user_memo
         self.purchase_id = purchase_id
         self.user_id = user_id
-        self.goods_id = goods_id
         self.promotion_id = promotion_id
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()

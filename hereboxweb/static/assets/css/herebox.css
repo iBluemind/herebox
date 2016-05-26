@@ -1082,3 +1082,8 @@ dl, ul, ol, menu, li {
   cursor: pointer;
   text-decoration: underline;
 }
+
+.schedule-id {
+  cursor: pointer;
+  text-decoration: underline;
+}

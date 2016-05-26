@@ -23,14 +23,14 @@ class DeliveryOrder(UserInputSerializable):
          'inputAddress2', 'textareaMemo']
 
     def deserialize(self, user_input):
-        self.delivery_option = int(user_input.get(self.user_input_keys()[0], DeliveryOption.RESTORE))
-        self.phone_number = user_input.get(self.user_input_keys()[1], None)
+        self.delivery_option = user_input.get(self.user_input_keys()[0], DeliveryOption.RESTORE)
+        self.phone_number = user_input.get(self.user_input_keys()[1], '')
         self.visit_date = user_input.get(self.user_input_keys()[2], None)
         self.post_code = user_input.get(self.user_input_keys()[3], None)
         self.visit_time = int(user_input.get(self.user_input_keys()[4], 0))
-        self.address1 = user_input.get(self.user_input_keys()[5], None)
-        self.address2 = user_input.get(self.user_input_keys()[6], None)
-        self.user_memo = user_input.get(self.user_input_keys()[7], None)
+        self.address1 = user_input.get(self.user_input_keys()[5], '')
+        self.address2 = user_input.get(self.user_input_keys()[6], '')
+        self.user_memo = user_input.get(self.user_input_keys()[7], '')
         self._validate()
 
     def _validate(self):
@@ -67,9 +67,9 @@ class DeliveryOrder(UserInputSerializable):
         return {
             'optionsDelivery': self.delivery_option,
             'inputPhoneNumber': self.phone_number,
-            'inputVisitDate': self.visit_date,
+            'inputDeliveryDate': self.visit_date,
             'inputPostCode': self.post_code,
-            'inputVisitTime': self.visit_time,
+            'inputDeliveryTime': self.visit_time,
             'inputAddress1': self.address1,
             'inputAddress2': self.address2,
             'textareaMemo': self.user_memo,

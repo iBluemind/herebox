@@ -31,7 +31,7 @@ def save_stuffs(api_endpoint):
     return response
 
 
-def get_stuffs():
+def get_goods():
     stuffs = request.cookies.get('estimate')
     if stuffs:
         stuffs = json.loads(stuffs)
@@ -39,11 +39,19 @@ def get_stuffs():
             Goods.goods_id.in_(stuffs.keys())
         ).limit(10).all()
 
+        return imported_stuffs
+
+
+def get_stuffs():
+    goods = get_goods()
+    if goods:
         packed_stuffs = []
-        for item in imported_stuffs:
+        for item in goods:
             today = datetime.date.today()
             remaining_day = item.expired_at - today
             item.remaining_day = remaining_day.days
             packed_stuffs.append(item)
 
         return packed_stuffs
+
+
