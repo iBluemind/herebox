@@ -1,27 +1,25 @@
 # -*- coding: utf-8 -*-
 
 
-import base64
+import random
 import re
+import string
 import urllib
 import urllib2
 import urlparse
-
-from Crypto.Cipher import PKCS1_OAEP
-from Crypto.PublicKey import RSA
-from flask import request, render_template, make_response
+from flask import render_template, make_response
 from flask.ext.login import login_required, login_user, logout_user, current_user
 from flask.ext.mobility.decorators import mobile_template
 from sqlalchemy.exc import IntegrityError
-from flask import request, url_for, redirect, flash, session, escape
-from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis, forbidden
+from flask import request, url_for, redirect, flash, session
+from hereboxweb import database, response_template, bad_request, unauthorized, login_manager, auth_code_redis, \
+    not_found
 from hereboxweb.auth import auth
-from hereboxweb.auth.crypto import AESCipher, RSACryptor
 from hereboxweb.auth.forms import LoginForm, SignupForm, ChangeForm
+from hereboxweb.auth.login import HereboxLoginHelper
 from hereboxweb.auth.models import User
 from config import RSA_PUBLIC_KEY_BASE64
-from config import RSA_PRIVATE_KEY_BASE64
-from hereboxweb.tasks import send_sms
+from hereboxweb.tasks import send_sms, send_mail
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -39,21 +37,11 @@ def login(template):
         encoded_aes_key = request.form['decryptKey']
         encoded_aes_iv = request.form['iv']
 
+        herebox_login_helper = HereboxLoginHelper(encoded_email, encoded_password,
+                                                    encoded_aes_key, encoded_aes_iv)
+
         try:
-            encrypted_email = base64.b64decode(encoded_email)
-            encrypted_password = base64.b64decode(encoded_password)
-            encrypted_aes_key = base64.b64decode(encoded_aes_key)
-            aes_iv = base64.b64decode(encoded_aes_iv)
-
-            decoded_private_key = base64.b64decode(RSA_PRIVATE_KEY_BASE64)
-            rsa_cipher = RSACryptor(decoded_private_key)
-
-            decrypted_aes_key = rsa_cipher.decrypt(encrypted_aes_key)
-            aes_cipher = AESCipher(decrypted_aes_key)
-
-            decrypted_email = aes_cipher.decrypt(encrypted_email, aes_iv)
-            decrypted_password = aes_cipher.decrypt(encrypted_password, aes_iv)
-
+            decrypted_email, decrypted_password = herebox_login_helper.decrypt()
             query = database.session.query(User).filter(User.email == decrypted_email)
             user = query.first()
 
@@ -141,10 +129,47 @@ def fb_login():
     return redirect(request.args.get('next') or url_for('index'))
 
 
-@auth.route('/findpw', methods=['GET'])
+@auth.route('/findpw', methods=['GET', 'POST'])
 def find_pw():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', None)
+        if not re.match('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email):
+            return bad_request(u'잘못된 이메일 주소입니다.')
+
+        found_user = User.query.filter(User.email == email).first()
+        if not found_user:
+            return not_found(u'찾을 수 없는 사용자입니다.')
+
+        def generate_random_str(size=6, chars=string.ascii_letters + string.digits):
+            return ''.join(random.choice(chars) for _ in range(size))
+
+        new_temp_password = generate_random_str()
+        found_user.password = User.encrypt_password(new_temp_password)
+
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다.', status=500)
+
+        mail_msg_body = u"""
+        안녕하세요? %s님. 히어박스 고객센터입니다.
+
+        임시 비밀번호 발급 요청에 따라 아래와 같은 임시 비밀번호로 설정되었음을 알려드립니다.
+        이메일 주소: %s
+        임시 비밀번호: %s
+
+        본 이메일이 잘못되었다고 생각하시면, 바로 고객센터(1600-2964)로 연락주시기 바랍니다.
+        앞으로도 히어박스는 고객님을 위해 노력하겠습니다.
+
+        감사합니다.
+
+        """ % (found_user.name, found_user.email, new_temp_password)
+
+        send_mail.apply_async(args=[u'히어박스 임시 비밀번호 발급', mail_msg_body, found_user.email])
+        return response_template(u'잠시 후 이메일의 받은 편지함을 확인해주세요.')
     return render_template('findpw.html')
 
 

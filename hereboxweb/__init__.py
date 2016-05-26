@@ -4,11 +4,12 @@
 from flask import Flask, render_template
 from flask.ext.assets import Environment
 from flask.ext.login import LoginManager
+from flask.ext.mail import Mail
 from flask.ext.mobility import Mobility
 from flask.ext.s3 import FlaskS3
+from flask.ext.script import Manager
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
     RedisConnectHelper, RedisType
-from hereboxweb.utils import initialize_db, compress, upload_to_s3, build_compressed_assets
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -16,6 +17,8 @@ login_manager.init_app(app)
 mobile = Mobility(app)
 assets = Environment(app)
 s3 = FlaskS3(app)
+mail = Mail(app)
+manager = Manager(app)
 
 app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'hEREboXiSthEBeST'
@@ -99,8 +102,3 @@ app.register_blueprint(admin)
 app.register_blueprint(payment)
 app.register_blueprint(book)
 
-
-# initialize_db()
-compress()
-# build_compressed_assets()
-# upload_to_s3()

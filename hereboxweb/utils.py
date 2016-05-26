@@ -182,6 +182,9 @@ def compress():
     assets.register('signup_js', signup_js)
     my_schedule_mobile_js = Bundle('assets/js/mobile/my_schedule.js', filters='jsmin', output='gen/my_schedule_mobile.min.js')
     assets.register('my_schedule_mobile_js', my_schedule_mobile_js)
+    find_pw_js = Bundle('assets/js/find_pw.js', filters='jsmin',
+                                   output='gen/find_pw.min.js')
+    assets.register('find_pw_js', find_pw_js)
 
 
 def build_compressed_assets():
