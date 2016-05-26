@@ -21,7 +21,7 @@
                         {% if my_schedule.reservation.reservation_type == 'new_reservation' %}
                             <a href="/reservation/{{ my_schedule.reservation.reservation_id }}">{{ my_schedule.schedule_id }}</a>
                         {% elif my_schedule.reservation.reservation_type == 'restore_reservation' %}
-                            <a class="" href="/pickup/{{ my_schedule.reservation.reservation_id }}">{{ my_schedule.schedule_id }}</a>
+                            <a href="/pickup/{{ my_schedule.reservation.reservation_id }}">{{ my_schedule.schedule_id }}</a>
                         {% endif %}
                     </div>
                     <div class="my-schedule-table-cell">{{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>

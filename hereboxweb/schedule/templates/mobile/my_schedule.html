@@ -27,7 +27,13 @@
                             {% endif %}</div>
                         <div class="row" style="text-align: center; margin: 0; padding-top: 30px;">
                             <div class="col-xs-6 schedule-cancel">취소하기</div>
-{#                            <div class="col-xs-6">자세히 보기</div>#}
+                            <div class="col-xs-6 schedule-id">
+                            {% if my_schedule.reservation.reservation_type == 'new_reservation' %}
+                                <a href="/reservation/{{ my_schedule.reservation.reservation_id }}">자세히 보기</a>
+                            {% elif my_schedule.reservation.reservation_type == 'restore_reservation' %}
+                                <a href="/pickup/{{ my_schedule.reservation.reservation_id }}">자세히 보기</a>
+                            {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -68,7 +74,10 @@
                             {% endif %}</div>
                         <div class="row" style="text-align: center; margin: 0; padding-top: 30px;">
                             <div class="col-xs-6 schedule-cancel">취소하기</div>
-{#                            <div class="col-xs-6">자세히 보기</div>#}
+
+                            <div class="col-xs-6 schedule-id">
+                                <a href="/delivery/{{ my_schedule.reservation.reservation_id }}">자세히 보기</a>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,90 @@
+{% extends "mobile/base.html" %}
+{% block content %}
+
+    <div class="container" style="margin-bottom: 100px;">
+        <div class="row" style="margin-left: 0; margin-right: 0;">
+            <div>
+                <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">주문 내용 확인</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        주문 번호 : {{ reservation_id }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin: 30px 30px 0;font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div>
+                    배송 요청한 물품
+                    <p style="font-size: 14px;">
+                        {% for my_stuff in packed_stuffs %}
+                            {{ my_stuff.name }}<br>
+                        {% endfor %}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    최종 결제 금액
+                    <p style="font-family: 'Nanum Barun Gothic Bold', sans-serif; color: #ffa000; font-size: 14px;">
+                        {{ total_price }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    결제 방법
+                    <p style="font-size: 14px;">
+                        {{ pay_type }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    결제 상태
+                    <p style="font-size: 14px;">
+                        {{ pay_status }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    배송 유형
+                    <p style="font-size: 14px;">
+                        {{ delivery_type }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    핸드폰 번호
+                    <p style="font-size: 14px;">
+                        {{ phone }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    주소
+                    <p style="font-size: 14px;">
+                        {{ address }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    방문 일시
+                    <p style="font-size: 14px;">
+                        {{ visit_date }} {{ visit_time }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    남기실 말씀
+                    <p style="font-size: 14px;">
+                        {% if user_memo %}
+                            {{ user_memo }}
+                        {% else %}
+                            없음
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
