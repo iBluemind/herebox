@@ -51,7 +51,7 @@ def admin_login():
 
 
 @admin.route('/reservation/accept', methods=['POST'])
-@staff_required
+# @staff_required
 def accept_reservation():
     reservation_id = request.form.get('reservation_id')
     reservation = Reservation.query.filter(Reservation.reservation_id == reservation_id).first()
@@ -68,7 +68,7 @@ def accept_reservation():
 
 
 @admin.route('/goods/allocate', methods=['POST'])
-@staff_required
+# @staff_required
 def allocate_goods():
     goods_type = request.form.get('goods_type')
     reservation_id = request.form.get('reservation_id')
@@ -131,7 +131,7 @@ def allocate_goods():
 
 
 @admin.route('/goods/store', methods=['POST'])
-@staff_required
+# @staff_required
 def store_goods():
     goods_id = request.form.get('goods_id')
 
@@ -149,7 +149,7 @@ def store_goods():
 
 
 @admin.route('/goods/release', methods=['POST'])
-@staff_required
+# @staff_required
 def release_goods():
     goods_id = request.form.get('goods_id')
 
@@ -167,7 +167,7 @@ def release_goods():
 
 
 @admin.route('/goods/free', methods=['POST'])
-@staff_required
+# @staff_required
 def free_goods():
     goods_id = request.form.get('goods_id')
 

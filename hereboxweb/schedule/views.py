@@ -9,6 +9,7 @@ from sqlalchemy.orm import aliased
 from hereboxweb import response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.book.stuffs import save_stuffs, get_stuffs
+from hereboxweb.payment.models import Purchase, PayType
 from hereboxweb.schedule import schedule
 from hereboxweb.schedule.delivery import calculate_total_delivery_price, \
     DeliverySerializableFactory, DeliveryOption
@@ -16,6 +17,7 @@ from hereboxweb.schedule.models import *
 from hereboxweb.schedule.purchase_step import PurchaseStepManager, CookieSerializableStoreManager
 from hereboxweb.schedule.reservation import calculate_storage_price, calculate_total_price, \
     ReservationSerializableFactory, RevisitOption, PeriodOption
+from sqlalchemy.orm import with_polymorphic
 
 SCHEDULE_LIST_MAX_COUNT = 10
 
@@ -277,7 +279,7 @@ def delivery_review():
     order_helper = DeliverySerializableFactory.serializable('order')
     order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
     try:
-        user_order = cookie_store_manager.get(order_manager, request.cookies)
+        user_order = order_manager.get(request.cookies)
         if not user_order:
             return redirect(url_for('index'))
     except KeyError as error:
@@ -427,6 +429,118 @@ def check_promotion(code):
     response = jsonify(content = {'message': u'정상 처리되었습니다'})
     response.set_cookie('promotion', promotion_code.code, path='/reservation/')
     return response
+
+
+pay_types = {
+    PayType.DIRECT: u'현장결제',
+    PayType.CARD: u'카드결제',
+    PayType.PHONE: u'휴대폰결제',
+    PayType.KAKAOPAY: u'카카오페이',
+}
+
+
+pay_status = [u'완료', u'미완료']
+
+
+@schedule.route('/reservation/<reservation_id>', methods=['GET'])
+@login_required
+def reservation_receipt(reservation_id):
+    entity = with_polymorphic(Reservation, NewReservation)
+    reservation = database.session.query(entity).join(Purchase, User). \
+        filter(Reservation.reservation_id == reservation_id).first()
+    if not reservation_id:
+        return render_template('404.html')
+
+    promotion_name = None
+    promotion_code = PromotionCode.query.filter(PromotionCode.code == reservation.promotion).first()
+    if promotion_code:
+        promotion_name = promotion_code.promotion.name
+
+    visit_time = VisitTime.query.get(reservation.delivery_time)
+    revisit_time = None
+    if reservation.revisit_option == 1:
+        revisit_time = VisitTime.query.get(reservation.recovery_time)
+
+    return render_template('reservation_receipt.html',
+                           reservation_id=reservation_id,
+                           pay_status=pay_status[reservation.purchase.status],
+                           pay_type=pay_types[reservation.purchase.pay_type],
+                           standard_box_count=reservation.standard_box_count,
+                           nonstandard_goods_count=reservation.nonstandard_goods_count,
+                           period_option=True if reservation.fixed_rate == 1 else False,
+                           period=reservation.period,
+                           binding_products=json.loads(reservation.binding_products),
+                           promotion=promotion_name,
+                           total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
+                           phone=reservation.user.phone,
+                           address='%s %s' % (reservation.user.address1, reservation.user.address2),
+                           visit_date=reservation.delivery_date,
+                           visit_time=visit_time,
+                           revisit_option=1 if reservation.revisit_option == RevisitOption.LATER else 0,
+                           revisit_date=reservation.recovery_date,
+                           revisit_time=revisit_time,
+                           user_memo=reservation.user_memo)
+
+
+delivery_types = [u'재보관 가능', u'보관종료']
+
+
+@schedule.route('/delivery/<reservation_id>', methods=['GET'])
+@login_required
+def delivery_receipt(reservation_id):
+    entity = with_polymorphic(Reservation, DeliveryReservation)
+    reservation = database.session.query(entity).join(Purchase, User).\
+        filter(Reservation.reservation_id == reservation_id).first()
+    if not reservation_id:
+        return render_template('404.html')
+
+    visit_time = VisitTime.query.get(reservation.delivery_time)
+    packed_stuffs = reservation.goods
+
+    return render_template('delivery_receipt.html',
+                                     delivery_type=delivery_types[reservation.delivery_option],
+                                     packed_stuffs=packed_stuffs,
+                                     reservation_id=reservation_id,
+                                     pay_status=pay_status[reservation.purchase.status],
+                                     pay_type=pay_types[reservation.purchase.pay_type],
+                                     total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
+                                     phone=reservation.user.phone,
+                                     address='%s %s' % (reservation.user.address1, reservation.user.address2),
+                                     visit_date=reservation.delivery_date,
+                                     visit_time=visit_time,
+                                     user_memo=reservation.user_memo)
+
+
+@schedule.route('/pickup/<reservation_id>', methods=['GET'])
+@login_required
+def pickup_receipt(reservation_id):
+    entity = with_polymorphic(Reservation, RestoreReservation)
+    reservation = database.session.query(entity).join(Purchase, User).\
+        filter(Reservation.reservation_id == reservation_id).first()
+    if not reservation_id:
+        return render_template('404.html')
+
+    visit_time = VisitTime.query.get(reservation.delivery_time)
+    revisit_time = None
+    if reservation.revisit_option == 1:
+        revisit_time = VisitTime.query.get(reservation.recovery_time)
+
+    packed_stuffs = reservation.goods
+
+    return render_template('pickup_receipt.html',
+                                     packed_stuffs=packed_stuffs,
+                                     reservation_id=reservation_id,
+                                     pay_status=pay_status[reservation.purchase.status],
+                                     pay_type=pay_types[reservation.purchase.pay_type],
+                                     total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
+                                     phone=reservation.user.phone,
+                                     address='%s %s' % (reservation.user.address1, reservation.user.address2),
+                                     visit_date=reservation.delivery_date,
+                                     visit_time=visit_time,
+                                     revisit_option=1 if reservation.revisit_option == RevisitOption.LATER else 0,
+                                     revisit_date=reservation.recovery_date,
+                                     revisit_time=revisit_time,
+                                     user_memo=reservation.user_memo)
 
 
 

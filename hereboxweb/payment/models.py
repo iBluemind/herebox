@@ -30,6 +30,7 @@ class Purchase(database.Model, JsonSerializable):
     pay_type = database.Column(database.SmallInteger)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     created_at = database.Column(database.DateTime)
+    reservations = database.relationship('Reservation', backref='purchase', lazy='dynamic')
 
     def __init__(self, status, amount, pay_type, user_id):
         self.status = status

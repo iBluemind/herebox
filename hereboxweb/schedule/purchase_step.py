@@ -66,8 +66,8 @@ class CookieSerializableStoreManager(SerializableStoreManager):
                 serialized = serialize(form)
             except KeyError as error:
                 return bad_request(error.message)
-            except ValueError:
-                return bad_request()
+            except ValueError as error:
+                return bad_request(error.message)
         else:
             serialized = serializable.serialize(form)
         kwargs['response'].set_cookie(serializable.__user_input_type__,

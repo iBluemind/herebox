@@ -17,7 +17,13 @@
 
             {% for my_schedule in packed_my_pickup %}
                 <div class="my-schedule-table-row content" data-id="{{ my_schedule.id }}">
-                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_id }}</div>
+                    <div class="my-schedule-table-cell schedule-id">
+                        {% if my_schedule.reservation.reservation_type == 'new_reservation' %}
+                            <a href="/reservation/{{ my_schedule.reservation.reservation_id }}">{{ my_schedule.schedule_id }}</a>
+                        {% elif my_schedule.reservation.reservation_type == 'restore_reservation' %}
+                            <a class="" href="/pickup/{{ my_schedule.reservation.reservation_id }}">{{ my_schedule.schedule_id }}</a>
+                        {% endif %}
+                    </div>
                     <div class="my-schedule-table-cell">{{ my_schedule.schedule_date.strftime('%Y-%m-%d') }}  {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
                     <div class="my-schedule-table-cell">
                         {% if my_schedule.reservation.reservation_type == 'new_reservation' %}신규
@@ -65,7 +71,7 @@
 
             {% for my_schedule in packed_my_delivery %}
                 <div class="my-schedule-table-row content" data-id="{{ my_schedule.id }}">
-                    <div class="my-schedule-table-cell">{{ my_schedule.schedule_id }}</div>
+                    <div class="my-schedule-table-cell schedule-id"><a href="/delivery/{{ my_schedule.reservation.reservation_id }}">{{ my_schedule.schedule_id }}</a></div>
                     <div class="my-schedule-table-cell">{{ my_schedule.schedule_date.strftime('%Y-%m-%d') }} {{ my_schedule.schedule_time.start_time.strftime('%H:%M') }}-{{ my_schedule.schedule_time.end_time.strftime('%H:%M') }}</div>
                     <div class="my-schedule-table-cell">
                         {% if my_schedule.reservation.delivery_option == 0 %}재보관 가능

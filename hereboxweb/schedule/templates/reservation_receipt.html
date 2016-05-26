@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container" style="width: 740px; margin-bottom: 100px;">
+        <div class="row" style="margin-top: 90px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">주문 내용 확인</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        주문 번호 : {{ reservation_id }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div>
+                    보관 물품
+
+                    <div style="display: table; width: 100%; font-size: 14px;">
+                        <div style="display: table-row;">
+                            <div style="display: table-cell;">규격박스</div>
+                            <div style="display: table-cell; text-align: right;">{{ standard_box_count }}개</div>
+                        </div>
+                        <div style="display: table-row;">
+                            <div style="display: table-cell;">비규격 물품</div>
+                            <div style="display: table-cell; text-align: right;">{{ nonstandard_goods_count }}개</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    보관 기간
+                    <p style="font-size: 14px;">
+                        {% if period_option %}
+                            자동결제
+                        {% else %}
+                            기간설정 - {{ period }}개월
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    보관 용품
+
+                    <div style="display: table; width: 100%; font-size: 14px;">
+                        {% for key, value in binding_products.items() recursive %}
+                            <div style="display: table-row;">
+                                <div style="display: table-cell;">{{ key }}</div>
+                                <div style="display: table-cell; text-align: right;">{{ value }}개</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    프로모션 코드
+                    <p style="font-size: 14px;">
+                        {% if promotion %}
+                            {{ promotion }}
+                        {% else %}
+                            해당사항 없음
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    최종 결제 금액
+                    <p style="font-family: 'Nanum Barun Gothic Bold', sans-serif; color: #ffa000; font-size: 14px;">
+                        {{ total_price }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    결제 방법
+                    <p style="font-size: 14px;">
+                        {{ pay_type }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    결제 상태
+                    <p style="font-size: 14px;">
+                        {{ pay_status }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 60px;">
+                    핸드폰 번호
+                    <p style="font-size: 14px;">
+                        {{ phone }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    주소
+                    <p style="font-size: 14px;">
+                        {{ address }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    방문 일시
+                    <p style="font-size: 14px;">
+                        {{ visit_date }} {{ visit_time }}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    픽업 준비
+                    <p style="font-size: 14px;">
+                        {% if revisit_option %}
+                            재방문 신청
+                        {% else %}
+                            재방문 신청안함
+                        {% endif %}
+                    </p>
+                </div>
+
+                {% if revisit_option %}
+                    <div style="margin-top: 20px;">
+                        재방문 일시
+                        <p style="font-size: 14px;">
+                            {{ revisit_date }} {{ revisit_time }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <div style="margin-top: 20px;">
+                    남기실 말씀
+                    <p style="font-size: 14px;">
+                        {% if user_memo %}
+                            {{ user_memo }}
+                        {% else %}
+                            없음
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

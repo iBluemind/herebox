@@ -9,6 +9,7 @@ from hereboxweb import response_template, bad_request, forbidden
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.book.models import Goods
+from hereboxweb.book.stuffs import get_goods
 from hereboxweb.book.views import get_stuffs
 from hereboxweb.payment import payment
 from hereboxweb.payment.models import *
@@ -74,52 +75,49 @@ def pickup_payment():
 
         database.session.add(purchase)
 
-        committed_reservations = []
-        for reservation in packed_stuffs:
-            restore_reservation = RestoreReservation(
-                status=ReservationStatus.WAITING,
-                user_id=current_user.uid,
-                contact=user_order.phone_number,
-                address='%s %s' % (user_order.address1, user_order.address2),
-                delivery_date=user_order.visit_date,
-                delivery_time=user_order.visit_time,
-                recovery_date=user_order.revisit_date,
-                recovery_time=user_order.revisit_time,
-                revisit_option=ReservationRevisitType.LATER if user_order.revisit_option == RevisitOption.LATER else ReservationRevisitType.IMMEDIATE,
-                user_memo=user_order.user_memo,
-                pay_type=pay_types[user_pay_type],
-                goods_id=reservation.id,
-                purchase_id=purchase.id
-            )
-            database.session.add(restore_reservation)
-            committed_reservations.append(restore_reservation)
+        goods = get_goods()
+        restore_reservation = RestoreReservation(
+            status=ReservationStatus.WAITING,
+            user_id=current_user.uid,
+            contact=user_order.phone_number,
+            address='%s %s' % (user_order.address1, user_order.address2),
+            delivery_date=user_order.visit_date,
+            delivery_time=user_order.visit_time,
+            recovery_date=user_order.revisit_date,
+            recovery_time=user_order.revisit_time,
+            revisit_option=ReservationRevisitType.LATER if user_order.revisit_option == RevisitOption.LATER else ReservationRevisitType.IMMEDIATE,
+            user_memo=user_order.user_memo,
+            pay_type=pay_types[user_pay_type],
+            goods=goods,
+            purchase_id=purchase.id
+        )
+        database.session.add(restore_reservation)
 
         try:
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
-        for reservation in committed_reservations:
-            new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
-                                          schedule_type=ScheduleType.RESTORE_DELIVERY,
-                                          staff_id=1,
-                                          customer_id=current_user.uid,
-                                          schedule_date=user_order.visit_date,
-                                          schedule_time_id=user_order.visit_time,
-                                          reservation_id=reservation.id)
-            database.session.add(new_visit_schedule)
+        new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                      schedule_type=ScheduleType.RESTORE_DELIVERY,
+                                      staff_id=1,
+                                      customer_id=current_user.uid,
+                                      schedule_date=user_order.visit_date,
+                                      schedule_time_id=user_order.visit_time,
+                                      reservation_id=restore_reservation.id)
+        database.session.add(new_visit_schedule)
 
-            new_revisit_schedule = None
-            if user_order.revisit_option == RevisitOption.LATER:
-                new_revisit_schedule = Schedule(status=ScheduleStatus.WAITING,
-                                                schedule_type=ScheduleType.RESTORE_RECOVERY,
-                                                staff_id=1,
-                                                customer_id=current_user.uid,
-                                                schedule_date=user_order.revisit_date,
-                                                schedule_time_id=user_order.revisit_time,
-                                                reservation_id=reservation.id)
-            if new_revisit_schedule:
-                database.session.add(new_revisit_schedule)
+        new_revisit_schedule = None
+        if user_order.revisit_option == RevisitOption.LATER:
+            new_revisit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                            schedule_type=ScheduleType.RESTORE_RECOVERY,
+                                            staff_id=1,
+                                            customer_id=current_user.uid,
+                                            schedule_date=user_order.revisit_date,
+                                            schedule_time_id=user_order.revisit_time,
+                                            reservation_id=restore_reservation.id)
+        if new_revisit_schedule:
+            database.session.add(new_revisit_schedule)
 
         try:
             database.session.commit()
@@ -172,38 +170,36 @@ def delivery_payment():
 
         database.session.add(purchase)
 
-        committed_reservations = []
-        for reservation in packed_stuffs:
-            delivery_reservation = DeliveryReservation(
-                status=ReservationStatus.WAITING,
-                user_id=current_user.uid,
-                contact=user_order.phone_number,
-                address='%s %s' % (user_order.address1, user_order.address2),
-                delivery_option=1 if user_order.delivery_option == DeliveryOption.EXPIRE else 0,
-                delivery_date=user_order.visit_date,
-                delivery_time=user_order.visit_time,
-                user_memo=user_order.user_memo,
-                pay_type=pay_types[user_pay_type],
-                goods_id=reservation.id,
-                purchase_id=purchase.id
-            )
-            database.session.add(delivery_reservation)
-            committed_reservations.append(delivery_reservation)
+        goods = get_goods()
+        delivery_reservation = DeliveryReservation(
+            status=ReservationStatus.WAITING,
+            user_id=current_user.uid,
+            contact=user_order.phone_number,
+            address='%s %s' % (user_order.address1, user_order.address2),
+            delivery_option=1 if user_order.delivery_option == DeliveryOption.EXPIRE else 0,
+            delivery_date=user_order.visit_date,
+            delivery_time=user_order.visit_time,
+            user_memo=user_order.user_memo,
+            pay_type=pay_types[user_pay_type],
+            goods=goods,
+            purchase_id=purchase.id
+        )
+        database.session.add(delivery_reservation)
 
         try:
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
-        for reservation in committed_reservations:
-            new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
-                                          schedule_type=ScheduleType.DELIVERY,
-                                          staff_id=1,
-                                          customer_id=current_user.uid,
-                                          schedule_date=user_order.visit_date,
-                                          schedule_time_id=user_order.visit_time,
-                                          reservation_id=reservation.id)
-            database.session.add(new_visit_schedule)
+        new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
+                                      schedule_type=ScheduleType.DELIVERY,
+                                      staff_id=1,
+                                      customer_id=current_user.uid,
+                                      schedule_date=user_order.visit_date,
+                                      schedule_time_id=user_order.visit_time,
+                                      reservation_id=delivery_reservation.id)
+        database.session.add(new_visit_schedule)
+
 
         try:
             database.session.commit()
