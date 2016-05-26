@@ -10,6 +10,7 @@ from flask.ext.s3 import FlaskS3
 from flask.ext.script import Manager
 from hereboxweb.connector import DBConnector, DBConnectHelper, DBType, DBConnectorType,\
     RedisConnectHelper, RedisType
+from hereboxweb.utils import compress
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -101,4 +102,6 @@ app.register_blueprint(auth)
 app.register_blueprint(admin)
 app.register_blueprint(payment)
 app.register_blueprint(book)
+
+compress()
 
