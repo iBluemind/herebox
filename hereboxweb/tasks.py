@@ -6,7 +6,6 @@ import coolsms
 from celery import Celery
 from config import RABBIT_MQ_USER, RABBIT_MQ_HOST, RABBIT_MQ_PASSWORD, RABBIT_MQ_PORT, RABBIT_MQ_VHOST, COOLSMS_API_KEY, \
     COOLSMS_API_KEY_SECRET
-from hereboxweb import mail, app
 from hereboxweb.auth.models import User
 
 
@@ -42,5 +41,6 @@ def send_mail(subject, message, to):
                        sender="contact@herebox.kr",
                        recipients=[to])
 
+    from hereboxweb import mail, app
     with app.app_context():
         mail.send(mail_msg)
