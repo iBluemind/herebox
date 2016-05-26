@@ -3,6 +3,8 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/common/css/reset.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/common/css/iubase.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/common/css/iu.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/css/pages/faq_mobile.css') }}">
+
     <!--[if lt IE 9]>
       <script type="text/javascript" src="{{ url_for('static', filename='resource/common/ie/json2.js') }}"></script>
       <script type="text/javascript" src="{{ url_for('static', filename='resource/common/ie/jquery.backgroundSize.js') }}"></script>
@@ -63,7 +65,7 @@
                   <p>히어박스는 서비스 품질 관리를 위해 현재 서울시를 대상으로만 서비스하고 있습니다.</p>
                 <p>단계 별로 지역을 확장해 나갈 예정이며 희망하는 지역을 신청해주시면 지역 확장 시 우선 고려하겠습니다.</p>
                 <p>&nbsp;</p>
-                <p><span style="color: #ffc107;">우리 동네 신청하기 &nbsp; &gt;</span></p>
+                <p><span style="color: #ffc107; cursor: pointer;" onclick="$('#requestArea').modal('show')">우리 동네 신청하기 &nbsp; &gt;</span></p>
                 </div>
               </div>
             </div>
@@ -191,7 +193,7 @@
                 </div>
                 <div class="CollapsibleHeaderItem_76 IUCollapsibleHeaderItem IUBox">
                   <div class="Text_76 IUText IUBox">
-                    <p>창고의 보안 시스템은 어떻게 되나요?`</p>
+                    <p>창고의 보안 시스템은 어떻게 되나요?</p>
                   </div>
                   <div class="Image_76 IUBox">
                   </div>
@@ -252,19 +254,11 @@
                 <div class="Text_98 IUText IUBox">
                   <p>히어박스의 규격박스는 엄격한 품질검사를 통과한 제품으로, 믿을 수 있는 협력사로부터 공급받고 있습니다.</p>
                 <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
-                <p>&nbsp;</p>
                 <p>박스 규격 : 60cm X 40cm X 37cm (가로 X 세로 X 높이)</p>
                 <p>적재 하중 : 최대 30Kg까지 보관하실 수 있습니다.</p>
                 <p><br />또한 각각의 박스는 고유의 번호를 부여하여 관리하며, 잠금장치를 통해 보호됩니다.</p>
                 <p>&nbsp;</p>
-                <p><span style="color: #ffc107;">박스 크기 영상으로 보기 &nbsp; &gt;</span></p>
+                <p style="color: #ffc107; cursor: pointer;"><span onclick="$('#boxSize').modal('show')">박스 크기 영상으로 보기 &nbsp; &gt;</span></p>
                 </div>
               </div>
             </div>
@@ -540,7 +534,7 @@
                   <p>히어박스의 박스 크기는 60cm x 40cm x 37cm로 신발 15~25켤레, 옷 40~80벌, 책 60~90권이 들어갈 수 있는 크기입니다.</p>
                 <p>박스 크기에 관한 이해를 돕기 위해 영상을 준비했습니다.</p>
                 <p>&nbsp;</p>
-                <p><span style="color: #ffc107;">박스 크기 영상으로 보기 &nbsp; &gt;</span></p>
+                <p style="color: #ffc107; cursor: pointer;"><span onclick="$('#boxSize').modal('show')">박스 크기 영상으로 보기 &nbsp; &gt;</span></p>
                 </div>
               </div>
             </div>
@@ -893,5 +887,4 @@
     <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iucarousel.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iugooglemap.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='resource/common/iujs/iu.js') }}"></script>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='resource/css/pages/faq_mobile.css') }}">
 {% endblock %}
