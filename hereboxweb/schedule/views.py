@@ -444,7 +444,8 @@ pay_status = [u'완료', u'미완료']
 
 @schedule.route('/reservation/<reservation_id>', methods=['GET'])
 @login_required
-def reservation_receipt(reservation_id):
+@mobile_template('{mobile/}reservation_receipt.html')
+def reservation_receipt(template, reservation_id):
     entity = with_polymorphic(Reservation, NewReservation)
     reservation = database.session.query(entity).join(Purchase, User). \
         filter(Reservation.reservation_id == reservation_id).first()
@@ -461,7 +462,7 @@ def reservation_receipt(reservation_id):
     if reservation.revisit_option == 1:
         revisit_time = VisitTime.query.get(reservation.recovery_time)
 
-    return render_template('reservation_receipt.html',
+    return render_template(template,
                            reservation_id=reservation_id,
                            pay_status=pay_status[reservation.purchase.status],
                            pay_type=pay_types[reservation.purchase.pay_type],
@@ -487,7 +488,8 @@ delivery_types = [u'재보관 가능', u'보관종료']
 
 @schedule.route('/delivery/<reservation_id>', methods=['GET'])
 @login_required
-def delivery_receipt(reservation_id):
+@mobile_template('{mobile/}delivery_receipt.html')
+def delivery_receipt(template, reservation_id):
     entity = with_polymorphic(Reservation, DeliveryReservation)
     reservation = database.session.query(entity).join(Purchase, User).\
         filter(Reservation.reservation_id == reservation_id).first()
@@ -497,7 +499,7 @@ def delivery_receipt(reservation_id):
     visit_time = VisitTime.query.get(reservation.delivery_time)
     packed_stuffs = reservation.goods
 
-    return render_template('delivery_receipt.html',
+    return render_template(template,
                                      delivery_type=delivery_types[reservation.delivery_option],
                                      packed_stuffs=packed_stuffs,
                                      reservation_id=reservation_id,
@@ -513,7 +515,8 @@ def delivery_receipt(reservation_id):
 
 @schedule.route('/pickup/<reservation_id>', methods=['GET'])
 @login_required
-def pickup_receipt(reservation_id):
+@mobile_template('{mobile/}pickup_receipt.html')
+def pickup_receipt(template, reservation_id):
     entity = with_polymorphic(Reservation, RestoreReservation)
     reservation = database.session.query(entity).join(Purchase, User).\
         filter(Reservation.reservation_id == reservation_id).first()
@@ -527,7 +530,7 @@ def pickup_receipt(reservation_id):
 
     packed_stuffs = reservation.goods
 
-    return render_template('pickup_receipt.html',
+    return render_template(template,
                                      packed_stuffs=packed_stuffs,
                                      reservation_id=reservation_id,
                                      pay_status=pay_status[reservation.purchase.status],
