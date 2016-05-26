@@ -2,16 +2,56 @@
 
 
 import datetime
-from flask import request, render_template
+from flask import request, render_template, make_response, url_for, redirect, flash
+from flask.ext.login import login_user
+from config import RSA_PUBLIC_KEY_BASE64
 from hereboxweb import database, response_template, bad_request
 from hereboxweb.admin import admin
+from hereboxweb.auth.forms import LoginForm
+from hereboxweb.auth.login import HereboxLoginHelper
+from hereboxweb.auth.models import User, UserStatus
 from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsStatus, BoxStatus
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus
-from hereboxweb.utils import add_months
+from hereboxweb.utils import add_months, staff_required
+
+
+@admin.route('/login', methods=['GET, POST'])
+def admin_login():
+    form = LoginForm()
+    rsa_public_key = RSA_PUBLIC_KEY_BASE64
+
+    if form.validate_on_submit():
+        encoded_email = form.email.data
+        encoded_password = form.password.data
+        encoded_aes_key = request.form['decryptKey']
+        encoded_aes_iv = request.form['iv']
+
+        herebox_login_helper = HereboxLoginHelper(encoded_email, encoded_password,
+                                                  encoded_aes_key, encoded_aes_iv)
+
+        try:
+            decrypted_email, decrypted_password = herebox_login_helper.decrypt()
+            query = database.session.query(User).filter(User.email == decrypted_email,
+                                                        User.status >= UserStatus.STAFF)
+            user = query.first()
+
+            if user.check_password(decrypted_password):
+                flash(u'환영합니다')
+                login_user(user)
+                return redirect(request.args.get('next') or url_for('index'))
+            else:
+                raise
+        except:
+            form.email.errors.append(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
+
+    form.email.data = ''
+    response = make_response(render_template('admin_login.html', form=form, active_menu='login'))
+    response.set_cookie('jsessionid', rsa_public_key, path='/login')
+    return response
 
 
 @admin.route('/reservation/accept', methods=['POST'])
-# @staff_required
+@staff_required
 def accept_reservation():
     reservation_id = request.form.get('reservation_id')
     reservation = Reservation.query.filter(Reservation.reservation_id == reservation_id).first()
@@ -28,7 +68,7 @@ def accept_reservation():
 
 
 @admin.route('/goods/allocate', methods=['POST'])
-# @staff_required
+@staff_required
 def allocate_goods():
     goods_type = request.form.get('goods_type')
     reservation_id = request.form.get('reservation_id')
@@ -91,7 +131,7 @@ def allocate_goods():
 
 
 @admin.route('/goods/store', methods=['POST'])
-# @staff_required
+@staff_required
 def store_goods():
     goods_id = request.form.get('goods_id')
 
@@ -109,7 +149,7 @@ def store_goods():
 
 
 @admin.route('/goods/release', methods=['POST'])
-# @staff_required
+@staff_required
 def release_goods():
     goods_id = request.form.get('goods_id')
 
@@ -127,7 +167,7 @@ def release_goods():
 
 
 @admin.route('/goods/free', methods=['POST'])
-# @staff_required
+@staff_required
 def free_goods():
     goods_id = request.form.get('goods_id')
 

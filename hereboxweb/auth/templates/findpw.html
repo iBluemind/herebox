@@ -10,7 +10,7 @@
         <div style="margin: 30px 400px 100px;">
             <form>
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="이메일 주소">
+                    <input id="email" type="text" class="form-control" placeholder="이메일 주소">
                 </div>
 
                 <div class="form-group">
@@ -21,4 +21,9 @@
         </div>
     </div>
 
+{% endblock %}
+{% block jscript %}
+    {% assets "find_pw_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
 {% endblock %}

@@ -15,33 +15,25 @@ from hereboxweb.models import AlertNewArea
 def index(template):
     if current_user.is_authenticated:
         return redirect(url_for('book.my_stuff'))
-    if request.MOBILE:
-        return render_template(template)
-    return render_template('index.html', active_menu='introduce')
+    return render_template(template, active_menu='introduce')
 
 
 @app.route('/introduce', methods=['GET'])
 @mobile_template('{mobile/}index.html')
 def introduce(template):
-    if request.MOBILE:
-        return render_template(template)
-    return render_template('index.html', active_menu='introduce')
+    return render_template(template, active_menu='introduce')
 
 
 @app.route('/faq', methods=['GET'])
 @mobile_template('{mobile/}faq.html')
 def faq(template):
-    if request.MOBILE:
-        return render_template(template)
-    return render_template('faq.html', active_menu='faq')
+    return render_template(template, active_menu='faq')
 
 
 @app.route('/event', methods=['GET'])
 @mobile_template('{mobile/}event.html')
 def event(template):
-    if request.MOBILE:
-        return render_template(template)
-    return render_template('event.html', active_menu='event')
+    return render_template(template, active_menu='event')
 
 
 @app.route('/privacy', methods=['GET'])
