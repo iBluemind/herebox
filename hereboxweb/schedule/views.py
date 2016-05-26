@@ -229,7 +229,8 @@ def completion(template):
 
 @schedule.route('/delivery/order', methods=['GET', 'POST'])
 @login_required
-def delivery_order():
+@mobile_template('{mobile/}delivery_reservation.html')
+def delivery_order(template):
     if request.method == 'POST':
         return save_stuffs('/delivery/')
 
@@ -245,10 +246,10 @@ def delivery_order():
         if not user_order:
             session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return make_response(
-                render_template('delivery_reservation.html', active_menu='reservation',
+                render_template(template, active_menu='reservation',
                                                     phone_number=current_user.phone))
         return make_response(
-            render_template('delivery_reservation.html', active_menu='reservation',
+            render_template(template, active_menu='reservation',
                             phone_number=current_user.phone,
                             address1=user_order.address1,
                             address2=user_order.address2,
@@ -261,7 +262,8 @@ def delivery_order():
 
 @schedule.route('/delivery/review', methods=['GET', 'POST'])
 @login_required
-def delivery_review():
+@mobile_template('{mobile/}delivery_review.html')
+def delivery_review(template):
     cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
         if not session.pop('phone_authentication', False):
@@ -289,7 +291,7 @@ def delivery_review():
 
     visit_time = VisitTime.query.get(user_order.visit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
-    response = make_response(render_template('delivery_review.html', active_menu='reservation',
+    response = make_response(render_template(template, active_menu='reservation',
                                              packed_stuffs=packed_stuffs,
                                              delivery_option=u'재보관 가능' if user_order.delivery_option == DeliveryOption.RESTORE else u'보관 종료',
                                              address=u'%s %s' % (user_order.address1, user_order.address2),
@@ -304,8 +306,9 @@ def delivery_review():
 
 @schedule.route('/delivery/completion', methods=['GET'])
 @login_required
-def delivery_completion():
-    return render_template('completion.html', active_menu='reservation')
+@mobile_template('{mobile/}delivery_completion.html')
+def delivery_completion(template):
+    return render_template(template, active_menu='reservation')
 
 
 @schedule.route('/pickup/order', methods=['GET', 'POST'])
