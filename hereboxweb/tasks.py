@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-from flask.ext.mail import Message
 
+
+from flask.ext.mail import Message
 import coolsms
 from celery import Celery
 from config import RABBIT_MQ_USER, RABBIT_MQ_HOST, RABBIT_MQ_PASSWORD, RABBIT_MQ_PORT, RABBIT_MQ_VHOST, COOLSMS_API_KEY, \
     COOLSMS_API_KEY_SECRET
-from hereboxweb import mail
+from hereboxweb import mail, app
 from hereboxweb.auth.models import User
 
 
@@ -40,4 +41,6 @@ def send_mail(subject, message, to):
                        subject=subject,
                        sender="contact@herebox.kr",
                        recipients=[to])
-    mail.send(mail_msg)
+
+    with app.app_context():
+        mail.send(mail_msg)
