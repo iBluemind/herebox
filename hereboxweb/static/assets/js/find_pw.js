@@ -7,6 +7,7 @@ $(document).ready(function() {
              },
              success: function () {
                 alert("잠시 후 이메일의 받은 편지함을 확인해주세요.");
+                location.href = '/login';
              },
              error: function(request, status, error) {
                 var parsedBody = $.parseJSON(request.responseText);
