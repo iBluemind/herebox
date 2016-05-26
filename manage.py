@@ -21,7 +21,6 @@ def upload():
 def run():
     from hereboxweb import app
     from config import DEBUG, PORT
-    compress()
     app.run(host='0.0.0.0', debug=DEBUG, port=PORT)
 
 
