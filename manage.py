@@ -9,7 +9,6 @@ def initial():
 
 @manager.command
 def build():
-    compress()
     build_compressed_assets()
 
 
