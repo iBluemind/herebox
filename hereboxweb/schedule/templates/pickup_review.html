@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-    <div class="container" style="width: 740px;">
+    <div class="container">
         <div style="margin: 40px 0 40px; text-align: center;">
             <img src="{{ url_for('static', filename='assets/img/4-step-2.png') }}">
         </div>
@@ -35,98 +35,100 @@
             </div>
         </div>
 
-        <div class="row" style="margin-top: 100px;">
-            <div class="col-xs-6">
-                <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
-                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
-                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">확인</div>
-                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
-                        예약 내용이 정확한지 확인해주세요
+        <div style="width: 740px; margin-right: auto; margin-left: auto;">
+            <div class="row" style="margin-top: 100px;">
+                <div class="col-xs-6">
+                    <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
+                    <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                        <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">확인</div>
+                        <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                            예약 내용이 정확한지 확인해주세요
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                <div style="margin-top: 20px;">
-                    핸드폰 번호
-                    <p style="font-size: 14px;">
-                        {{ phone_number }}
-                    </p>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    주소
-                    <p style="font-size: 14px;">
-                        {{ address }}
-                    </p>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    방문 일시
-                    <p style="font-size: 14px;">
-                        {{ visit_date_time }}
-                    </p>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    픽업 준비
-                    <p style="font-size: 14px;">
-                        {% if revisit_option %}
-                            재방문 신청
-                        {% else %}
-                            재방문 신청안함
-                        {% endif %}
-                    </p>
-                </div>
-
-                {% if revisit_option %}
+                <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
                     <div style="margin-top: 20px;">
-                        재방문 일시
+                        핸드폰 번호
                         <p style="font-size: 14px;">
-                            {{ revisit_date_time }}
+                            {{ phone_number }}
                         </p>
                     </div>
-                {% endif %}
 
-                <div style="margin-top: 20px;">
-                    남기실 말씀
-                    <p style="font-size: 14px;">
-                        {% if user_memo %}
-                            {{ user_memo }}
-                        {% else %}
-                            없음
-                        {% endif %}
-                    </p>
+                    <div style="margin-top: 20px;">
+                        주소
+                        <p style="font-size: 14px;">
+                            {{ address }}
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        방문 일시
+                        <p style="font-size: 14px;">
+                            {{ visit_date_time }}
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        픽업 준비
+                        <p style="font-size: 14px;">
+                            {% if revisit_option %}
+                                재방문 신청
+                            {% else %}
+                                재방문 신청안함
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% if revisit_option %}
+                        <div style="margin-top: 20px;">
+                            재방문 일시
+                            <p style="font-size: 14px;">
+                                {{ revisit_date_time }}
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <div style="margin-top: 20px;">
+                        남기실 말씀
+                        <p style="font-size: 14px;">
+                            {% if user_memo %}
+                                {{ user_memo }}
+                            {% else %}
+                                없음
+                            {% endif %}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div style="margin-top: 80px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; text-align: center;">
-            예상 배송 비용
-            <div>
-                <div id="totalPrice" style="display: inline-block; margin: 10px 0; padding: 15px 120px; font-family: 'Nanum Barun Gothic Bold', sans-serif; font-size: 26px; color: #ffc107; border-radius: 4px; background-color: #ffffff; border: solid 1px #ffc107;">
-                    {{ total_price }}
+            <div style="margin-top: 80px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; text-align: center;">
+                예상 배송 비용
+                <div>
+                    <div id="totalPrice" style="display: inline-block; margin: 10px 0; padding: 15px 120px; font-family: 'Nanum Barun Gothic Bold', sans-serif; font-size: 26px; color: #ffc107; border-radius: 4px; background-color: #ffffff; border: solid 1px #ffc107;">
+                        {{ total_price }}
+                    </div>
+                </div>
+
+                <div style="font-size: 14px; color: #727272;">
+                    개당 2,000원
+                    <br><br>
                 </div>
             </div>
 
-            <div style="font-size: 14px; color: #727272;">
-                개당 2,000원
-                <br><br>
+            <div style="text-align: center; margin: 50px 0 10px 0;">
+                <div class="checkbox" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">
+                    <label>
+                        <input type="checkbox" id="chkAgree">
+                        히어박스의 <a href="/terms" target="_blank" style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
+                    </label>
+                </div>
             </div>
-        </div>
 
-        <div style="text-align: center; margin: 50px 0 10px 0;">
-            <div class="checkbox" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">
-                <label>
-                    <input type="checkbox" id="chkAgree">
-                    히어박스의 <a href="/terms" target="_blank" style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
-                </label>
+            <div style="margin-bottom: 100px; text-align: center;">
+                <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+                <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
             </div>
-        </div>
-
-        <div style="margin-bottom: 100px; text-align: center;">
-            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
-            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
         </div>
     </div>
 
