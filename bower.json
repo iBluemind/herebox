@@ -24,6 +24,9 @@
     "eonasdan-bootstrap-datetimepicker": "^4.17.37",
     "js-cookie": "^2.1.1",
     "drawer": "^3.2.0",
-    "iscroll": "^5.2.0"
+    "iscroll": "^5.2.0",
+    "Flot": "flot#^0.8.3",
+    "components-font-awesome": "^4.6.3",
+    "morris.js": "^0.5.1"
   }
 }

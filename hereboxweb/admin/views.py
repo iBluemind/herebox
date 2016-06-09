@@ -15,7 +15,15 @@ from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleT
 from hereboxweb.utils import add_months, staff_required
 
 
-@admin.route('/login', methods=['GET, POST'])
+@admin.route('/', methods=['GET'])
+@staff_required
+def admin_index():
+    return render_template('admin_dashboard.html', page_title=u'대시보드',
+                                                    page_subtitle='Overview',
+                                                )
+
+
+@admin.route('/login', methods=['GET', 'POST'])
 def admin_login():
     form = LoginForm()
     rsa_public_key = RSA_PUBLIC_KEY_BASE64
@@ -38,15 +46,15 @@ def admin_login():
             if user.check_password(decrypted_password):
                 flash(u'환영합니다')
                 login_user(user)
-                return redirect(request.args.get('next') or url_for('index'))
+                return redirect(url_for('admin.admin_index'))
             else:
                 raise
         except:
             form.email.errors.append(u'이메일 주소 또는 비밀번호를 다시 확인해주세요.')
 
     form.email.data = ''
-    response = make_response(render_template('admin_login.html', form=form, active_menu='login'))
-    response.set_cookie('jsessionid', rsa_public_key, path='/login')
+    response = make_response(render_template('admin_login.html', form=form))
+    response.set_cookie('jsessionid', rsa_public_key, path='/admin/login')
     return response
 
 

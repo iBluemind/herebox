@@ -90,13 +90,14 @@ def staff_required(func):
 
     @wraps(func)
     def decorated_view(*args, **kwargs):
+        from flask import redirect, url_for
         if current_app.login_manager._login_disabled:
             return func(*args, **kwargs)
         elif not current_user.is_authenticated:
-            return current_app.login_manager.unauthorized()
+            return redirect(url_for('admin.admin_login'))
         else:
             if current_user.status < UserStatus.STAFF:
-                return current_app.login_manager.unauthorized()
+                return redirect(url_for('admin.admin_login'))
         return func(*args, **kwargs)
     return decorated_view
 
