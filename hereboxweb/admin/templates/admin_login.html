@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Herebox 어드민</title>
+
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/img/favicon.ico') }}">
+    <link href="{{ url_for('static', filename='libs/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='libs/NanumBarunGothic/nanumbarungothic.css') }}" rel="stylesheet">
+    {% assets "herebox_css" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <div style="margin: 60px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/mark-login.png') }}">
+            <p style="margin: 20px; color: #212121; font-size: 20px;">관리자 로그인</p>
+
+            <div class="center-block" id="login" style="width: 300px;">
+                {% for field in form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                      <span class="sr-only">오류:</span>
+                        {% for error in form.errors[field] %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                {% if form.message %}
+                    <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">오류:</span>
+                    {{ form.message }}
+                    </div>
+                {% endif %}
+
+                <form id="frmLogin" action="{{url_for('admin.admin_login')}}" method="POST">
+                    {{ form.csrf_token }}
+                    <div class="form-group">
+                        {{ form.email(placeholder="이메일 주소", class="form-control") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.password(placeholder="비밀번호", class="form-control") }}
+                    </div>
+                    <input type="hidden" name="decryptKey">
+                    <input type="hidden" name="iv">
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-hbprimary btn-block" style="padding: 12px 100px 12px 100px;">로그인</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='libs/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/jquery-form/jquery.form.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/forge/js/forge.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='assets/js/admin/login.js') }}"></script>
+  </body>
+</html>
