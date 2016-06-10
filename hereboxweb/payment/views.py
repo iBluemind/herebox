@@ -433,6 +433,7 @@ def reservation_payment(template):
         visit_time = VisitTime.query.get(user_order.visit_time)
         pay_type = u'현장' if new_reservation.pay_type == PayType.DIRECT else u'온라인'
 
+        binding_products = json.dumps(json.loads(new_reservation.binding_products))
         mail_msg_body = u'%s / %s / %s / %s %s / 신규(방문) / %s / %s / %s / %s / %s / %s개월/ %s / %s ' % (
                                        new_visit_schedule.schedule_id, current_user.name,
                                        current_user.email,
@@ -440,7 +441,7 @@ def reservation_payment(template):
                                        pay_type, new_reservation.address, current_user.phone,
                                        new_reservation.standard_box_count,
                                        new_reservation.nonstandard_goods_count, new_reservation.period,
-                                       new_reservation.binding_products,
+                                       binding_products,
                                        new_reservation.user_memo)
 
         send_mail.apply_async(args=[u'%s 신규 주문 정보' % new_visit_schedule.schedule_id,
