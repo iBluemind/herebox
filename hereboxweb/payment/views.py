@@ -20,7 +20,7 @@ from hereboxweb.schedule.models import NewReservation, ReservationStatus, Schedu
 from hereboxweb.schedule.purchase_step import CookieSerializableStoreManager, PurchaseStepManager
 from hereboxweb.schedule.reservation import ReservationSerializableFactory, calculate_total_price, PeriodOption, \
     RevisitOption, IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE
-from hereboxweb.tasks import send_mms
+from hereboxweb.tasks import send_mms, send_mail
 from hereboxweb.utils import add_months
 
 
@@ -432,25 +432,32 @@ def reservation_payment(template):
 
         visit_time = VisitTime.query.get(user_order.visit_time)
         pay_type = u'현장' if new_reservation.pay_type == PayType.DIRECT else u'온라인'
-        send_mms.apply_async(args=['01064849686', u'%s / %s / %s %s / 신규(방문) / %s'
-                                                  u' / %s / %s / %s / %s'
-                                                  u' / %s개월 / %s ' % (
-                                       new_visit_schedule.schedule_id, current_user.name, user_order.visit_date, visit_time,
+
+        mail_msg_body = u'%s / %s / %s %s / 신규(방문) / %s / %s / %s / %s / %s / %s개월 / %s ' % (
+                                       new_visit_schedule.schedule_id, current_user.name,
+                                       user_order.visit_date, visit_time,
                                        pay_type, new_reservation.address, current_user.phone,
                                        new_reservation.standard_box_count,
                                        new_reservation.nonstandard_goods_count, new_reservation.period,
-                                       new_reservation.user_memo), u'[히어박스]'])
+                                       new_reservation.user_memo)
+
+        send_mail.apply_async(args=[u'%s 신규 주문 정보' % new_visit_schedule.schedule_id,
+                                    mail_msg_body, 'contact@herebox.kr'])
 
         if new_revisit_schedule:
             revisit_time = VisitTime.query.get(user_order.revisit_time)
-            send_mms.apply_async(args=['01064849686', u'%s / %s / %s %s / 신규(재방문) / %s'
-                                                      u' / %s / %s / %s / %s'
-                                                      u' / %s개월 / %s ' % (
-                                           new_revisit_schedule.schedule_id, current_user.name, user_order.revisit_date, revisit_time,
+
+            mail_msg_body = u'%s / %s / %s %s / 신규(재방문) / %s / %s / %s / %s / %s / %s개월 / %s ' % (
+                                           new_revisit_schedule.schedule_id, current_user.name,
+                                           user_order.revisit_date, revisit_time,
                                            pay_type, new_reservation.address, current_user.phone,
                                            new_reservation.standard_box_count,
                                            new_reservation.nonstandard_goods_count, new_reservation.period,
-                                           new_reservation.user_memo), u'[히어박스]'])
+                                           new_reservation.user_memo)
+
+            send_mail.apply_async(args=[u'%s 신규 주문 정보' % new_revisit_schedule.schedule_id,
+                                    mail_msg_body, 'contact@herebox.kr'])
+
         return response_template(u'정상 처리되었습니다', 200)
     return render_template(template, active_menu='reservation')
 
