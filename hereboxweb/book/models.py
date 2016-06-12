@@ -91,12 +91,13 @@ class Goods(database.Model, JsonSerializable):
     box_id = database.Column(database.Integer, database.ForeignKey('box.id'), nullable=True)
     user_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
     fixed_rate = database.Column(database.SmallInteger)   # 자동결제 여부
+    started_at = database.Column(database.Date)
     expired_at = database.Column(database.Date)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
 
     def __init__(self, goods_type, name, memo, in_store, status, user_id, fixed_rate,
-                                expired_at=None, schedules=None, box_id=None):
+                                started_at=None, expired_at=None, box_id=None):
         self.goods_id = self._generate_goods_id(goods_type)
         self.goods_type = goods_type
         self.name = name
@@ -106,7 +107,7 @@ class Goods(database.Model, JsonSerializable):
         self.status = status
         self.user_id = user_id
         self.fixed_rate = fixed_rate
-        self.schedules = schedules
+        self.started_at = started_at
         self.expired_at = expired_at
         self.created_at = datetime.datetime.now()
         self.updated_at = datetime.datetime.now()
