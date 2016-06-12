@@ -84,6 +84,9 @@ def allocate_goods():
     box_id = request.form.get('box_id')
     memo = request.form.get('memo')
     user_id = request.form.get('uid')
+    started_at = request.form.get('started_at')
+    expired_at = request.form.get('expired_at')
+    fixed_rate = request.form.get('fixed_rate')
 
     box = None
     if goods_type == GoodsType.STANDARD_BOX:
@@ -93,22 +96,27 @@ def allocate_goods():
 
         box.status = BoxStatus.UNAVAILABLE
 
-    reservation = Reservation.query.filter(
-                        Reservation.reservation_id == reservation_id,
-                        Reservation.status == ReservationStatus.ACCEPTED).first()
-    if not reservation:
-        return response_template(u'접수된 주문 %s을 찾을 수 없습니다.' % reservation_id, status=400)
+    if fixed_rate:
+        fixed_rate = int(fixed_rate)
 
-    schedules = reservation.schedules
-    pickup_schedules = []
-    for schedule in schedules:
-        if schedule.schedule_type == ScheduleType.PICKUP_DELIVERY or\
-                schedule.schedule_type == ScheduleType.PICKUP_RECOVERY:
-            schedule.status = ScheduleStatus.COMPLETE
-            pickup_schedules.append(schedule)
+    started_at = datetime.datetime.strptime(started_at, "%Y-%m-%d")
 
-    today = datetime.date.today()
-    expired = add_months(today, reservation.period)
+    if reservation_id:
+        reservation = Reservation.query.filter(
+                            Reservation.reservation_id == reservation_id,
+                            Reservation.status == ReservationStatus.ACCEPTED).first()
+        if not reservation:
+            return response_template(u'접수된 주문 %s을 찾을 수 없습니다.' % reservation_id, status=400)
+
+        schedules = reservation.schedules
+        for schedule in schedules:
+            if schedule.schedule_type == ScheduleType.PICKUP_DELIVERY or\
+                    schedule.schedule_type == ScheduleType.PICKUP_RECOVERY:
+                schedule.status = ScheduleStatus.COMPLETE
+
+        user_id = reservation.user_id
+        expired_at = add_months(started_at, reservation.period)
+        fixed_rate = reservation.fixed_rate
 
     new_goods = Goods(goods_type=goods_type,
                       name=name,
@@ -116,9 +124,9 @@ def allocate_goods():
                       in_store=InStoreStatus.IN_STORE,
                       box_id=box.id if box else None,
                       user_id=user_id,
-                      schedules=pickup_schedules,
-                      expired_at=expired,
-                      fixed_rate=reservation.fixed_rate,
+                      started_at=started_at,
+                      expired_at=expired_at,
+                      fixed_rate=fixed_rate,
                       status=GoodsStatus.ACTIVE)
 
     try:
