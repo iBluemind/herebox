@@ -173,6 +173,7 @@
 
     {% include "dialog_box_size.html" %}
     {% include "dialog_request.html" %}
+    {% include "dialog_event2.html" %}
 {% endblock %}
 {% block jscript %}
 
@@ -180,4 +181,8 @@
     {% assets "introduce_js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
+
+    <script>
+        $('#popUpEvent2').modal('show');
+    </script>
 {% endblock %}
