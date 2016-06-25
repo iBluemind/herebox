@@ -2,7 +2,8 @@
 
 
 import datetime
-from flask import request, render_template, make_response, url_for, redirect, flash
+
+from flask import request, render_template, make_response, url_for, redirect, flash, json
 from flask.ext.login import login_user
 from config import RSA_PUBLIC_KEY_BASE64
 from hereboxweb import database, response_template, bad_request
@@ -15,12 +16,61 @@ from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleT
 from hereboxweb.utils import add_months, staff_required
 
 
+USERS_PER_PAGE = 10
+
+
 @admin.route('/', methods=['GET'])
 @staff_required
 def admin_index():
+
+    today = datetime.date.today()
+    reservations_today = Reservation.query.filter(Reservation.created_at >= today).count()
+    goods_expired_today = Goods.query.filter(Goods.expired_at >= today).count()
+    user_join_today = User.query.filter(User.created_at >= today).count()
+    used_box_today = Box.query.filter(Box.status == BoxStatus.UNAVAILABLE).count()
+
+    reservation_statistics = database.engine.execute(
+        """
+        SELECT CONCAT(
+                  DATE_FORMAT(
+                     DATE_SUB(created_at, INTERVAL (DAYOFWEEK(created_at) - 1) DAY),
+                     "%%Y/%%m/%%d"),
+                  ' ~ ',
+                  DATE_FORMAT(
+                     DATE_SUB(created_at, INTERVAL (DAYOFWEEK(created_at) - 7) DAY),
+                     "%%Y/%%m/%%d"))
+                  AS date,
+               COUNT(*) AS count
+          FROM `reservation`
+        GROUP BY date
+        ORDER BY `date` DESC
+        """
+    )
+
+    reservation_statistics_data = []
+    for row in reservation_statistics:
+        reservation_statistics_data.append({
+            "x": row[0],
+            "y": row[1]
+        })
+
     return render_template('admin_dashboard.html', page_title=u'대시보드',
                                                     page_subtitle='Overview',
-                                                )
+                           reservations_today=reservations_today,
+                           goods_expired_today=goods_expired_today,
+                           user_join_today=user_join_today,
+                           used_box_today=used_box_today,
+                           reservation_statistics=json.dumps(reservation_statistics_data))
+
+@admin.route('/users/<int:page>', methods=['GET'])
+@staff_required
+def admin_users(page):
+    paginate = User.query.order_by(User.created_at.desc()).paginate(page, USERS_PER_PAGE, False)
+
+    return render_template('admin_users.html', page_title=u'회원정보',
+                                                    page_subtitle='Users',
+                                            pagination=paginate
+    )
 
 
 @admin.route('/login', methods=['GET', 'POST'])
