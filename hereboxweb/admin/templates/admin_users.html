@@ -22,7 +22,7 @@
                         <td>{{ item.uid }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.email or '' }}</td>
-                        <td>{{ item.fb_user_id or '' }}</td>
+                        <td>{% if item.fb_user_id %}<a href="http://facebook.com/{{ item.fb_user_id }}" target="_blank">{{ item.fb_user_id }}</a>{% endif %}</td>
                         <td>{{ item.phone or '' }}</td>
                         <td>{{ item.address1 or '' }}</td>
                         <td>{{ item.address2 or '' }}</td>
