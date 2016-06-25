@@ -37,14 +37,6 @@
   </head>
 
   <body class="drawer drawer--right">
-    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM59LG"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-MM59LG');</script>
-
     <nav class="navbar navbar-herebox navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
@@ -163,6 +155,51 @@
             </div>
         </div>
     </footer>
+
+    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM59LG"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-MM59LG');</script>
+
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+
+    fbq('init', '522496584600031');
+    fbq('track', "PageView");</script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=522496584600031&ev=PageView&noscript=1"
+    /></noscript>
+
+    <script>
+      window.channelPluginSettings = {
+        "plugin_id": "64861481-fa1d-4fac-845a-4d01cafe7292"
+      };
+      (function() {
+        var node = document.createElement('div');
+        node.id = 'ch-plugin';
+        document.body.appendChild(node);
+        var async_load = function() {
+          var s = document.createElement('script');
+          s.type = 'text/javascript';
+          s.async = true;
+          s.src = '//cdn.channel.io/plugin/ch-plugin-web.js';
+          var x = document.getElementsByTagName('script')[0];
+          x.parentNode.insertBefore(s, x);
+        };
+        if (window.attachEvent) {
+          window.attachEvent('onload', async_load);
+        } else {
+          window.addEventListener('load', async_load, false);
+        }
+      })();
+    </script>
 
     <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
