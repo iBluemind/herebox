@@ -18,7 +18,7 @@ from hereboxweb.auth.models import User, UserStatus
 from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsStatus, BoxStatus
 from hereboxweb.payment.models import Purchase
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus, NewReservation, \
-    ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule
+    ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType
 from hereboxweb.schedule.reservation import RevisitOption
 from hereboxweb.utils import add_months, staff_required
 
@@ -49,6 +49,15 @@ def schedule_detail(schedule_id):
     schedule = Schedule.query.filter(Schedule.schedule_id==schedule_id).first()
     schedule.parsed_schedule_time = VisitTime.query.get(schedule.schedule_time_id)
 
+    reservation = schedule.reservation
+    if reservation.reservation_id.startswith(ReservationType.PICKUP_NEW):
+        if (reservation.revisit_option == ReservationRevisitType.IMMEDIATE) or \
+                (reservation.revisit_option == ReservationRevisitType.LATER and
+                     schedule.schedule_id.endswith('_1')):
+            return render_template('admin_schedule.html', page_title=u'스케줄',
+                                   page_subtitle='Schedule',
+                                   schedule_detail=schedule,
+                                   register_goods_popup=True)
     return render_template('admin_schedule.html', page_title=u'스케줄',
                                page_subtitle='Schedule',
                                schedule_detail=schedule)
@@ -369,6 +378,7 @@ def accept_reservation():
         return response_template(u'%s 주문을 찾을 수 없습니다.' % reservation_id, status=400)
 
     reservation.status = ReservationStatus.ACCEPTED
+    reservation.updated_at = datetime.datetime.now()
 
     try:
         database.session.commit()
@@ -377,18 +387,21 @@ def accept_reservation():
     return response_template(u'정상 처리되었습니다.')
 
 
-@admin.route('/goods/allocate', methods=['POST'])
+@admin.route('/schedule/register/goods', methods=['POST'])
 @staff_required
-def allocate_goods():
+def register_goods():
+    schedule_id = request.form.get('schedule_id')
+    schedule = Schedule.query.filter(Schedule.schedule_id == schedule_id).first()
+
+    if not schedule:
+        return response_template(u'%s 스케줄을 찾을 수 없습니다.' % schedule_id, status=400)
+
+    reservation = schedule.reservation
     goods_type = request.form.get('goods_type')
-    reservation_id = request.form.get('reservation_id')
     name = request.form.get('name')
     box_id = request.form.get('box_id')
     memo = request.form.get('memo')
-    user_id = request.form.get('uid')
     started_at = request.form.get('started_at')
-    expired_at = request.form.get('expired_at')
-    fixed_rate = request.form.get('fixed_rate')
 
     box = None
     if goods_type == GoodsType.STANDARD_BOX:
@@ -398,27 +411,11 @@ def allocate_goods():
 
         box.status = BoxStatus.UNAVAILABLE
 
-    if fixed_rate:
-        fixed_rate = int(fixed_rate)
-
     started_at = datetime.datetime.strptime(started_at, "%Y-%m-%d")
 
-    if reservation_id:
-        reservation = Reservation.query.filter(
-                            Reservation.reservation_id == reservation_id,
-                            Reservation.status == ReservationStatus.ACCEPTED).first()
-        if not reservation:
-            return response_template(u'접수된 주문 %s을 찾을 수 없습니다.' % reservation_id, status=400)
-
-        schedules = reservation.schedules
-        for schedule in schedules:
-            if schedule.schedule_type == ScheduleType.PICKUP_DELIVERY or\
-                    schedule.schedule_type == ScheduleType.PICKUP_RECOVERY:
-                schedule.status = ScheduleStatus.COMPLETE
-
-        user_id = reservation.user_id
-        expired_at = add_months(started_at, reservation.period)
-        fixed_rate = reservation.fixed_rate
+    user_id = reservation.user_id
+    expired_at = add_months(started_at, reservation.period)
+    fixed_rate = reservation.fixed_rate
 
     new_goods = Goods(goods_type=goods_type,
                       name=name,
@@ -431,33 +428,12 @@ def allocate_goods():
                       fixed_rate=fixed_rate,
                       status=GoodsStatus.ACTIVE)
 
-    try:
-        database.session.add(new_goods)
-        database.session.commit()
-    except:
-        return response_template(u'오류가 발생했습니다.', status=500)
+    database.session.add(new_goods)
 
     if goods_type == GoodsType.STANDARD_BOX:
         box.goods_id = new_goods.id
 
-        try:
-            database.session.commit()
-        except:
-            return response_template(u'오류가 발생했습니다.', status=500)
-
-    return response_template(u'정상 처리되었습니다.')
-
-
-@admin.route('/goods/store', methods=['POST'])
-@staff_required
-def store_goods():
-    goods_id = request.form.get('goods_id')
-
-    goods = Goods.query.filter(Goods.goods_id == goods_id,
-                                Goods.in_store == InStoreStatus.OUT_OF_STORE)\
-                            .first()
-
-    goods.in_store = InStoreStatus.IN_STORE
+    reservation.goods.append(new_goods)
 
     try:
         database.session.commit()
@@ -466,16 +442,52 @@ def store_goods():
     return response_template(u'정상 처리되었습니다.')
 
 
-@admin.route('/goods/release', methods=['POST'])
+@admin.route('/schedule/complete', methods=['POST'])
 @staff_required
-def release_goods():
-    goods_id = request.form.get('goods_id')
+def complete_schedule():
+    schedule_id = request.form.get('schedule_id')
+    schedule = Schedule.query.filter(Schedule.schedule_id == schedule_id).first()
 
-    goods = Goods.query.filter(Goods.goods_id == goods_id,
-                                Goods.in_store == InStoreStatus.IN_STORE)\
-                            .first()
+    if not schedule:
+        return response_template(u'%s 스케줄을 찾을 수 없습니다.' % schedule_id, status=400)
 
-    goods.in_store = InStoreStatus.OUT_OF_STORE
+    reservation = schedule.reservation
+    if reservation.status == ReservationStatus.WAITING:
+        return response_template(u'%s 주문이 접수된 상태이어야 합니다!' % reservation.reservation_id, status=400)
+
+    if reservation.reservation_id.startswith(ReservationType.PICKUP_NEW):
+        if (reservation.revisit_option == ReservationRevisitType.IMMEDIATE) or \
+                (reservation.revisit_option == ReservationRevisitType.LATER and
+                    schedule.schedule_id.endswith('_1')):
+            goods_count = len(reservation.goods)
+            if goods_count == 0:
+                return response_template(u'%s 주문에 등록된 물품이 없습니다!' % reservation.reservation_id, status=400)
+            schedules = reservation.schedules
+            for schedule in schedules:
+                if schedule.schedule_type == ScheduleType.PICKUP_DELIVERY or \
+                                schedule.schedule_type == ScheduleType.PICKUP_RECOVERY:
+                    schedule.status = ScheduleStatus.COMPLETE
+
+    elif reservation.reservation_id.startswith(ReservationType.PICKUP_AGAIN):
+        if (reservation.revisit_option == ReservationRevisitType.IMMEDIATE) or \
+                (reservation.revisit_option == ReservationRevisitType.LATER and
+                     schedule.schedule_id.endswith('_1')):
+            for goods in reservation.goods:
+                goods.in_store = InStoreStatus.IN_STORE
+
+    elif reservation.reservation_id.startswith(ReservationType.DELIVERY):
+        for goods in reservation.goods:
+            if reservation.delivery_option == ReservationDeliveryType.EXPIRE:
+                if goods.box_id != None:
+                    box = Box.query.get(goods.box_id)
+                    box.goods_id = None
+                    box.status = BoxStatus.AVAILABLE
+                goods.status = GoodsStatus.EXPIRED
+            else:
+                goods.in_store = InStoreStatus.OUT_OF_STORE
+
+    schedule.status = ScheduleStatus.COMPLETE
+    schedule.updated_at = datetime.datetime.now()
 
     try:
         database.session.commit()
@@ -484,28 +496,3 @@ def release_goods():
     return response_template(u'정상 처리되었습니다.')
 
 
-@admin.route('/goods/free', methods=['POST'])
-@staff_required
-def free_goods():
-    goods_id = request.form.get('goods_id')
-
-    today = datetime.date.today()
-    goods = Goods.query.filter(
-                               Goods.goods_id == goods_id,
-                               today >= Goods.expired_at,
-                               Goods.status == GoodsStatus.ACTIVE).first()
-
-    if not goods:
-        return bad_request(u'물품 %s를 찾을 수 없습니다.' % goods_id)
-
-    if goods.box_id != None:
-        box = Box.query.get(goods.box_id)
-        box.goods_id = None
-        box.status = BoxStatus.AVAILABLE
-    goods.status = GoodsStatus.EXPIRED
-
-    try:
-        database.session.commit()
-    except:
-        return response_template(u'오류가 발생했습니다.', status=500)
-    return response_template(u'정상 처리되었습니다.')
