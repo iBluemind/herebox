@@ -1,0 +1,42 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>박스번호</th>
+                        <th>사용중</th>
+                        <th>보관중</th>
+                        <th>등록일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     {% for item in pagination.items %}
+                     <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.box_id }}</td>
+                        <td>
+                            {{ 'N' if item.status == 0 }}
+                            {{ 'Y' if item.status == 1 }}
+                        </td>
+                        <td>
+                            {{ 'Y' if item.in_store == 0 }}
+                            {{ 'N' if item.in_store == 1 }}
+                        </td>
+                        <td>{{ item.created_at }}</td>
+                     </tr>
+                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="text-center">
+            {% from "admin_pagination.html" import render_pagination %}
+            {{ render_pagination(pagination, 'admin.boxes') }}
+        </nav>
+    </div>
+
+{% endblock %}

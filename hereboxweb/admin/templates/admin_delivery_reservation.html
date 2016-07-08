@@ -1,0 +1,70 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div style="width: 800px; margin-left: auto; margin-right: auto;">
+        <form method="post">
+            <div class="form-group col-lg-6">
+                <label>주문번호</label>
+                <input class="form-control" value="{{ reservation_detail.reservation_id }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>주문종류</label>
+                <select class="form-control" name="status">
+                    <option value="new_reservation" {{ 'selected' if reservation_detail.reservation_type == 'new_reservation' else '' }}>신규픽업</option>
+                    <option value="restore_reservation" {{ 'selected' if reservation_detail.reservation_type == 'restore_reservation' else '' }}>재보관</option>
+                    <option value="delivery_reservation" {{ 'selected' if reservation_detail.reservation_type == 'delivery_reservation' else '' }}>배송</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>상태</label>
+                <select class="form-control" name="status">
+                    <option value="0" {{ 'selected' if reservation_detail.status == 0 else '' }}>대기</option>
+                    <option value="1" {{ 'selected' if reservation_detail.status == 1 else '' }}>접수</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>연락처</label>
+                <input class="form-control" value="{{ reservation_detail.contact }}">
+            </div>
+            <div class="form-group col-lg-12">
+                <label>주소</label>
+                <input class="form-control" value="{{ reservation_detail.address }}">
+            </div>
+            <div class="form-group col-lg-12">
+                <label>남긴 말</label>
+                <input class="form-control" value="{{ reservation_detail.user_memo or '' }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>회원</label>
+                <input class="form-control" value="{{ reservation_detail.user.name }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>예약일</label>
+                <input class="form-control" value="{{ reservation_detail.created_at }}" disabled>
+            </div>
+            <br><br>
+
+            <div class="form-group col-lg-6">
+                <label>배달일시</label>
+                <input class="form-control" value="{{ reservation_detail.delivery_date }} {{ reservation_detail.parsed_delivery_time }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>재보관여부</label>
+                <input class="form-control" value="{{ reservation_detail.parsed_delivery_option }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>대상물품</label>
+                <input class="form-control" value="{% for goods in reservation_detail.goods %}{{ goods.goods_id }} {% endfor %}" disabled>
+            </div>
+
+            <div class="form-group">
+                {% if reservation_detail.status == 0 %}
+                    <button type="button" class="btn btn-primary">접수</button>
+                {% endif %}
+                <button type="submit" class="btn btn-warning">변경</button>
+                <button type="button" class="btn btn-danger">삭제</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

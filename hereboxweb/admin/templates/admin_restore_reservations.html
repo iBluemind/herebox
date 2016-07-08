@@ -1,0 +1,44 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>주문번호</th>
+                        <th>방문날짜</th>
+                        <th>방문시간</th>
+                        <th>재방문여부</th>
+                        <th>대상물품</th>
+                        <th>회원</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     {% for item in pagination.items %}
+                     <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="/admin/reservation/{{ item.reservation_id }}">{{ item.reservation_id }}</a></td>
+                        <td>{{ item.delivery_date }}</td>
+                        <td>{{ item.parsed_delivery_time }}</td>
+                        <td>{{ item.parsed_revisit_option }}</td>
+                        <td>
+                            {% for goods in item.goods %}
+                                <a href="/admin/goods/{{ goods.goods_id }}">{{ goods.goods_id }}</a>
+                            {% endfor %}
+                        </td>
+                        <td><a href="/admin/user/{{ item.user.uid }}" target="_blank">{{ item.user.name }}</a></td>
+                    </tr>
+                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="text-center">
+            {% from "admin_pagination.html" import render_pagination %}
+            {{ render_pagination(pagination, 'admin.restore_reservations') }}
+        </nav>
+    </div>
+
+{% endblock %}

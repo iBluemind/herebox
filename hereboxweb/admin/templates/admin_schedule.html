@@ -1,0 +1,59 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div style="width: 800px; margin-left: auto; margin-right: auto;">
+        <form method="post">
+            <div class="form-group col-lg-6">
+                <label>스케줄번호</label>
+                <input class="form-control" value="{{ schedule_detail.schedule_id }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>스케줄종류</label>
+                <select class="form-control" name="status">
+                    <option value="0" {{ 'selected' if schedule_detail.schedule_type == 0 else '' }}>신규픽업</option>
+                    <option value="1" {{ 'selected' if schedule_detail.schedule_type == 1 else '' }}>신규픽업(재방문)</option>
+                    <option value="2" {{ 'selected' if schedule_detail.schedule_type == 2 else '' }}>배송</option>
+                    <option value="3" {{ 'selected' if schedule_detail.schedule_type == 3 else '' }}>재보관</option>
+                    <option value="4" {{ 'selected' if schedule_detail.schedule_type == 4 else '' }}>재보관(재방문)</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>상태</label>
+                <select class="form-control" name="status">
+                    <option value="0" {{ 'selected' if schedule_detail.status == 0 else '' }}>대기</option>
+                    <option value="1" {{ 'selected' if schedule_detail.status == 1 else '' }}>완료</option>
+                    <option value="2" {{ 'selected' if schedule_detail.status == 2 else '' }}>취소</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>주문번호</label>
+                <input class="form-control" value="{{ schedule_detail.reservation.reservation_id }}">
+            </div>
+            <div class="form-group col-lg-12">
+                <label>방문일짜</label>
+                <input class="form-control" value="{{ schedule_detail.schedule_date }}">
+            </div>
+            <div class="form-group col-lg-12">
+                <label>방문시간</label>
+                <input class="form-control" value="{{ schedule_detail.parsed_schedule_time }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>회원</label>
+                <input class="form-control" value="{{ schedule_detail.customer[0].name }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>직원</label>
+                <input class="form-control" value="{{ schedule_detail.staff[0].created_at }}" disabled>
+            </div>
+
+            <div class="form-group">
+                {% if schedule_detail.status == 0 %}
+                    <button type="button" class="btn btn-primary">완료</button>
+                {% endif %}
+                <button type="submit" class="btn btn-warning">변경</button>
+                <button type="button" class="btn btn-danger">삭제</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

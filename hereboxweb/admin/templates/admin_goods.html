@@ -1,0 +1,61 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div style="width: 800px; margin-left: auto; margin-right: auto;">
+        <form method="post">
+            <div class="form-group col-lg-6">
+                <label>관리번호</label>
+                <input class="form-control" value="{{ goods_detail.goods_id }}" disabled>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>물품종류</label>
+                <select class="form-control" name="status">
+                    <option value="0" {{ 'selected' if goods_detail.goods_id.startswith('A') else '' }}>규격</option>
+                    <option value="1" {{ 'selected' if goods_detail.goods_id.startswith('B') else '' }}>비규격</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>상태</label>
+                <select class="form-control" name="status">
+                    <option value="0" {{ 'selected' if goods_detail.status == 0 else '' }}>활성화</option>
+                    <option value="1" {{ 'selected' if goods_detail.status == 1 else '' }}>만료됨</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-6">
+                <label>보관여부</label>
+                <select class="form-control" name="status">
+                    <option value="0" {{ 'selected' if goods_detail.status == 0 else '' }}>보관중</option>
+                    <option value="1" {{ 'selected' if goods_detail.status == 1 else '' }}>보관중이지 않음</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-12">
+                <label>메모</label>
+                <input class="form-control" value="{{ goods_detail.memo or '' }}">
+            </div>
+            <div class="form-group col-lg-6">
+                <label>시작일</label>
+                <input class="form-control" value="{{ goods_detail.started_at }}">
+            </div>
+            <div class="form-group col-lg-6">
+                <label>만료일</label>
+                <input class="form-control" value="{{ goods_detail.expired_at }}" disabled>
+            </div>
+            <div class="form-group col-lg-12">
+                <label>사진</label>
+                <input class="form-control" value="{{ goods_detail.photo or '' }}" disabled>
+            </div>
+            {% if goods_detail.goods_id.startswith('A') %}
+            <div class="form-group col-lg-12">
+                <label>박스번호</label>
+                <input class="form-control" value="{{ goods_detail.box.box_id }}" disabled>
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-warning">변경</button>
+                <button type="button" class="btn btn-danger">삭제</button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

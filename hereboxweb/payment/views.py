@@ -370,7 +370,7 @@ def reservation_payment(template):
                     return response_template(u'문제가 발생했습니다.', status=500)
 
         new_reservation = NewReservation(
-            status=ReservationStatus.ACCEPTED,
+            status=ReservationStatus.WAITING,
             standard_box_count=user_estimate.regular_item_count,
             nonstandard_goods_count=user_estimate.irregular_item_count,
             period=user_estimate.period,

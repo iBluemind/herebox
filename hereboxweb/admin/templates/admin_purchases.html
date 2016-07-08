@@ -1,0 +1,47 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>상태</th>
+                        <th>금액</th>
+                        <th>지불방법</th>
+                        <th>구매일자</th>
+                        <th>대상회원</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     {% for item in pagination.items %}
+                     <tr>
+                        <td>{{ item.id }}</td>
+                        <td>
+                            {{ '정상처리' if item.status == 0 }}
+                            {{ '실패' if item.status == 1 }}
+                        </td>
+                        <td>{{ item.amount }}</td>
+                        <td>
+                            {{ '카드' if item.pay_type == 0 }}
+                            {{ '현장' if item.pay_type == 1 }}
+                            {{ '휴대폰' if item.pay_type == 2 }}
+                            {{ '카카오페이' if item.pay_type == 3 }}
+                            {{ '무통장' if item.pay_type == 4 }}
+                        </td>
+                        <td>{{ item.created_at }}</td>
+                        <td><a href="/admin/user/{{ item.user.uid }}" target="_blank">{{ item.user.name }}</a></td>
+                    </tr>
+                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="text-center">
+            {% from "admin_pagination.html" import render_pagination %}
+            {{ render_pagination(pagination, 'admin.schedules') }}
+        </nav>
+    </div>
+
+{% endblock %}
