@@ -19,7 +19,7 @@
                 <tbody>
                      {% for item in pagination.items %}
                      <tr>
-                        <td>{{ item.uid }}</td>
+                        <td><a href="/admin/user/{{ item.uid }}">{{ item.uid }}</a></td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.email or '' }}</td>
                         <td>{% if item.fb_user_id %}<a href="http://facebook.com/{{ item.fb_user_id }}" target="_blank">{{ item.fb_user_id }}</a>{% endif %}</td>

@@ -17,6 +17,8 @@ class PayType(object):
     DIRECT = 1
     PHONE = 2
     KAKAOPAY = 3
+    ACCOUNT = 4     # 무통장입금
+
 
 
 # 결제 내역

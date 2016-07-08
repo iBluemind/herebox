@@ -33,6 +33,7 @@ class User(database.Model, UserMixin, JsonSerializable):
     fb_access_token = database.Column(database.String(200), nullable=True)
     goods = database.relationship('Goods', backref='user', lazy='dynamic')
     reservations = database.relationship('Reservation', backref='user', lazy='dynamic')
+    purchases = database.relationship('Purchase', backref='user', lazy='dynamic')
 
     def __init__(self, name, email=None, fb_user_id=None, fb_access_token=None,
                         address1=None, address2=None, status=UserStatus.NORMAL, password=None, phone=None):

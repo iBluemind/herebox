@@ -1,0 +1,46 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>스케줄번호</th>
+                        <th>스케줄종류</th>
+                        <th>주문번호</th>
+                        <th>방문일짜</th>
+                        <th>방문시간</th>
+                        <th>대상회원</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     {% for item in pagination.items %}
+                     <tr>
+                        <td>{{ item.id }}</td>
+                        <td><a href="/admin/schedule/{{ item.schedule_id }}">{{ item.schedule_id }}</a></td>
+                        <td>
+                            {{ '신규픽업' if item.schedule_type == 0 }}
+                            {{ '신규픽업(재방문)' if item.schedule_type == 1 }}
+                            {{ '배송' if item.schedule_type == 2 }}
+                            {{ '재보관' if item.schedule_type == 3 }}
+                            {{ '재보관(재방문)' if item.schedule_type == 4 }}
+                        </td>
+                        <td><a href="/admin/reservation/{{ item.reservation.reservation_id }}">{{ item.reservation.reservation_id }}</a></td>
+                        <td>{{ item.schedule_date }}</td>
+                        <td>{{ item.parsed_schedule_time }}</td>
+                        <td><a href="/admin/user/{{ item.customer[0].uid }}" target="_blank">{{ item.customer[0].name }}</a></td>
+                    </tr>
+                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="text-center">
+            {% from "admin_pagination.html" import render_pagination %}
+            {{ render_pagination(pagination, 'admin.schedules') }}
+        </nav>
+    </div>
+
+{% endblock %}
