@@ -5,11 +5,11 @@
         <form method="post">
             <div class="form-group col-lg-6">
                 <label>스케줄번호</label>
-                <input class="form-control" value="{{ schedule_detail.schedule_id }}" disabled>
+                <input id="inputScheduleId" class="form-control" value="{{ schedule_detail.schedule_id }}" disabled>
             </div>
             <div class="form-group col-lg-6">
                 <label>스케줄종류</label>
-                <select class="form-control" name="status">
+                <select class="form-control" name="schedule_type" disabled>
                     <option value="0" {{ 'selected' if schedule_detail.schedule_type == 0 else '' }}>신규픽업</option>
                     <option value="1" {{ 'selected' if schedule_detail.schedule_type == 1 else '' }}>신규픽업(재방문)</option>
                     <option value="2" {{ 'selected' if schedule_detail.schedule_type == 2 else '' }}>배송</option>
@@ -19,7 +19,7 @@
             </div>
             <div class="form-group col-lg-6">
                 <label>상태</label>
-                <select class="form-control" name="status">
+                <select class="form-control" name="status" disabled>
                     <option value="0" {{ 'selected' if schedule_detail.status == 0 else '' }}>대기</option>
                     <option value="1" {{ 'selected' if schedule_detail.status == 1 else '' }}>완료</option>
                     <option value="2" {{ 'selected' if schedule_detail.status == 2 else '' }}>취소</option>
@@ -27,33 +27,100 @@
             </div>
             <div class="form-group col-lg-6">
                 <label>주문번호</label>
-                <input class="form-control" value="{{ schedule_detail.reservation.reservation_id }}">
+                <input class="form-control" value="{{ schedule_detail.reservation.reservation_id }}" disabled>
             </div>
-            <div class="form-group col-lg-12">
+            <div class="form-group col-lg-6">
                 <label>방문일짜</label>
                 <input class="form-control" value="{{ schedule_detail.schedule_date }}">
             </div>
-            <div class="form-group col-lg-12">
+            <div class="form-group col-lg-6">
                 <label>방문시간</label>
                 <input class="form-control" value="{{ schedule_detail.parsed_schedule_time }}" disabled>
             </div>
             <div class="form-group col-lg-6">
-                <label>회원</label>
+                <label>대상회원</label>
                 <input class="form-control" value="{{ schedule_detail.customer[0].name }}" disabled>
             </div>
             <div class="form-group col-lg-6">
-                <label>직원</label>
-                <input class="form-control" value="{{ schedule_detail.staff[0].created_at }}" disabled>
+                <label>담당직원</label>
+                <input class="form-control" value="{{ schedule_detail.staff[0].name }}" disabled>
             </div>
 
             <div class="form-group">
                 {% if schedule_detail.status == 0 %}
-                    <button type="button" class="btn btn-primary">완료</button>
+                    <button id="btnAddGoods" type="button" class="btn btn-default">물품추가</button>
+                    {% if register_goods_popup %}<button id="btnComplete" type="button" class="btn btn-primary">완료</button>{% endif %}
                 {% endif %}
                 <button type="submit" class="btn btn-warning">변경</button>
-                <button type="button" class="btn btn-danger">삭제</button>
+                {% if schedule_detail.status == 0 %}
+                    <button id="btnDelete" type="button" class="btn btn-danger">삭제</button>
+                {% endif %}
             </div>
         </form>
     </div>
+
+    {% if register_goods_popup %}
+        {% include "admin_dialog_new_goods.html" %}
+    {% endif %}
+{% endblock %}
+{% block jscript %}
+
+    <script>
+        $.fn.exists = function () {
+            return this.length !== 0;
+        };
+
+        $(document).ready(function() {
+            if ($('#registerGoods').exists()) {
+                $('#btnRegisterGoods').click(addGoods);
+                $('#btnAddGoods').click(function() {
+                    $('#registerGoods').modal('show');
+                });
+            }
+
+            $('#btnComplete').click(function() {
+                completeSchedule();
+            });
+        });
+
+        function addGoods() {
+            $.ajax({
+                 type: "POST",
+                 url: "/admin/schedule/register/goods",
+                 data: {schedule_id: $('#inputScheduleId').val(),
+                     goods_type: $('#goods_type').val(),
+                     name: $('#goods_name').val(),
+                     box_id: $('#goods_box_id').val(),
+                     memo: $('#goods_memo').val(),
+                     started_at: $('#goods_started_at').val()
+                 },
+                 success: function () {
+                    alert('추가되었습니다.');
+                     location.reload();
+                 },
+                 error: function(request, status, error) {
+                    var parsedBody = $.parseJSON(request.responseText);
+                    alert(parsedBody['message']);
+                 }
+            });
+        }
+
+        function completeSchedule() {
+            $.ajax({
+                 type: "POST",
+                 url: "/admin/schedule/complete",
+                 data: {schedule_id: $('#inputScheduleId').val()},
+                 success: function () {
+                    alert('완료되었습니다.');
+                     location.reload();
+                 },
+                 error: function(request, status, error) {
+                    var parsedBody = $.parseJSON(request.responseText);
+                    alert(parsedBody['message']);
+                 }
+            });
+        }
+
+    </script>
 
 {% endblock %}

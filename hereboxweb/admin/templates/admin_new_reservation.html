@@ -5,11 +5,11 @@
         <form method="post">
             <div class="form-group col-lg-6">
                 <label>주문번호</label>
-                <input class="form-control" value="{{ reservation_detail.reservation_id }}" disabled>
+                <input id="inputReservationId" class="form-control" value="{{ reservation_detail.reservation_id }}" disabled>
             </div>
             <div class="form-group col-lg-6">
                 <label>주문종류</label>
-                <select class="form-control" name="reservation_type">
+                <select class="form-control" name="reservation_type" disabled>
                     <option value="new_reservation" {{ 'selected' if reservation_detail.reservation_type == 'new_reservation' else '' }}>신규픽업</option>
                     <option value="restore_reservation" {{ 'selected' if reservation_detail.reservation_type == 'restore_reservation' else '' }}>재보관</option>
                     <option value="delivery_reservation" {{ 'selected' if reservation_detail.reservation_type == 'delivery_reservation' else '' }}>배송</option>
@@ -17,7 +17,7 @@
             </div>
             <div class="form-group col-lg-6">
                 <label>상태</label>
-                <select class="form-control" name="status">
+                <select class="form-control" name="status" disabled>
                     <option value="0" {{ 'selected' if reservation_detail.status == 0 else '' }}>대기</option>
                     <option value="1" {{ 'selected' if reservation_detail.status == 1 else '' }}>접수</option>
                 </select>
@@ -83,12 +83,39 @@
 
             <div class="form-group">
                 {% if reservation_detail.status == 0 %}
-                    <button type="button" class="btn btn-primary">접수</button>
+                    <button id="btnAccept" type="button" class="btn btn-primary">접수</button>
                 {% endif %}
                 <button type="submit" class="btn btn-warning">변경</button>
-                <button type="button" class="btn btn-danger">삭제</button>
+                {% if reservation_detail.status == 0 %}
+                    <button id="btnDelete" type="button" class="btn btn-danger">삭제</button>
+                {% endif %}
             </div>
         </form>
     </div>
 
+{% endblock %}
+{% block jscript %}
+    <script>
+        $(document).ready(function() {
+            $('#btnAccept').click(function() {
+                if (confirm('접수하시겠습니까?')) {
+                    $.ajax({
+                         type: "POST",
+                         url: "/admin/reservation/accept",
+                         data: {reservation_id: $('#inputReservationId').val()
+                         },
+                         success: function () {
+                            alert('접수되었습니다.');
+                             location.reload();
+                         },
+                         error: function(request, status, error) {
+                            var parsedBody = $.parseJSON(request.responseText);
+                            alert(parsedBody['message']);
+                         }
+                    });
+                }
+            });
+        });
+
+    </script>
 {% endblock %}
