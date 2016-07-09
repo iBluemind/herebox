@@ -123,6 +123,57 @@ def pickup_payment():
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
+
+        visit_time = VisitTime.query.get(user_order.visit_time)
+        pay_type = u'현장' if restore_reservation.pay_type == PayType.DIRECT else u'온라인'
+
+        parsed_goods_ids = ''
+        for single_goods in goods:
+            parsed_goods_ids += '%s ' % single_goods.goods_id
+
+        mail_msg_body = u"""
+            재보관 주문 정보입니다.
+            http://www.herebox.kr/admin/reservation/%s
+
+            스케줄번호: %s   회원: %s
+            주소: %s   연락처: %s
+            지불방법: %s
+
+            방문일자: %s   방문시간: %s
+            대상물품: %s   남긴말: %s
+            """ % (
+            new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+            current_user.name, restore_reservation.address, current_user.phone,
+            pay_type, user_order.visit_date, visit_time,
+            parsed_goods_ids, restore_reservation.user_memo
+        )
+
+        send_mail.apply_async(args=[u'재보관 주문 정보: %s' % new_visit_schedule.schedule_id,
+                                    mail_msg_body, 'contact@herebox.kr'])
+
+        if new_revisit_schedule:
+            revisit_time = VisitTime.query.get(user_order.revisit_time)
+
+            mail_msg_body = u"""
+                재보관 주문 정보입니다.
+                http://www.herebox.kr/admin/reservation/%s
+
+                스케줄번호: %s   회원: %s
+                주소: %s   연락처: %s
+                지불방법: %s
+
+                방문일자: %s   방문시간: %s
+                대상물품: %s   남긴말: %s
+                """ % (
+                new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+                current_user.name, restore_reservation.address, current_user.phone,
+                pay_type, user_order.revisit_date, revisit_time,
+                parsed_goods_ids, restore_reservation.user_memo
+            )
+
+            send_mail.apply_async(args=[u'[재방문] 재보관 주문 정보: %s' % new_revisit_schedule.schedule_id,
+                                        mail_msg_body, 'contact@herebox.kr'])
+
         return response_template(u'정상 처리되었습니다', 200)
     return render_template('pickup_payment.html', active_menu='reservation')
 
@@ -206,6 +257,35 @@ def delivery_payment(template):
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
+
+        visit_time = VisitTime.query.get(user_order.visit_time)
+        pay_type = u'현장' if delivery_reservation.pay_type == PayType.DIRECT else u'온라인'
+        delivery_option = u'만료' if user_order.delivery_option == DeliveryOption.EXPIRE else u'유지'
+        parsed_goods_ids = ''
+        for single_goods in goods:
+            parsed_goods_ids += '%s ' % single_goods.goods_id
+
+        mail_msg_body = u"""
+            배송 주문 정보입니다.
+            http://www.herebox.kr/admin/reservation/%s
+
+            스케줄번호: %s   회원: %s
+            주소: %s   연락처: %s
+            지불방법: %s
+
+            방문일자: %s   방문시간: %s
+            대상물품: %s   배송옵션: %s
+            남긴말: %s
+            """ % (
+            new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+            current_user.name, delivery_reservation.address, current_user.phone,
+            pay_type, user_order.visit_date, visit_time,
+            parsed_goods_ids, delivery_option, delivery_reservation.user_memo
+        )
+
+        send_mail.apply_async(args=[u'배송 주문 정보: %s' % new_visit_schedule.schedule_id,
+                                    mail_msg_body, 'contact@herebox.kr'])
+
         return response_template(u'정상 처리되었습니다', 200)
     return render_template(template, active_menu='reservation')
 
@@ -433,33 +513,61 @@ def reservation_payment(template):
         visit_time = VisitTime.query.get(user_order.visit_time)
         pay_type = u'현장' if new_reservation.pay_type == PayType.DIRECT else u'온라인'
 
-        binding_products = json.dumps(json.loads(new_reservation.binding_products))
-        mail_msg_body = u'%s / %s / %s / %s %s / 신규(방문) / %s / %s / %s / %s / %s / %s개월/ %s / %s ' % (
-                                       new_visit_schedule.schedule_id, current_user.name,
-                                       current_user.email,
-                                       user_order.visit_date, visit_time,
-                                       pay_type, new_reservation.address, current_user.phone,
-                                       new_reservation.standard_box_count,
-                                       new_reservation.nonstandard_goods_count, new_reservation.period,
-                                       binding_products,
-                                       new_reservation.user_memo)
+        parsed_binding_products = ''
+        binding_products = json.loads(new_reservation.binding_products)
+        for key in binding_products.keys():
+            parsed_binding_products += '%s: ' % key
+            parsed_binding_products += '%s ' % binding_products[key]
 
-        send_mail.apply_async(args=[u'%s 신규 주문 정보' % new_visit_schedule.schedule_id,
+        mail_msg_body = u"""
+        신규 주문 정보입니다.
+        http://www.herebox.kr/admin/reservation/%s
+
+        스케줄번호: %s   회원: %s
+        주소: %s   연락처: %s
+        지불방법: %s
+
+        방문일자: %s   방문시간: %s
+        규격물품: %s   비규격물품: %s
+        포장용품: %s   기간: %s
+        남긴말: %s
+        """ % (
+            new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+            current_user.name, new_reservation.address, current_user.phone,
+            pay_type, user_order.visit_date, visit_time,
+            new_reservation.standard_box_count,
+            new_reservation.nonstandard_goods_count, parsed_binding_products,
+            new_reservation.period, new_reservation.user_memo
+        )
+
+        send_mail.apply_async(args=[u'신규 주문 정보: %s' % new_visit_schedule.schedule_id,
                                     mail_msg_body, 'contact@herebox.kr'])
 
         if new_revisit_schedule:
             revisit_time = VisitTime.query.get(user_order.revisit_time)
 
-            mail_msg_body = u'%s / %s / %s / %s %s / 신규(재방문) / %s / %s / %s / %s / %s / %s개월 / %s ' % (
-                                           new_revisit_schedule.schedule_id, current_user.name,
-                                           current_user.email,
-                                           user_order.revisit_date, revisit_time,
-                                           pay_type, new_reservation.address, current_user.phone,
-                                           new_reservation.standard_box_count,
-                                           new_reservation.nonstandard_goods_count, new_reservation.period,
-                                           new_reservation.user_memo)
+            mail_msg_body = u"""
+                [재방문] 신규 주문 정보입니다.
+                http://www.herebox.kr/admin/reservation/%s
 
-            send_mail.apply_async(args=[u'%s 신규 주문 정보' % new_revisit_schedule.schedule_id,
+                스케줄번호: %s   회원: %s
+                주소: %s   연락처: %s
+                지불방법: %s
+
+                방문일자: %s   방문시간: %s
+                규격물품: %s   비규격물품: %s
+                포장용품: %s   기간: %s
+                남긴말: %s
+                """ % (
+                new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+                current_user.name, new_reservation.address, current_user.phone,
+                pay_type, user_order.revisit_date, revisit_time,
+                new_reservation.standard_box_count,
+                new_reservation.nonstandard_goods_count, parsed_binding_products,
+                new_reservation.period, new_reservation.user_memo
+            )
+
+            send_mail.apply_async(args=[u'[재방문] 신규 주문 정보: %s' % new_revisit_schedule.schedule_id,
                                     mail_msg_body, 'contact@herebox.kr'])
 
         return response_template(u'정상 처리되었습니다', 200)
