@@ -24,11 +24,11 @@
             </div>
             <div class="form-group col-lg-6">
                 <label>연락처</label>
-                <input class="form-control" value="{{ reservation_detail.contact }}">
+                <input class="form-control" name="contact" value="{{ reservation_detail.contact }}">
             </div>
             <div class="form-group col-lg-12">
                 <label>주소</label>
-                <input class="form-control" value="{{ reservation_detail.address }}">
+                <input class="form-control" name="address" value="{{ reservation_detail.address }}">
             </div>
             <div class="form-group col-lg-12">
                 <label>남긴 말</label>
@@ -87,6 +87,22 @@
                          success: function () {
                             alert('접수되었습니다.');
                              location.reload();
+                         },
+                         error: function(request, status, error) {
+                            var parsedBody = $.parseJSON(request.responseText);
+                            alert(parsedBody['message']);
+                         }
+                    });
+                }
+            });
+            $('#btnDelete').click(function() {
+                if (confirm('삭제하시겠습니까?')) {
+                    $.ajax({
+                         type: "DELETE",
+                         url: window.location.pathname,
+                         success: function () {
+                            alert('삭제되었습니다.');
+                             location.href='/admin/restore_reservations/1';
                          },
                          error: function(request, status, error) {
                             var parsedBody = $.parseJSON(request.responseText);
