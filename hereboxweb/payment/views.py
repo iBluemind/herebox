@@ -142,7 +142,7 @@ def pickup_payment():
             방문일자: %s   방문시간: %s
             대상물품: %s   남긴말: %s
             """ % (
-            new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+            restore_reservation.reservation_id, new_visit_schedule.schedule_id,
             current_user.name, restore_reservation.address, current_user.phone,
             pay_type, user_order.visit_date, visit_time,
             parsed_goods_ids, restore_reservation.user_memo
@@ -155,7 +155,7 @@ def pickup_payment():
             revisit_time = VisitTime.query.get(user_order.revisit_time)
 
             mail_msg_body = u"""
-                재보관 주문 정보입니다.
+                [재방문] 재보관 주문 정보입니다.
                 http://www.herebox.kr/admin/reservation/%s
 
                 스케줄번호: %s   회원: %s
@@ -165,7 +165,7 @@ def pickup_payment():
                 방문일자: %s   방문시간: %s
                 대상물품: %s   남긴말: %s
                 """ % (
-                new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+                restore_reservation.reservation_id, new_visit_schedule.schedule_id,
                 current_user.name, restore_reservation.address, current_user.phone,
                 pay_type, user_order.revisit_date, revisit_time,
                 parsed_goods_ids, restore_reservation.user_memo
@@ -277,7 +277,7 @@ def delivery_payment(template):
             대상물품: %s   배송옵션: %s
             남긴말: %s
             """ % (
-            new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+            delivery_reservation.reservation_id, new_visit_schedule.schedule_id,
             current_user.name, delivery_reservation.address, current_user.phone,
             pay_type, user_order.visit_date, visit_time,
             parsed_goods_ids, delivery_option, delivery_reservation.user_memo
@@ -532,7 +532,7 @@ def reservation_payment(template):
         포장용품: %s   기간: %s
         남긴말: %s
         """ % (
-            new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+            new_reservation.reservation_id, new_visit_schedule.schedule_id,
             current_user.name, new_reservation.address, current_user.phone,
             pay_type, user_order.visit_date, visit_time,
             new_reservation.standard_box_count,
@@ -559,7 +559,7 @@ def reservation_payment(template):
                 포장용품: %s   기간: %s
                 남긴말: %s
                 """ % (
-                new_visit_schedule.schedule_id, new_visit_schedule.schedule_id,
+                new_reservation.reservation_id, new_visit_schedule.schedule_id,
                 current_user.name, new_reservation.address, current_user.phone,
                 pay_type, user_order.revisit_date, revisit_time,
                 new_reservation.standard_box_count,
