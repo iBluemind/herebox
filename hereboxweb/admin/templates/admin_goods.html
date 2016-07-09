@@ -5,7 +5,7 @@
         <form method="post">
             <div class="form-group col-lg-6">
                 <label>관리번호</label>
-                <input class="form-control" value="{{ goods_detail.goods_id }}" disabled>
+                <input id="inputGoodsId" class="form-control" value="{{ goods_detail.goods_id }}" disabled>
             </div>
             <div class="form-group col-lg-6">
                 <label>물품종류</label>
@@ -52,10 +52,33 @@
             {% endif %}
 
             <div class="form-group">
+                <button id="btnExpire" type="button" class="btn btn-danger">만료</button>
                 <button type="submit" class="btn btn-warning">변경</button>
-                <button type="button" class="btn btn-danger">삭제</button>
             </div>
         </form>
     </div>
 
+{% endblock %}
+{% block jscript %}
+    <script>
+        $(document).ready(function() {
+            $('#btnExpire').click(function() {
+                if (confirm('만료처리하시겠습니까?')) {
+                    $.ajax({
+                         type: "DELETE",
+                         url: window.location.pathname,
+                         success: function () {
+                            alert('만료처리되었습니다.');
+                             location.href='/admin/goods_list/1';
+                         },
+                         error: function(request, status, error) {
+                            var parsedBody = $.parseJSON(request.responseText);
+                            alert(parsedBody['message']);
+                         }
+                    });
+                }
+            });
+        });
+
+    </script>
 {% endblock %}
