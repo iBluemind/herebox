@@ -30,8 +30,8 @@
                 <input class="form-control" value="{{ schedule_detail.reservation.reservation_id }}" disabled>
             </div>
             <div class="form-group col-lg-6">
-                <label>방문일짜</label>
-                <input class="form-control" value="{{ schedule_detail.schedule_date }}">
+                <label>방문일자</label>
+                <input class="form-control" name="visit_date" value="{{ schedule_detail.schedule_date }}">
             </div>
             <div class="form-group col-lg-6">
                 <label>방문시간</label>
@@ -48,8 +48,8 @@
 
             <div class="form-group">
                 {% if schedule_detail.status == 0 %}
-                    <button id="btnAddGoods" type="button" class="btn btn-default">물품추가</button>
-                    {% if register_goods_popup %}<button id="btnComplete" type="button" class="btn btn-primary">완료</button>{% endif %}
+                    {% if register_goods_popup %}<button id="btnAddGoods" type="button" class="btn btn-default">물품추가</button>{% endif %}
+                    <button id="btnComplete" type="button" class="btn btn-primary">완료</button>
                 {% endif %}
                 <button type="submit" class="btn btn-warning">변경</button>
                 {% if schedule_detail.status == 0 %}
@@ -80,6 +80,23 @@
 
             $('#btnComplete').click(function() {
                 completeSchedule();
+            });
+
+            $('#btnDelete').click(function() {
+                if (confirm('삭제하시겠습니까?')) {
+                    $.ajax({
+                         type: "DELETE",
+                         url: window.location.pathname,
+                         success: function () {
+                            alert('삭제되었습니다.');
+                             location.href='/admin/schedules/1';
+                         },
+                         error: function(request, status, error) {
+                            var parsedBody = $.parseJSON(request.responseText);
+                            alert(parsedBody['message']);
+                         }
+                    });
+                }
             });
         });
 

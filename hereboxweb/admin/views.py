@@ -31,23 +31,69 @@ BOXES_PER_PAGE = 10
 GOODS_PER_PAGE = 10
 
 
-@admin.route('/goods/<goods_id>', methods=['GET', 'POST'])
+
+@admin.route('/goods/<goods_id>', methods=['GET', 'POST', 'DELETE'])
 @staff_required
 def goods_detail(goods_id):
     goods = Goods.query.filter(Goods.goods_id==goods_id).first()
     if goods.goods_id.startswith('A'):
         goods.box = Box.query.get(goods.box_id)
 
+    if request.method == 'POST':
+        goods_type = request.form.get('goods_type')
+        status = request.form.get('status')
+        in_store = request.form.get('in_store')
+        memo = request.form.get('memo')
+        started_at = request.form.get('started_at')
+
+        if goods_type and goods.goods_type != goods_type:
+            goods.goods_type = goods_type
+        if status and goods.status != status:
+            goods.status = status
+        if in_store and goods.in_store != in_store:
+            goods.in_store = in_store
+        if memo and goods.memo != memo:
+            goods.memo = memo
+        if started_at and goods.started_at != started_at:
+            goods.started_at = started_at
+
+        try:
+            database.session.commit()
+        except:
+            return response_template(u'문제가 발생했습니다.', status=500)
+
+    if request.method == 'DELETE':
+        database.session.delete(goods)
+        try:
+            database.session.commit()
+            return redirect(url_for('admin.goods_list'))
+        except:
+            return response_template(u'문제가 발생했습니다.', status=500)
+
     return render_template('admin_goods.html', page_title=u'물품',
                                page_subtitle='Goods',
                            goods_detail=goods)
 
 
-@admin.route('/schedule/<schedule_id>', methods=['GET', 'POST'])
+@admin.route('/schedule/<schedule_id>', methods=['GET', 'POST', 'DELETE'])
 @staff_required
 def schedule_detail(schedule_id):
     schedule = Schedule.query.filter(Schedule.schedule_id==schedule_id).first()
     schedule.parsed_schedule_time = VisitTime.query.get(schedule.schedule_time_id)
+
+    if request.method == 'POST':
+        visit_date = request.form.get('visit_date')
+        if visit_date and schedule.schedule_date != visit_date:
+            schedule.schedule_date = visit_date
+        database.session.commit()
+
+    if request.method == 'DELETE':
+        database.session.delete(schedule)
+        try:
+            database.session.commit()
+            return redirect(url_for('admin.schedules'))
+        except:
+            return response_template(u'문제가 발생했습니다.', status=500)
 
     reservation = schedule.reservation
     if reservation.reservation_id.startswith(ReservationType.PICKUP_NEW):
@@ -151,9 +197,25 @@ def schedules(page):
     )
 
 
-@admin.route('/reservation/<reservation_id>', methods=['GET', 'POST'])
+@admin.route('/reservation/<reservation_id>', methods=['GET', 'POST', 'DELETE'])
 @staff_required
 def reservation_detail(reservation_id):
+    reservation = None
+    def change_reservation():
+        if request.method == 'POST':
+            contact = request.form.get('contact')
+            address = request.form.get('address')
+
+            if contact and reservation.contact != contact:
+                reservation.contact = contact
+            if address and reservation.address != address:
+                reservation.address = address
+
+            try:
+                database.session.commit()
+            except:
+                return response_template(u'오류가 발생했습니다.', status=500)
+
     if reservation_id.startswith(ReservationType.PICKUP_NEW):
         reservation = NewReservation.query.filter(Reservation.reservation_id==reservation_id).first()
 
@@ -170,6 +232,25 @@ def reservation_detail(reservation_id):
         reservation.parsed_delivery_time = VisitTime.query.get(reservation.delivery_time)
         reservation.parsed_recovery_time = VisitTime.query.get(reservation.recovery_time)
 
+        if request.method == 'POST':
+            standard_box_count = request.form.get('standard_box_count')
+            nonstandard_goods_count = request.form.get('nonstandard_goods_count')
+
+            if standard_box_count and reservation.standard_box_count != int(standard_box_count):
+                reservation.standard_box_count = int(standard_box_count)
+            if nonstandard_goods_count and reservation.nonstandard_goods_count != int(nonstandard_goods_count):
+                reservation.nonstandard_goods_count = int(nonstandard_goods_count)
+
+        change_reservation()
+
+        if request.method == 'DELETE':
+            database.session.delete(reservation)
+            try:
+                database.session.commit()
+                return redirect(url_for('admin.new_reservations'))
+            except:
+                return response_template(u'문제가 발생했습니다.', status=500)
+
         return render_template('admin_new_reservation.html', page_title=u'예약 정보',
                                page_subtitle='Reservation',
                                reservation_detail=reservation)
@@ -180,6 +261,16 @@ def reservation_detail(reservation_id):
         reservation.parsed_recovery_time = VisitTime.query.get(reservation.recovery_time)
         reservation.parsed_revisit_option = 'Y' if reservation.revisit_option == RevisitOption.LATER else 'N'
 
+        change_reservation()
+
+        if request.method == 'DELETE':
+            database.session.delete(reservation)
+            try:
+                database.session.commit()
+                return redirect(url_for('admin.restore_reservations'))
+            except:
+                return response_template(u'문제가 발생했습니다.', status=500)
+
         return render_template('admin_restore_reservation.html', page_title=u'예약 정보',
                                page_subtitle='Reservation',
                                reservation_detail=reservation)
@@ -189,10 +280,19 @@ def reservation_detail(reservation_id):
         reservation.parsed_delivery_time = VisitTime.query.get(reservation.delivery_time)
         reservation.parsed_delivery_option = 'Y' if reservation.delivery_option == ReservationDeliveryType.RESTORE else 'N'
 
+        change_reservation()
+
+        if request.method == 'DELETE':
+            database.session.delete(reservation)
+            try:
+                database.session.commit()
+                return redirect(url_for('admin.delivery_reservations'))
+            except:
+                return response_template(u'문제가 발생했습니다.', status=500)
+
         return render_template('admin_delivery_reservation.html', page_title=u'예약 정보',
                                page_subtitle='Reservation',
                                reservation_detail=reservation)
-
 
 @admin.route('/user/<int:user_id>', methods=['GET', 'POST'])
 @staff_required
