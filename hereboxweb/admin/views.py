@@ -388,7 +388,7 @@ def new_reservations(page):
 def admin_index():
     today = datetime.date.today()
     reservations_today = Reservation.query.filter(Reservation.created_at >= today).count()
-    goods_expired_today = Goods.query.filter(Goods.expired_at >= today).count()
+    goods_expired_today = Goods.query.filter(Goods.expired_at <= today).count()
     user_join_today = User.query.filter(User.created_at >= today).count()
     used_box_today = Box.query.filter(Box.status == BoxStatus.UNAVAILABLE).count()
 
@@ -507,6 +507,9 @@ def register_goods():
     started_at = request.form.get('started_at')
 
     box = None
+    if goods_type not in (GoodsType.STANDARD_BOX, GoodsType.NONSTANDARD_GOODS):
+        return response_template(u'잘못된 규격입니다', status=400)
+
     if goods_type == GoodsType.STANDARD_BOX:
         box = Box.query.filter(Box.box_id == box_id, Box.status == BoxStatus.AVAILABLE).first()
         if not box:
@@ -514,7 +517,10 @@ def register_goods():
 
         box.status = BoxStatus.UNAVAILABLE
 
-    started_at = datetime.datetime.strptime(started_at, "%Y-%m-%d")
+    try:
+        started_at = datetime.datetime.strptime(started_at, "%Y-%m-%d")
+    except:
+        return response_template(u'잘못된 날짜형식입니다.', status=400)
 
     user_id = reservation.user_id
     expired_at = add_months(started_at, reservation.period)
@@ -532,11 +538,15 @@ def register_goods():
                       status=GoodsStatus.ACTIVE)
 
     database.session.add(new_goods)
+    reservation.goods.append(new_goods)
+
+    try:
+        database.session.commit()
+    except:
+        return response_template(u'오류가 발생했습니다.', status=500)
 
     if goods_type == GoodsType.STANDARD_BOX:
         box.goods_id = new_goods.id
-
-    reservation.goods.append(new_goods)
 
     try:
         database.session.commit()
