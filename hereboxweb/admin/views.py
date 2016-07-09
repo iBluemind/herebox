@@ -63,10 +63,13 @@ def goods_detail(goods_id):
             return response_template(u'문제가 발생했습니다.', status=500)
 
     if request.method == 'DELETE':
-        database.session.delete(goods)
+        if goods.box_id != None:
+            box = Box.query.get(goods.box_id)
+            box.goods_id = None
+            box.status = BoxStatus.AVAILABLE
+        goods.status = GoodsStatus.EXPIRED
         try:
             database.session.commit()
-            return redirect(url_for('admin.goods_list'))
         except:
             return response_template(u'문제가 발생했습니다.', status=500)
 
