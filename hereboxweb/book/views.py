@@ -9,7 +9,7 @@ from hereboxweb import response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book
 from hereboxweb.book.stuffs import save_stuffs, get_stuffs
-
+from hereboxweb.schedule.reservation import REGULAR_ITEM_PRICE, IRREGULAR_ITEM_PRICE
 
 STUFF_LIST_MAX_COUNT = 10
 
@@ -83,9 +83,9 @@ def extended_review():
         for goods_id in old_estimate_info.keys():
             if type(new_estimate_info[goods_id]) is int:
                 if goods_id.startswith('B'):
-                    total_price += (9900 * new_estimate_info[goods_id])
+                    total_price += (IRREGULAR_ITEM_PRICE * new_estimate_info[goods_id])
                 else:
-                    total_price += (7500 * new_estimate_info[goods_id])
+                    total_price += (REGULAR_ITEM_PRICE * new_estimate_info[goods_id])
             else:
                 del new_estimate_info[goods_id]
 

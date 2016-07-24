@@ -58,28 +58,28 @@ def initialize_db():
     # database.drop_all()
     database.create_all()
 
-    database.session.add(VisitTime(start_time='10:00', end_time='12:00'))
-    database.session.add(VisitTime(start_time='12:00', end_time='14:00'))
-    database.session.add(VisitTime(start_time='14:00', end_time='16:00'))
-    database.session.add(VisitTime(start_time='16:00', end_time='18:00'))
-    database.session.add(VisitTime(start_time='18:00', end_time='20:00'))
-    database.session.add(VisitTime(start_time='20:00', end_time='22:00'))
-    database.session.add(User(email='contact@herebox.kr', name='구본준', status=UserStatus.ADMIN,
-                              password='akswhddk8', phone='01064849686'))
-
-    promotion = Promotion(u'첫 달 무료', u'첫달무료 10개 한정 프로모션', PromotionType.ALLOW_TO_ALL, '2016-05-31')
-    database.session.add(promotion)
-
-    from hereboxweb.book.models import Box, BoxStatus, InStoreStatus
-    for i in xrange(1, 10):
-        database.session.add(Box(box_id='1A%03d' % i, in_store=InStoreStatus.IN_STORE,
-                                                        status=BoxStatus.AVAILABLE))
-
-    database.session.commit()
-
-    promotion_code = PromotionCode("HELLOHB", promotion.id)
-    database.session.add(promotion_code)
-    database.session.commit()
+    # database.session.add(VisitTime(start_time='10:00', end_time='12:00'))
+    # database.session.add(VisitTime(start_time='12:00', end_time='14:00'))
+    # database.session.add(VisitTime(start_time='14:00', end_time='16:00'))
+    # database.session.add(VisitTime(start_time='16:00', end_time='18:00'))
+    # database.session.add(VisitTime(start_time='18:00', end_time='20:00'))
+    # database.session.add(VisitTime(start_time='20:00', end_time='22:00'))
+    # database.session.add(User(email='contact@herebox.kr', name='구본준', status=UserStatus.ADMIN,
+    #                           password='akswhddk8', phone='01064849686'))
+    #
+    # promotion = Promotion(u'첫 달 무료', u'첫달무료 10개 한정 프로모션', PromotionType.ALLOW_TO_ALL, '2016-05-31')
+    # database.session.add(promotion)
+    #
+    # from hereboxweb.book.models import Box, BoxStatus, InStoreStatus
+    # for i in xrange(1, 10):
+    #     database.session.add(Box(box_id='1A%03d' % i, in_store=InStoreStatus.IN_STORE,
+    #                                                     status=BoxStatus.AVAILABLE))
+    #
+    # database.session.commit()
+    #
+    # promotion_code = PromotionCode("HELLOHB", promotion.id)
+    # database.session.add(promotion_code)
+    # database.session.commit()
 
 
 def staff_required(func):

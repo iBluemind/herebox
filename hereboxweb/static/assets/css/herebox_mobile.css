@@ -661,6 +661,10 @@ dl, ul, ol, menu, li {
   text-align: center;
 }
 
+.item-box img {
+  max-width:100%;
+}
+
 .my-stuff-item .item-box h2 {
   font-size: 20px;
   color: #212121;

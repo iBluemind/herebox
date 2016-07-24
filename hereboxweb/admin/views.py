@@ -18,18 +18,60 @@ from hereboxweb.auth.models import User, UserStatus
 from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsStatus, BoxStatus
 from hereboxweb.payment.models import Purchase
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus, NewReservation, \
-    ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType
+    ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType, \
+    ExtendPeriod, ExtendPeriodStatus
 from hereboxweb.schedule.reservation import RevisitOption
 from hereboxweb.utils import add_months, staff_required
 
 
-USERS_PER_PAGE = 10
-RESERVATIONS_PER_PAGE = 10
-SCHEDULES_PER_PAGE = 10
+USERS_PER_PAGE = 15
+RESERVATIONS_PER_PAGE = 15
+SCHEDULES_PER_PAGE = 15
 PURCHASES_PER_PAGE = 10
-BOXES_PER_PAGE = 10
-GOODS_PER_PAGE = 10
+BOXES_PER_PAGE = 15
+GOODS_PER_PAGE = 15
+EXTEND_PERIOD_PER_PAGE = 10
 
+
+@admin.route('/extend-period/<int:extend_period_id>', methods=['PUT'])
+@staff_required
+def extend_period(extend_period_id):
+    extend_period = ExtendPeriod.query.filter(ExtendPeriod.id==extend_period_id).first()
+
+    extend_period.status = ExtendPeriodStatus.ACCEPTED
+    extend_period.goods.expired_at = add_months(extend_period.goods.expired_at, extend_period.amount)
+
+    try:
+        database.session.commit()
+    except:
+        return response_template(u'문제가 발생했습니다.', status=500)
+    return response_template(u'처리되었습니다', status=200)
+
+
+@admin.route('/extend-periods/<int:page>', methods=['GET'])
+@staff_required
+def extend_period_list(page):
+    paginate = ExtendPeriod.query.filter(ExtendPeriod.status==ExtendPeriodStatus.WAITING)\
+        .order_by(ExtendPeriod.created_at.desc())\
+        .paginate(page, EXTEND_PERIOD_PER_PAGE, False)
+
+    return render_template('admin_extend_period_list.html', page_title=u'기간연장',
+                                                    page_subtitle='Extend Period',
+                                            pagination=paginate
+    )
+
+
+@admin.route('/old-extend-periods/<int:page>', methods=['GET'])
+@staff_required
+def old_extend_period_list(page):
+    paginate = ExtendPeriod.query.filter(ExtendPeriod.status==ExtendPeriodStatus.ACCEPTED)\
+        .order_by(ExtendPeriod.created_at.desc())\
+        .paginate(page, EXTEND_PERIOD_PER_PAGE, False)
+
+    return render_template('admin_old_extend_period_list.html', page_title=u'지난 기간연장',
+                                                    page_subtitle='Old Extend Period',
+                                            pagination=paginate
+    )
 
 
 @admin.route('/goods/<goods_id>', methods=['GET', 'POST', 'DELETE'])

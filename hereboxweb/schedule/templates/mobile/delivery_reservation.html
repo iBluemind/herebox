@@ -4,7 +4,7 @@
     <div class="container">
 
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/m-4-step-1.png') }}">
+            <img src="{{ url_for('static', filename='assets/img/m-4-step-1.png') }}" style="max-width:100%;">
         </div>
 
         <div class="row" style="margin-top: 60px; margin-left: 0; margin-right: 0;">
@@ -78,10 +78,10 @@
             </div>
             <div style="margin: 30px 30px;">
                 <div>
-                    <div style="float: left; width: 68%;">
+                    <div style="float: left; width: 54%;">
                         <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요">
                     </div>
-                    <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="height: 34px; float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 6px 4px;">우편번호 찾기</button>
+                    <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="height: 34px; float: left; margin-left: 5px; width: 42%; font-size: 14px; padding: 6px 4px;">우편번호 찾기</button>
                 </div>
                 <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" value="{{ address1 }}">
                 <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" value="{{ address2 }}">

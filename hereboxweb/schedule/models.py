@@ -397,3 +397,25 @@ class PromotionHistory(database.Model, JsonSerializable):
         self.code = code
         self.created_at = datetime.datetime.now()
 
+
+class ExtendPeriodStatus(object):
+    WAITING = 0
+    ACCEPTED = 1
+
+
+class ExtendPeriod(database.Model):
+
+    __tablename__ = 'extend_period'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    amount = database.Column(database.Integer, nullable=False)
+    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
+    status = database.Column(database.SmallInteger, default=ExtendPeriodStatus.WAITING)
+    created_at = database.Column(database.DateTime)
+
+    def __init__(self, amount, goods_id, status):
+        self.amount = amount
+        self.goods_id = goods_id
+        self.status = status
+        self.created_at = datetime.datetime.now()
+

@@ -95,6 +95,7 @@ class Goods(database.Model, JsonSerializable):
     expired_at = database.Column(database.Date)
     created_at = database.Column(database.DateTime)
     updated_at = database.Column(database.DateTime)
+    extend_periods = database.relationship('ExtendPeriod', backref='goods', lazy='dynamic')
 
     def __init__(self, goods_type, name, memo, in_store, status, user_id, fixed_rate,
                                 started_at=None, expired_at=None, box_id=None):

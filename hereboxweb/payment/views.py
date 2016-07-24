@@ -16,7 +16,7 @@ from hereboxweb.payment.models import *
 from hereboxweb.schedule.delivery import calculate_total_delivery_price, DeliverySerializableFactory, DeliveryOption
 from hereboxweb.schedule.models import NewReservation, ReservationStatus, Schedule, \
     ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation, PromotionCode, \
-    PromotionHistory, Promotion
+    PromotionHistory, Promotion, ExtendPeriod, ExtendPeriodStatus
 from hereboxweb.schedule.purchase_step import CookieSerializableStoreManager, PurchaseStepManager
 from hereboxweb.schedule.reservation import ReservationSerializableFactory, calculate_total_price, PeriodOption, \
     RevisitOption, IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE
@@ -29,6 +29,7 @@ pay_types = {
     'card': PayType.CARD,
     'phone': PayType.PHONE,
     'kakao': PayType.KAKAOPAY,
+    'account': PayType.ACCOUNT,
 }
 
 
@@ -344,23 +345,31 @@ def extended_payment():
             Goods.goods_id.in_(estimate_info.keys())
         ).limit(10).all()
 
-        packed_stuffs = []
         for item in stuffs:
-            item.expired_at = add_months(item.expired_at, estimate_info[item.goods_id])
-            packed_stuffs.append(item)
+            new_extend_period = None
+            if pay_types[user_pay_type] is PayType.ACCOUNT:
+                new_extend_period = ExtendPeriod(estimate_info[item.goods_id],
+                                                 item.id, ExtendPeriodStatus.WAITING)
+            else:
+                #TODO: PG사 API로부터 결제 성공 여부 확인 후 아래 작업을 수행하도록 추가 구현해야 함.
+                new_extend_period = ExtendPeriod(estimate_info[item.goods_id],
+                                                 item.id, ExtendPeriodStatus.ACCEPTED)
+                item.expired_at = add_months(item.expired_at, estimate_info[item.goods_id])
 
-        if len(packed_stuffs) == 0:
-            return response_template(u'잘못된 요청입니다.', status=400)
+            if new_extend_period:
+                database.session.add(new_extend_period)
 
-        purchase = Purchase(
-            status=PurchaseStatus.NORMAL,
-            amount=total_price,
-            pay_type=pay_types[user_pay_type],
-            user_id=current_user.uid
-        )
+        # 무통장 입금 처리는 어드민에서 연장 버튼 누를 시 자동 처리
+        if pay_types[user_pay_type] is not PayType.ACCOUNT:
+            purchase = Purchase(
+                status=PurchaseStatus.NORMAL,
+                amount=total_price,
+                pay_type=pay_types[user_pay_type],
+                user_id=current_user.uid
+            )
+            database.session.add(purchase)
 
         try:
-            database.session.add(purchase)
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', status=500)
