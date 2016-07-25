@@ -158,6 +158,11 @@
         </div>
     </footer>
 
+    <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
+
+    {% block jscript %}{% endblock %}
+
     <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM59LG"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -202,10 +207,5 @@
         }
       })();
     </script>
-
-    <script src="{{ url_for('static', filename='libs/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='assets/js/ie10-viewport-bug-workaround.js') }}"></script>
-
-    {% block jscript %}{% endblock %}
   </body>
 </html>
