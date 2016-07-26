@@ -443,16 +443,20 @@ dl, ul, ol, menu, li {
   overflow: hidden;
 }
 
-.main-feature .row h1 {
+.main-feature h1 {
   font-size: 16px;
   color: #212121;
 }
 
-.main-feature .row p {
-  font-size: 10px;
+.main-feature h2 {
+  font-size: 14px;
   color: #212121;
 }
 
+.main-feature p {
+  font-size: 10px;
+  color: #212121;
+}
 
 .main-feature .feature-items {
   display: inline-block;
@@ -466,26 +470,16 @@ dl, ul, ol, menu, li {
   margin: 30px 18px;
 }
 
-.main-feature h2 {
-  font-size: 14px;
-  color: #212121;
-}
-
-.main-feature p {
-  font-size: 10px;
-  color: #212121;
-}
-
 .main-review {
   padding-bottom: 0;
 }
 
-.main-review .row h1 {
+.main-review h1 {
   font-size: 16px;
   color: #212121;
 }
 
-.main-review .row p {
+.main-review p {
   font-size: 10px;
   color: #212121;
 }
