@@ -638,6 +638,10 @@ dl, ul, ol, menu, li {
   overflow: hidden;
 }
 
+.main-feature p {
+  font-size: 20px;
+}
+
 .main-feature .row h1 {
   font-size: 32px;
   color: #212121;
@@ -672,6 +676,10 @@ dl, ul, ol, menu, li {
 
 .main-review {
   padding-bottom: 40px;
+}
+
+.main-review p {
+  font-size: 20px;
 }
 
 .main-review .row .item {

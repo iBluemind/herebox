@@ -326,9 +326,10 @@ dl, ul, ol, menu, li {
 }
 
 .main-index {
-  height: 360px; padding-top: 30px;
-  background: #fff url('/static/assets/img/bg.png') no-repeat center bottom;
-  background-size: 767px;
+  padding: 0;
+  height: 250px;
+  background: #fff url('/static/assets/img/m-bg.png') no-repeat center bottom;
+  background-size: 100%;
   color: #727272;
 }
 
@@ -341,7 +342,7 @@ dl, ul, ol, menu, li {
 }
 
 .main-index button {
-  margin-top: 40px;
+  margin-top: 10px;
 }
 
 .main-easy {
