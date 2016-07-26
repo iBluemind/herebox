@@ -1,6 +1,6 @@
 body {
   font-family: 'Nanum Barun Gothic', sans-serif;
-  padding-top: 90px;
+  padding-top: 80px;
 }
 
 body,
@@ -167,12 +167,12 @@ fieldset[disabled] .btn-hbsub.active {
 }
 
 .btn-hb {
-  color: #FFC107;
-  background-color: #FFFFFF;
+  color: #FFFFFF;
+  background-color: #FFC107;
   border-color: #FFC107;
 
   font-size: 18px;
-  padding: 16px 49px 16px 49px;
+  padding: 12px 49px 12px 49px;
   border-radius: 25px;
 }
 
@@ -181,8 +181,8 @@ fieldset[disabled] .btn-hbsub.active {
 .btn-hb:active,
 .btn-hb.active,
 .open .dropdown-toggle.btn-hb {
-  color: #FFC107;
-  background-color: #FFECB3;
+  color: #FFFFFF;
+  background-color: #E5AD06;
   border-color: #FFC107;
 }
 
@@ -326,11 +326,13 @@ dl, ul, ol, menu, li {
 }
 
 .main-index {
-  padding: 0;
   height: 250px;
-  background: #fff url('/static/assets/img/m-bg.png') no-repeat center bottom;
-  background-size: 100%;
-  color: #727272;
+  background: #fff url('/static/assets/img/bg.png') no-repeat center center;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  color: #FFFFFF;
 }
 
 .main-index h1 {
@@ -474,15 +476,29 @@ dl, ul, ol, menu, li {
   color: #212121;
 }
 
-.main-review {
-  background: #E39129 url('/static/assets/img/m-img-review.png') no-repeat left top;
-  background-size: auto;
-  height: 180px;
+.main-review .row h1 {
+  font-size: 16px;
+  color: #212121;
+}
+
+.main-review .row p {
+  font-size: 10px;
+  color: #212121;
 }
 
 .main-review .review {
-  position: relative;
-  top: 30%;
+  margin-top: 40px;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+
+.main-review .review img {
+  max-width: 100%;
+}
+
+.main-review .review .item p {
+  text-align: left;
+  margin-top: 10px;
 }
 
 .main-review .review .content {
