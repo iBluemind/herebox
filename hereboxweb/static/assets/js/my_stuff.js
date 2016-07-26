@@ -42,25 +42,24 @@ $(document).ready(function () {
     });
 
     $("#btnExtend").click(function () {
-        // var selectedStuffs = [];
-        // $('.my-herebox-stuff-checkbox input:checked').each(function() {
-        //     selectedStuffs.push($(this).attr('name'));
-        // });
-        //
-        // $.ajax({
-        //      type: "POST",
-        //      url: "/extended/estimate",
-        //      data: {stuffIds: JSON.stringify(selectedStuffs)
-        //      },
-        //      success: function () {
-        //         location.href = '/extended/estimate'
-        //      },
-        //      error: function(request, status, error) {
-        //         var parsedBody = $.parseJSON(request.responseText);
-        //         alert(parsedBody['message']);
-        //      }
-        // });
-        alert("기간 연장은 고객센터로 신청해주세요.");
+        var selectedStuffs = [];
+        $('.my-herebox-stuff-checkbox input:checked').each(function() {
+            selectedStuffs.push($(this).attr('name'));
+        });
+
+        $.ajax({
+             type: "POST",
+             url: "/extended/estimate",
+             data: {stuffIds: JSON.stringify(selectedStuffs)
+             },
+             success: function () {
+                location.href = '/extended/estimate'
+             },
+             error: function(request, status, error) {
+                var parsedBody = $.parseJSON(request.responseText);
+                alert(parsedBody['message']);
+             }
+        });
     });
 
     $(".btn-extend-single").each(function() {

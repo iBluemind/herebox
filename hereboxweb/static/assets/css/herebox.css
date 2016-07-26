@@ -521,7 +521,10 @@ dl, ul, ol, menu, li {
 .main-index {
   height: 640px;
   background: #fff url('/static/assets/img/bg.png') no-repeat center center;
-  background-size: 100%;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
   color: #FFFFFF;
 }
 
