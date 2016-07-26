@@ -27,6 +27,7 @@
     "iscroll": "^5.2.0",
     "Flot": "flot#^0.8.3",
     "components-font-awesome": "^4.6.3",
-    "morris.js": "^0.5.1"
+    "morris.js": "^0.5.1",
+    "slick-carousel": "^1.6.0"
   }
 }

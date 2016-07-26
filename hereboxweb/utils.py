@@ -159,6 +159,8 @@ def compress():
     assets.register('herebox_js', herebox_js)
     introduce_js = Bundle('assets/js/introduce.js', filters='jsmin', output='gen/introduce.min.js')
     assets.register('introduce_js', introduce_js)
+    introduce_mobile_js = Bundle('assets/js/mobile/introduce.js', filters='jsmin', output='gen/introduce_mobile.min.js')
+    assets.register('introduce_mobile_js', introduce_mobile_js)
     login_js = Bundle('assets/js/login.js', filters='jsmin', output='gen/login.min.js')
     assets.register('login_js', login_js)
     my_info_js = Bundle('assets/js/my_info.js', filters='jsmin', output='gen/my_info.min.js')

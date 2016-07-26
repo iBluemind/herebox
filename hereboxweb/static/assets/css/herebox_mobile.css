@@ -476,6 +476,10 @@ dl, ul, ol, menu, li {
   color: #212121;
 }
 
+.main-review {
+  padding-bottom: 0;
+}
+
 .main-review .row h1 {
   font-size: 16px;
   color: #212121;
