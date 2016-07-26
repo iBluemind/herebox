@@ -449,10 +449,13 @@ pay_status = [u'완료', u'미완료']
 @login_required
 @mobile_template('{mobile/}reservation_receipt.html')
 def reservation_receipt(template, reservation_id):
+    if not reservation_id:
+        return render_template('404.html')
+
     entity = with_polymorphic(Reservation, NewReservation)
     reservation = database.session.query(entity).join(Purchase, User). \
         filter(Reservation.reservation_id == reservation_id).first()
-    if not reservation_id:
+    if not reservation:
         return render_template('404.html')
 
     if current_user.uid != reservation.user.uid:
