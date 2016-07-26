@@ -5,7 +5,7 @@ body {
 body,
 .navbar-fixed-top {
   min-width: 1200px;
-  padding-top: 90px;
+  padding-top: 80px;
 }
 
 a:hover,
@@ -14,6 +14,8 @@ a:focus {
   color: inherit;
   text-decoration: none;
 }
+
+.chromeframe{text-align:center;padding:20px;margin-top:20px;margin-bottom:0;border-bottom: 1px solid #777;}
 
 .navbar-herebox {
   background-color: #fff;
@@ -353,8 +355,8 @@ fieldset[disabled] .btn-hbsub.active {
 }
 
 .btn-hb {
-  color: #FFC107;
-  background-color: #FFFFFF;
+  color: #FFFFFF;
+  background-color: #FFC107;
   border-color: #FFC107;
 
   font-size: 18px;
@@ -367,8 +369,8 @@ fieldset[disabled] .btn-hbsub.active {
 .btn-hb:active,
 .btn-hb.active,
 .open .dropdown-toggle.btn-hb {
-  color: #FFC107;
-  background-color: #FFECB3;
+  color: #FFFFFF;
+  background-color: #E5AD06;
   border-color: #FFC107;
 }
 
@@ -512,16 +514,15 @@ dl, ul, ol, menu, li {
 .section {
   text-align: center;
   min-height: 360px;
-  padding: 60px 0;
+  padding: 130px 0;
   font-family: 'Nanum Barun Gothic Light', sans-serif;
 }
 
 .main-index {
-  height: 550px;
-  padding: 30px auto 0 auto;
-  background: #fff url('/static/assets/img/bg.png') no-repeat center bottom;
+  height: 640px;
+  background: #fff url('/static/assets/img/bg.png') no-repeat center center;
   background-size: 100%;
-  color: #727272;
+  color: #FFFFFF;
 }
 
 .main-index h1 {
@@ -666,31 +667,26 @@ dl, ul, ol, menu, li {
 }
 
 .main-review {
-  background: #E39129 url('/static/assets/img/img-review.png') no-repeat left top;
-  background-size: auto;
-  height: 500px;
+  padding-bottom: 40px;
 }
 
-.main-review .review {
-  position: relative;
-  top: 30%;
+.main-review .row .item {
+  padding: 0;
 }
 
-.main-review .review .content {
+.main-review .row .item p {
+  display: inline-block;
+  width: 450px;
+  text-align: left;
   font-family: "Nanum Barun Gothic Light", sans-serif;
-  color: #fff;
-  font-size: 26px;
-}
-
-.main-review .review .author {
-  font-family: "Nanum Barun Gothic Light", sans-serif;
-  color: #fff;
-  font-size: 18px;
+  color: #212121;
+  font-size: 14px;
+  margin: 0;
 }
 
 .main-try .try {
   position: relative;
-  top: 50px;
+  top: 40px;
 }
 
 .main-try .try p {

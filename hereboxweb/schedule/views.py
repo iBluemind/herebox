@@ -455,6 +455,9 @@ def reservation_receipt(template, reservation_id):
     if not reservation_id:
         return render_template('404.html')
 
+    if current_user.uid != reservation.user.uid:
+        return render_template('403.html')
+
     promotion_name = None
     promotion_code = PromotionCode.query.filter(PromotionCode.code == reservation.promotion).first()
     if promotion_code:
