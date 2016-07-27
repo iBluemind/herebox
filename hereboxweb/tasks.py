@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from flask.ext.mail import Message
+from flask_mail import Message
 import coolsms
 from celery import Celery
 from config import RABBIT_MQ_USER, RABBIT_MQ_HOST, RABBIT_MQ_PASSWORD, RABBIT_MQ_PORT, RABBIT_MQ_VHOST, COOLSMS_API_KEY, \

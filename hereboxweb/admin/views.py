@@ -4,7 +4,7 @@
 import datetime
 
 from flask import request, render_template, make_response, url_for, redirect, flash, json
-from flask.ext.login import login_user
+from flask_login import login_user
 from sqlalchemy import or_
 from sqlalchemy.orm import aliased
 

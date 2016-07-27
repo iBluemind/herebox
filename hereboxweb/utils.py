@@ -85,7 +85,7 @@ def initialize_db():
 def staff_required(func):
     from functools import wraps
     from flask import current_app
-    from flask.ext.login import current_user
+    from flask_login import current_user
     from hereboxweb.auth.models import UserStatus
 
     @wraps(func)
@@ -127,7 +127,7 @@ class RequiredIf(Required):
 
 
 def compress():
-    from flask.ext.assets import Bundle
+    from flask_assets import Bundle
     from hereboxweb import assets
 
     herebox_css = Bundle('assets/css/herebox.css', filters='cssmin', output='gen/herebox.min.css')
@@ -203,8 +203,8 @@ def build_compressed_assets():
 
 
 def upload_to_s3():
-    from flask.ext.s3 import create_all
+    from flask_s3 import create_all
     from hereboxweb import app
-    create_all(app)
+    create_all(app, filepath_filter_regex=r'^(assets|gen|libs|resource|fonts)')
 
 

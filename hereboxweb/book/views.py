@@ -3,8 +3,8 @@
 
 import json
 from flask import request, render_template, make_response, redirect, url_for
-from flask.ext.login import login_required, current_user
-from flask.ext.mobility.decorators import mobile_template
+from flask_login import login_required, current_user
+from flask_mobility.decorators import mobile_template
 from hereboxweb import response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book

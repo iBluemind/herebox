@@ -2,7 +2,7 @@
 
 
 import datetime
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from hereboxweb import database, login_manager
 from hereboxweb.utils import JsonSerializable

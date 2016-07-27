@@ -2,8 +2,8 @@
 import re
 
 from flask import redirect, url_for, render_template, request
-from flask.ext.login import current_user
-from flask.ext.mobility.decorators import mobile_template
+from flask_login import current_user
+from flask_mobility.decorators import mobile_template
 
 from config import response_template
 from hereboxweb import app, database, bad_request

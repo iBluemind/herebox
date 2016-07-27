@@ -2,8 +2,8 @@
 
 
 from flask import request, render_template, redirect, url_for, make_response, session, escape, jsonify
-from flask.ext.login import login_required, current_user
-from flask.ext.mobility.decorators import mobile_template
+from flask_login import login_required, current_user
+from flask_mobility.decorators import mobile_template
 from sqlalchemy import or_, func
 from sqlalchemy.orm import aliased
 from hereboxweb import response_template, bad_request, forbidden

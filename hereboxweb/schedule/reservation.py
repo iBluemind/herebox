@@ -3,7 +3,7 @@
 import datetime
 import re
 from flask import escape, session
-from flask.ext.login import current_user
+from flask_login import current_user
 from hereboxweb.schedule.purchase_step import UserInputSerializable, UserInputSerializableFactory
 
 
