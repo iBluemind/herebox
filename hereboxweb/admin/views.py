@@ -2,20 +2,17 @@
 
 
 import datetime
-
 from flask import request, render_template, make_response, url_for, redirect, flash, json
 from flask_login import login_user
 from sqlalchemy import or_
-from sqlalchemy.orm import aliased
-
 from config import RSA_PUBLIC_KEY_BASE64
-from hereboxweb import database, response_template, bad_request
+from hereboxweb import database, response_template
 from hereboxweb.admin import admin
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.forms import LoginForm
 from hereboxweb.auth.login import HereboxLoginHelper
 from hereboxweb.auth.models import User, UserStatus
-from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsStatus, BoxStatus
+from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsStatus, BoxStatus, Incoming, Outgoing
 from hereboxweb.payment.models import Purchase
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus, NewReservation, \
     ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType, \
@@ -99,6 +96,9 @@ def goods_detail(goods_id):
         if started_at and goods.started_at != started_at:
             goods.started_at = started_at
 
+        incoming_history = Incoming(goods.id)
+        database.session.add(incoming_history)
+
         try:
             database.session.commit()
         except:
@@ -110,6 +110,9 @@ def goods_detail(goods_id):
             box.goods_id = None
             box.status = BoxStatus.AVAILABLE
         goods.status = GoodsStatus.EXPIRED
+        outgoing_history = Outgoing(goods.id)
+        database.session.add(outgoing_history)
+
         try:
             database.session.commit()
         except:
@@ -640,6 +643,8 @@ def complete_schedule():
                 goods.status = GoodsStatus.EXPIRED
             else:
                 goods.in_store = InStoreStatus.OUT_OF_STORE
+        outgoing_history = Outgoing(goods.id)
+        database.session.add(outgoing_history)
 
     schedule.status = ScheduleStatus.COMPLETE
     schedule.updated_at = datetime.datetime.now()

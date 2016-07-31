@@ -288,61 +288,6 @@ class Schedule(database.Model, JsonSerializable):
         return '%s%s' % (reservation.reservation_id, postfix)
 
 
-class CompletedSchedule(database.Model, JsonSerializable):
-
-    __tablename__ = 'completed_schedule'
-
-    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    purchase_id = database.Column(database.Integer,
-                                  database.ForeignKey('purchase.id'), nullable=True)
-    staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
-    reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('reservation.id'), nullable=True)
-    scheduled_at = database.Column(database.DateTime)       # 예약된 시간
-    created_at = database.Column(database.DateTime)         # 완료된 시간
-
-    def __init__(self, purchase_id, staff_id, customer_id, goods_id, scheduled_at,
-                                            reservation_id=None):
-        self.purchase_id = purchase_id
-        self.staff_id = staff_id
-        self.customer_id = customer_id
-        self.goods_id = goods_id
-        self.reservation_id = reservation_id
-        self.scheduled_at = scheduled_at
-        self.created_at = datetime.datetime.now()
-
-
-class CanceledSchedule(database.Model, JsonSerializable):
-
-    __tablename__ = 'canceled_schedule'
-
-    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    purchase_id = database.Column(database.Integer,
-                                  database.ForeignKey('purchase.id'), nullable=True)
-    staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=False)
-    reason = database.Column(database.Text)
-    reservation_type = database.Column(database.String(50))
-    reservation_id = database.Column(database.Integer,
-                                     database.ForeignKey('reservation.id'), nullable=True)
-    scheduled_at = database.Column(database.DateTime)   # 예약된 시간
-    created_at = database.Column(database.DateTime)     # 취소된 시간
-
-    def __init__(self, purchase_id, staff_id, customer_id, goods_id, reason, scheduled_at,
-                                                        reservation_id=None):
-        self.purchase_id = purchase_id
-        self.staff_id = staff_id
-        self.customer_id = customer_id
-        self.goods_id = goods_id
-        self.reason = reason
-        self.reservation_id = reservation_id
-        self.scheduled_at = scheduled_at
-        self.created_at = datetime.datetime.now()
-
-
 class PromotionType(object):
     ALLOW_TO_ALL = 0                # 모두에게 허용
     USER_SPECIFIC = 1               # 특정인에게만 허용
