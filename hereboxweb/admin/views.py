@@ -16,7 +16,7 @@ from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsSt
 from hereboxweb.payment.models import Purchase
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus, NewReservation, \
     ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType, \
-    ExtendPeriod, ExtendPeriodStatus
+    ExtendPeriod, ExtendPeriodStatus, PromotionCode
 from hereboxweb.schedule.reservation import RevisitOption
 from hereboxweb.utils import add_months, staff_required
 
@@ -304,6 +304,10 @@ def reservation_detail(reservation_id):
 
         reservation.parsed_delivery_time = VisitTime.query.get(reservation.delivery_time)
         reservation.parsed_recovery_time = VisitTime.query.get(reservation.recovery_time)
+
+        promotion_code = PromotionCode.query.filter(PromotionCode.code == reservation.promotion).first()
+        if promotion_code:
+            reservation.promotion_name = promotion_code.promotion.name
 
         if request.method == 'POST':
             standard_box_count = request.form.get('standard_box_count')
