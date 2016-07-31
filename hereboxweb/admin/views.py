@@ -307,7 +307,8 @@ def reservation_detail(reservation_id):
 
         promotion_code = PromotionCode.query.filter(PromotionCode.code == reservation.promotion).first()
         if promotion_code:
-            reservation.promotion_name = promotion_code.promotion.name
+            reservation.promotion_name = u'%s(%s)' % (promotion_code.promotion.name,
+                                                      reservation.promotion)
 
         if request.method == 'POST':
             standard_box_count = request.form.get('standard_box_count')
