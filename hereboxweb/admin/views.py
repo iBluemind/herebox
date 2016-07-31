@@ -28,6 +28,31 @@ PURCHASES_PER_PAGE = 10
 BOXES_PER_PAGE = 15
 GOODS_PER_PAGE = 15
 EXTEND_PERIOD_PER_PAGE = 10
+INCOMINGS_PER_PAGE = 30
+
+
+@admin.route('/outgoing/<int:page>', methods=['GET'])
+@staff_required
+def outgoing_history(page=1):
+    paginate = Outgoing.query.join(Goods)  \
+        .order_by(Outgoing.created_at.desc()) \
+        .paginate(page, INCOMINGS_PER_PAGE, False)
+
+    return render_template('admin_outgoing_history.html', page_title=u'출고기록',
+                           page_subtitle='Outgoing History',
+                           pagination=paginate)
+
+
+@admin.route('/incoming/<int:page>', methods=['GET'])
+@staff_required
+def incoming_history(page=1):
+    paginate = Incoming.query.join(Goods) \
+        .order_by(Incoming.created_at.desc()) \
+        .paginate(page, INCOMINGS_PER_PAGE, False)
+
+    return render_template('admin_incoming_history.html', page_title=u'입고기록',
+                           page_subtitle='Incoming History',
+                           pagination=paginate)
 
 
 @admin.route('/extend-period/<int:extend_period_id>', methods=['PUT'])
@@ -620,6 +645,9 @@ def complete_schedule():
             goods_count = len(reservation.goods)
             if goods_count == 0:
                 return response_template(u'%s 주문에 등록된 물품이 없습니다!' % reservation.reservation_id, status=400)
+            for goods in reservation.goods:
+                incoming_history = Incoming(goods.id)
+                database.session.add(incoming_history)
             schedules = reservation.schedules
             for schedule in schedules:
                 if schedule.schedule_type == ScheduleType.PICKUP_DELIVERY or \
@@ -632,6 +660,13 @@ def complete_schedule():
                      schedule.schedule_id.endswith('_1')):
             for goods in reservation.goods:
                 goods.in_store = InStoreStatus.IN_STORE
+                incoming_history = Incoming(goods.id)
+                database.session.add(incoming_history)
+            schedules = reservation.schedules
+            for schedule in schedules:
+                if schedule.schedule_type == ScheduleType.RESTORE_DELIVERY or \
+                                schedule.schedule_type == ScheduleType.RESTORE_RECOVERY:
+                    schedule.status = ScheduleStatus.COMPLETE
 
     elif reservation.reservation_id.startswith(ReservationType.DELIVERY):
         for goods in reservation.goods:
@@ -643,8 +678,8 @@ def complete_schedule():
                 goods.status = GoodsStatus.EXPIRED
             else:
                 goods.in_store = InStoreStatus.OUT_OF_STORE
-        outgoing_history = Outgoing(goods.id)
-        database.session.add(outgoing_history)
+            outgoing_history = Outgoing(goods.id)
+            database.session.add(outgoing_history)
 
     schedule.status = ScheduleStatus.COMPLETE
     schedule.updated_at = datetime.datetime.now()

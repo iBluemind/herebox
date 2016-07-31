@@ -1,0 +1,30 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+    <div class="row">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>물품 관리번호</th>
+                        <th>입고날짜</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     {% for item in pagination.items %}
+                     <tr>
+                        <td><a href="/admin/goods/{{ item.goods.goods_id }}">{{ item.goods.goods_id }}</a></td>
+                        <td>{{ item.created_at }}</td>
+                     </tr>
+                     {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="text-center">
+            {% from "admin_pagination.html" import render_pagination %}
+            {{ render_pagination(pagination, 'admin.incoming_history') }}
+        </nav>
+    </div>
+
+{% endblock %}
