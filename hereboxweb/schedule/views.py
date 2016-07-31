@@ -14,9 +14,9 @@ from hereboxweb.schedule import schedule
 from hereboxweb.schedule.delivery import calculate_total_delivery_price, \
     DeliverySerializableFactory, DeliveryOption
 from hereboxweb.schedule.models import *
+from hereboxweb.schedule.price import calculate_storage_price, calculate_total_price
 from hereboxweb.schedule.purchase_step import PurchaseStepManager, CookieSerializableStoreManager
-from hereboxweb.schedule.reservation import calculate_storage_price, calculate_total_price, \
-    ReservationSerializableFactory, RevisitOption, PeriodOption
+from hereboxweb.schedule.reservation import ReservationSerializableFactory, RevisitOption, PeriodOption
 from sqlalchemy.orm import with_polymorphic
 
 SCHEDULE_LIST_MAX_COUNT = 10
@@ -84,16 +84,15 @@ def estimate(template):
         user_estimate = estimate_manager.get(request.cookies)
         if user_estimate:
             return make_response(render_template(template, active_menu='reservation',
-                                                 regular_item_count=user_estimate.regular_item_count,
-                                                 irregular_item_count=user_estimate.irregular_item_count,
-                                                 period=user_estimate.period,
-                                                 period_option=user_estimate.period_option,
-                                                 binding_product0_count=user_estimate.binding_product0_count,
-                                                 binding_product1_count=user_estimate.binding_product1_count,
-                                                 binding_product2_count=user_estimate.binding_product2_count,
-                                                 binding_product3_count=user_estimate.binding_product3_count,
-                                                 promotion=user_estimate.promotion)
-                                 )
+                             regular_item_count=user_estimate.regular_item_count,
+                             irregular_item_count=user_estimate.irregular_item_count,
+                             period=user_estimate.period,
+                             period_option=user_estimate.period_option,
+                             binding_product0_count=user_estimate.binding_product0_count,
+                             binding_product1_count=user_estimate.binding_product1_count,
+                             binding_product2_count=user_estimate.binding_product2_count,
+                             binding_product3_count=user_estimate.binding_product3_count,
+                             promotion=user_estimate.promotion))
         session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return render_template(template, active_menu='reservation')
     except KeyError as error:
@@ -197,25 +196,24 @@ def review(template):
         user_estimate.binding_product3_count)
 
     response = make_response(render_template(template, active_menu='reservation',
-                                             standard_box_count=user_estimate.regular_item_count,
-                                             nonstandard_goods_count=user_estimate.irregular_item_count,
-                                             period_option=True if user_estimate.period_option == PeriodOption.SUBSCRIPTION else False,
-                                             period=user_estimate.period,
-                                             binding_products={u'포장용 에어캡 1m': user_estimate.binding_product0_count,
-                                                               u'실리카겔 (제습제) 50g': user_estimate.binding_product1_count,
-                                                               u'압축팩 40cm x 60cm': user_estimate.binding_product2_count,
-                                                               u'테이프 48mm x 40m': user_estimate.binding_product3_count},
-                                             promotion=promotion_name,
-                                             total_price=u'{:,d}원'.format(total_price),
-                                             phone=user_order.phone_number,
-                                             address='%s %s' % (user_order.address1, user_order.address2),
-                                             visit_date=user_order.visit_date,
-                                             visit_time=visit_time,
-                                             revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
-                                             revisit_date=user_order.revisit_date,
-                                             revisit_time=revisit_time,
-                                             user_memo=user_order.user_memo)
-                             )
+                 standard_box_count=user_estimate.regular_item_count,
+                 nonstandard_goods_count=user_estimate.irregular_item_count,
+                 period_option=True if user_estimate.period_option == PeriodOption.SUBSCRIPTION else False,
+                 period=user_estimate.period,
+                 binding_products={u'포장용 에어캡 1m': user_estimate.binding_product0_count,
+                                   u'실리카겔 (제습제) 50g': user_estimate.binding_product1_count,
+                                   u'압축팩 40cm x 60cm': user_estimate.binding_product2_count,
+                                   u'테이프 48mm x 40m': user_estimate.binding_product3_count},
+                 promotion=promotion_name,
+                 total_price=u'{:,d}원'.format(total_price),
+                 phone=user_order.phone_number,
+                 address='%s %s' % (user_order.address1, user_order.address2),
+                 visit_date=user_order.visit_date,
+                 visit_time=visit_time,
+                 revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
+                 revisit_date=user_order.revisit_date,
+                 revisit_time=revisit_time,
+                 user_memo=user_order.user_memo))
     response.set_cookie('totalPrice', '%d' % (total_price), path='/reservation/')
     return response
 
@@ -292,14 +290,14 @@ def delivery_review(template):
     visit_time = VisitTime.query.get(user_order.visit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
     response = make_response(render_template(template, active_menu='reservation',
-                                             packed_stuffs=packed_stuffs,
-                                             delivery_option=u'재보관 가능' if user_order.delivery_option == DeliveryOption.RESTORE else u'보관 종료',
-                                             address=u'%s %s' % (user_order.address1, user_order.address2),
-                                             phone_number=user_order.phone_number,
-                                             visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
-                                             user_memo=user_order.user_memo,
-                                             total_price=u'{:,d}원'.format(total_price))
-                                            )
+         packed_stuffs=packed_stuffs,
+         delivery_option=u'재보관 가능' if user_order.delivery_option == DeliveryOption.RESTORE else u'보관 종료',
+         address=u'%s %s' % (user_order.address1, user_order.address2),
+         phone_number=user_order.phone_number,
+         visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
+         user_memo=user_order.user_memo,
+         total_price=u'{:,d}원'.format(total_price))
+        )
     response.set_cookie('totalPrice', '%d' % (total_price), path='/delivery/')
     return response
 
@@ -374,15 +372,15 @@ def pickup_review():
         revisit_time = VisitTime.query.get(user_order.revisit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
     response = make_response(render_template('pickup_review.html', active_menu='reservation',
-                                             packed_stuffs=packed_stuffs,
-                                             phone_number=user_order.phone_number,
-                                             address=u'%s %s' % (user_order.address1, user_order.address2),
-                                             visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
-                                             revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
-                                             revisit_date_time=u'%s %s' % (user_order.revisit_date, revisit_time),
-                                             user_memo=user_order.user_memo,
-                                             total_price=u'{:,d}원'.format(total_price))
-                                            )
+                         packed_stuffs=packed_stuffs,
+                         phone_number=user_order.phone_number,
+                         address=u'%s %s' % (user_order.address1, user_order.address2),
+                         visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
+                         revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
+                         revisit_date_time=u'%s %s' % (user_order.revisit_date, revisit_time),
+                         user_memo=user_order.user_memo,
+                         total_price=u'{:,d}원'.format(total_price))
+                        )
     response.set_cookie('totalPrice', '%d' % (total_price), path='/pickup/')
     return response
 
@@ -416,7 +414,8 @@ def cancel_schedule():
 @schedule.route('/promotion/<code>', methods=['GET'])
 @login_required
 def check_promotion(code):
-    promotion_code = PromotionCode.query.join(Promotion).filter(PromotionCode.code == func.binary(code)).first()
+    promotion_code = PromotionCode.query.join(Promotion).filter(
+        PromotionCode.code == func.binary(code)).first()
     if not promotion_code:
         return bad_request(u'유효하지 않는 프로모션입니다.')
 
@@ -424,12 +423,21 @@ def check_promotion(code):
     if today > promotion_code.promotion.expired_at:
         return forbidden(u'유효 기간이 지난 프로모션입니다.')
 
-    promotion_history = PromotionHistory.query.filter(PromotionHistory.code == promotion_code.id,
-                                            PromotionHistory.user_id == current_user.uid).first()
-    if promotion_history:
-        return forbidden(u'이미 사용한 적이 있는 프로모션입니다.')
+    promotion_histories = PromotionHistory.query.join(PromotionCode).filter(
+        PromotionHistory.user_id==current_user.uid)
+    for history in promotion_histories:
+        # 코드가 같을 경우
+        if history.promotion_code.id == promotion_code.id:
+            return forbidden(u'이미 사용한 적이 있는 프로모션입니다.')
+        # 프로모션 자체가 같을 경우
+        if history.promotion_code.promotion_id == promotion_code.promotion_id:
+            return forbidden(u'이미 사용한 적이 있는 프로모션입니다.')
 
-    response = jsonify(content = {'message': u'정상 처리되었습니다'})
+    promotion_obj = promotion_code.promotion
+    from hereboxweb.schedule.promotion import ApplyPromotionManager
+    apply_promotion = ApplyPromotionManager.apply(promotion_obj)
+
+    response = jsonify(content = {'message': u'사용할 수 있는 프로모션입니다.', 'url': apply_promotion.__url__})
     response.set_cookie('promotion', promotion_code.code, path='/reservation/')
     return response
 
@@ -509,17 +517,17 @@ def delivery_receipt(template, reservation_id):
     packed_stuffs = reservation.goods
 
     return render_template(template,
-                                     delivery_type=delivery_types[reservation.delivery_option],
-                                     packed_stuffs=packed_stuffs,
-                                     reservation_id=reservation_id,
-                                     pay_status=pay_status[reservation.purchase.status],
-                                     pay_type=pay_types[reservation.purchase.pay_type],
-                                     total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
-                                     phone=reservation.user.phone,
-                                     address='%s %s' % (reservation.user.address1, reservation.user.address2),
-                                     visit_date=reservation.delivery_date,
-                                     visit_time=visit_time,
-                                     user_memo=reservation.user_memo)
+                     delivery_type=delivery_types[reservation.delivery_option],
+                     packed_stuffs=packed_stuffs,
+                     reservation_id=reservation_id,
+                     pay_status=pay_status[reservation.purchase.status],
+                     pay_type=pay_types[reservation.purchase.pay_type],
+                     total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
+                     phone=reservation.user.phone,
+                     address='%s %s' % (reservation.user.address1, reservation.user.address2),
+                     visit_date=reservation.delivery_date,
+                     visit_time=visit_time,
+                     user_memo=reservation.user_memo)
 
 
 @schedule.route('/pickup/<reservation_id>', methods=['GET'])
@@ -540,19 +548,19 @@ def pickup_receipt(template, reservation_id):
     packed_stuffs = reservation.goods
 
     return render_template(template,
-                                     packed_stuffs=packed_stuffs,
-                                     reservation_id=reservation_id,
-                                     pay_status=pay_status[reservation.purchase.status],
-                                     pay_type=pay_types[reservation.purchase.pay_type],
-                                     total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
-                                     phone=reservation.user.phone,
-                                     address='%s %s' % (reservation.user.address1, reservation.user.address2),
-                                     visit_date=reservation.delivery_date,
-                                     visit_time=visit_time,
-                                     revisit_option=1 if reservation.revisit_option == RevisitOption.LATER else 0,
-                                     revisit_date=reservation.recovery_date,
-                                     revisit_time=revisit_time,
-                                     user_memo=reservation.user_memo)
+             packed_stuffs=packed_stuffs,
+             reservation_id=reservation_id,
+             pay_status=pay_status[reservation.purchase.status],
+             pay_type=pay_types[reservation.purchase.pay_type],
+             total_price=u'{:,d}원'.format(int(reservation.purchase.amount)),
+             phone=reservation.user.phone,
+             address='%s %s' % (reservation.user.address1, reservation.user.address2),
+             visit_date=reservation.delivery_date,
+             visit_time=visit_time,
+             revisit_option=1 if reservation.revisit_option == RevisitOption.LATER else 0,
+             revisit_date=reservation.recovery_date,
+             revisit_time=revisit_time,
+             user_memo=reservation.user_memo)
 
 
 

@@ -17,10 +17,11 @@ from hereboxweb.schedule.delivery import calculate_total_delivery_price, Deliver
 from hereboxweb.schedule.models import NewReservation, ReservationStatus, Schedule, \
     ScheduleStatus, ScheduleType, ReservationRevisitType, DeliveryReservation, RestoreReservation, PromotionCode, \
     PromotionHistory, Promotion, ExtendPeriod, ExtendPeriodStatus
+from hereboxweb.schedule.price import IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE, calculate_total_price
 from hereboxweb.schedule.purchase_step import CookieSerializableStoreManager, PurchaseStepManager
-from hereboxweb.schedule.reservation import ReservationSerializableFactory, calculate_total_price, PeriodOption, \
-    RevisitOption, IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE
-from hereboxweb.tasks import send_mms, send_mail
+from hereboxweb.schedule.reservation import ReservationSerializableFactory, PeriodOption, \
+    RevisitOption
+from hereboxweb.tasks import send_mail
 from hereboxweb.utils import add_months
 
 

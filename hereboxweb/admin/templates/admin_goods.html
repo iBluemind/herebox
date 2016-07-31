@@ -29,6 +29,10 @@
                 </select>
             </div>
             <div class="form-group col-lg-12">
+                <label>이름</label>
+                <input class="form-control" name="memo" value="{{ goods_detail.name or '' }}">
+            </div>
+            <div class="form-group col-lg-12">
                 <label>메모</label>
                 <input class="form-control" name="memo" value="{{ goods_detail.memo or '' }}">
             </div>

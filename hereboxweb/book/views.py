@@ -9,7 +9,7 @@ from hereboxweb import response_template
 from hereboxweb.book.models import *
 from hereboxweb.book import book
 from hereboxweb.book.stuffs import save_stuffs, get_stuffs
-from hereboxweb.schedule.reservation import REGULAR_ITEM_PRICE, IRREGULAR_ITEM_PRICE
+from hereboxweb.schedule.price import IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE
 
 STUFF_LIST_MAX_COUNT = 10
 

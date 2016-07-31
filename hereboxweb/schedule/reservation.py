@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import datetime
 import re
 from flask import escape, session
@@ -136,74 +137,3 @@ class ReservationSerializableFactory(UserInputSerializableFactory):
                 return reservation_serializable
         raise NotImplementedError()
 
-
-REGULAR_ITEM_PRICE = 7500
-IRREGULAR_ITEM_PRICE = 9900
-BINDING_PRODUCT_0_PRICE = 500
-BINDING_PRODUCT_1_PRICE = 500
-BINDING_PRODUCT_2_PRICE = 1500
-BINDING_PRODUCT_3_PRICE = 1000
-
-
-def apply_hellohb_promotion(regular_item_count, irregular_item_count, period):
-    total_storage_price = 0
-    discount_count = 10
-    discount_count = discount_count - irregular_item_count
-    if discount_count >= 0:
-        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * irregular_item_count * (period - 1))
-    else:
-        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * 10 * (period - 1))
-        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * (discount_count * -1) * period)
-
-    if discount_count > 0:
-        if regular_item_count > 0:
-            discount_count = discount_count - regular_item_count
-            if discount_count >= 0:
-                total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * regular_item_count * (period - 1))
-            else:
-                total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * 10 * (period - 1))
-                total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * (discount_count * -1) * period)
-    else:
-        total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * regular_item_count * period)
-
-    return total_storage_price
-
-
-def calculate_storage_price(regular_item_count, irregular_item_count, period_option, period, promotion=None):
-    total_storage_price = 0
-    if period_option == PeriodOption.SUBSCRIPTION:
-        # 매월 자동 결제일 경우!
-        total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * regular_item_count)
-        total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * irregular_item_count)
-    else:
-        if 'HELLOHB' == promotion:
-            total_storage_price = apply_hellohb_promotion(regular_item_count, irregular_item_count, period)
-        else:
-            total_storage_price = total_storage_price + (REGULAR_ITEM_PRICE * period * regular_item_count)
-            total_storage_price = total_storage_price + (IRREGULAR_ITEM_PRICE * period * irregular_item_count)
-    return total_storage_price
-
-
-def calculate_binding_products_price(binding_product0_count, binding_product1_count, binding_product2_count,
-                                        binding_product3_count):
-    total_binding_products_price = 0
-    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_0_PRICE * binding_product0_count
-    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_1_PRICE * binding_product1_count
-    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_2_PRICE * binding_product2_count
-    total_binding_products_price = total_binding_products_price + BINDING_PRODUCT_3_PRICE * binding_product3_count
-    return total_binding_products_price
-
-
-def calculate_total_price(regular_item_count, irregular_item_count, period, period_option, promotion,
-                          binding_product0_count, binding_product1_count, binding_product2_count,
-                          binding_product3_count):
-    total_storage_price = calculate_storage_price(regular_item_count, irregular_item_count,
-                                                  period_option,
-                                                  period, promotion)
-
-    total_binding_products_price = calculate_binding_products_price(binding_product0_count,
-                                                                        binding_product1_count,
-                                                                        binding_product2_count,
-                                                                        binding_product3_count)
-
-    return total_storage_price + total_binding_products_price

@@ -56,7 +56,7 @@ def initialize_db():
     from hereboxweb.schedule.models import PromotionType, PromotionCode, Promotion
 
     # database.drop_all()
-    database.create_all()
+    # database.create_all()
 
     # database.session.add(VisitTime(start_time='10:00', end_time='12:00'))
     # database.session.add(VisitTime(start_time='12:00', end_time='14:00'))
@@ -80,6 +80,33 @@ def initialize_db():
     # promotion_code = PromotionCode("HELLOHB", promotion.id)
     # database.session.add(promotion_code)
     # database.session.commit()
+
+    promotion = Promotion(u'5천원 할인', u'5천원 할인', PromotionType.ALLOW_TO_ALL, '2016-09-30')
+    database.session.add(promotion)
+    database.session.commit()
+    promotion_code1 = PromotionCode("HBIFG", promotion.id)
+    promotion_code2 = PromotionCode("BJLHJ", promotion.id)
+    promotion_code3 = PromotionCode("PRMHB", promotion.id)
+    promotion_code4 = PromotionCode("HBMBJ", promotion.id)
+    promotion_code5 = PromotionCode("HBMDH", promotion.id)
+    promotion_code6 = PromotionCode("STTMJ", promotion.id)
+    promotion_code7 = PromotionCode("STTJE", promotion.id)
+    promotion_code8 = PromotionCode("KDHLU", promotion.id)
+    promotion_code9 = PromotionCode("ROKAF", promotion.id)
+    promotion_code10 = PromotionCode("GGDGY", promotion.id)
+    promotion_code11 = PromotionCode("BHCJM", promotion.id)
+    database.session.add(promotion_code1)
+    database.session.add(promotion_code2)
+    database.session.add(promotion_code3)
+    database.session.add(promotion_code4)
+    database.session.add(promotion_code5)
+    database.session.add(promotion_code6)
+    database.session.add(promotion_code7)
+    database.session.add(promotion_code8)
+    database.session.add(promotion_code9)
+    database.session.add(promotion_code10)
+    database.session.add(promotion_code11)
+    database.session.commit()
 
 
 def staff_required(func):
@@ -188,6 +215,12 @@ def compress():
     find_pw_js = Bundle('assets/js/find_pw.js', filters='jsmin',
                                    output='gen/find_pw.min.js')
     assets.register('find_pw_js', find_pw_js)
+    promotion_hellohb_js = Bundle('assets/js/promotion/hellohb.js', filters='jsmin',
+                        output='gen/promotion_hellohb.min.js')
+    assets.register('promotion_hellohb_js', promotion_hellohb_js)
+    promotion_fivethousand_js = Bundle('assets/js/promotion/fivethousand.js', filters='jsmin',
+                        output='gen/promotion_fivethousand.min.js')
+    assets.register('promotion_fivethousand_js', promotion_fivethousand_js)
 
 
 def build_compressed_assets():

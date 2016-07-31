@@ -321,6 +321,7 @@ class PromotionCode(database.Model, JsonSerializable):
     code = database.Column(database.String(20))
     promotion_id = database.Column(database.Integer, database.ForeignKey('promotion.id'), nullable=False)
     created_at = database.Column(database.DateTime)
+    histories = database.relationship('PromotionHistory', backref='promotion_code', lazy='dynamic')
 
     def __init__(self, code, promotion_id):
         self.code = code
