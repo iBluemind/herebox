@@ -26,7 +26,7 @@ def calculate_storage_price(regular_item_count, irregular_item_count, period_opt
                 from hereboxweb.schedule.promotion import ApplyPromotionManager
                 apply_promotion = ApplyPromotionManager.apply(promotion_obj)
                 try:
-                    return apply_promotion.storage_price()
+                    return apply_promotion.storage_price(regular_item_count, irregular_item_count, period)
                 except NotImplementedError:
                     pass
         total_storage_price = REGULAR_ITEM_PRICE * period * regular_item_count
