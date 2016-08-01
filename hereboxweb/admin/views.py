@@ -107,6 +107,7 @@ def goods_detail(goods_id):
         goods_type = request.form.get('goods_type')
         status = request.form.get('status')
         in_store = request.form.get('in_store')
+        name = request.form.get('name')
         memo = request.form.get('memo')
         started_at = request.form.get('started_at')
 
@@ -116,6 +117,8 @@ def goods_detail(goods_id):
             goods.status = status
         if in_store and goods.in_store != in_store:
             goods.in_store = in_store
+        if name and goods.name != name:
+            goods.name = name
         if memo and goods.memo != memo:
             goods.memo = memo
         if started_at and goods.started_at != started_at:
