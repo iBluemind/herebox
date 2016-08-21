@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import re
+import cPickle
+from datetime import datetime, timedelta
+from uuid import uuid4
+from flask.sessions import SessionMixin, SessionInterface
 from sqlalchemy.sql import ClauseElement
+from werkzeug.datastructures import CallbackDict
 from wtforms.validators import Required
+from hereboxweb import RedisConnectHelper, RedisType
 
 
 class JsonSerializable(object):
@@ -239,5 +245,59 @@ def upload_to_s3():
     from flask_s3 import create_all
     from hereboxweb import app
     create_all(app, filepath_filter_regex=r'^(assets|gen|libs|resource|fonts)')
+
+
+class RedisSession(CallbackDict, SessionMixin):
+    def __init__(self, initial=None, sid=None):
+        CallbackDict.__init__(self, initial)
+        self.sid = sid
+        self.modified = False
+
+
+class RedisSessionInterface(SessionInterface):
+    def __init__(self):
+        sessions_redis_helper = RedisConnectHelper(RedisType.AUTH_SESSIONS_REDIS)
+        self.store = sessions_redis_helper.get_redis()
+        self.timeout = 3600
+
+    def open_session(self, app, request):
+        sid = request.cookies.get(app.session_cookie_name)
+
+        if sid:
+            stored_session = None
+            ssstr = self.store.get(sid)
+            if ssstr:
+                stored_session = cPickle.loads(ssstr)
+            if stored_session:
+                if stored_session.get('expiration') > datetime.utcnow():
+                    return RedisSession(initial=stored_session['data'],
+                                        sid=stored_session['sid'])
+
+        sid = str(uuid4())
+        return RedisSession(sid=sid)
+
+    def save_session(self, app, session, response):
+        domain = self.get_cookie_domain(app)
+
+        if not session:
+            response.delete_cookie(app.session_cookie_name, domain=domain)
+            return
+
+        if self.get_expiration_time(app, session):
+            expiration = self.get_expiration_time(app, session)
+        else:
+            expiration = datetime.utcnow() + timedelta(hours=1)
+
+        ssd = {
+            'sid': session.sid,
+            'data': session,
+            'expiration': expiration
+        }
+        ssstr = cPickle.dumps(ssd)
+        self.store.setex(session.sid, self.timeout, ssstr)
+
+        response.set_cookie(app.session_cookie_name, session.sid,
+                            expires=self.get_expiration_time(app, session),
+                            httponly=True, domain=domain)
 
 
