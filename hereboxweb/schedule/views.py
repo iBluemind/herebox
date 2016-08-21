@@ -463,14 +463,12 @@ def reservation_receipt(template, reservation_id):
     entity = with_polymorphic(Reservation, NewReservation)
     reservation = database.session.query(entity).join(Purchase, User). \
         filter(Reservation.reservation_id == reservation_id).first()
-    if not reservation:
+    if (not reservation) or (current_user.uid != reservation.user.uid):
         return render_template('404.html')
 
-    if current_user.uid != reservation.user.uid:
-        return render_template('403.html')
-
     promotion_name = None
-    promotion_code = PromotionCode.query.filter(PromotionCode.code == reservation.promotion).first()
+    promotion_code = PromotionCode.query.filter(PromotionCode.code ==
+                                                reservation.promotion).first()
     if promotion_code:
         promotion_name = promotion_code.promotion.name
 
