@@ -171,7 +171,7 @@ def schedule_detail(schedule_id):
         database.session.commit()
 
     if request.method == 'DELETE':
-        database.session.delete(schedule)
+        schedule.status = ScheduleStatus.CANCELED
         try:
             database.session.commit()
             return redirect(url_for('admin.schedules'))

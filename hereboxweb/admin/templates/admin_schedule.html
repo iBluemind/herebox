@@ -53,7 +53,7 @@
                 {% endif %}
                 <button type="submit" class="btn btn-warning">변경</button>
                 {% if schedule_detail.status == 0 %}
-                    <button id="btnDelete" type="button" class="btn btn-danger">삭제</button>
+                    <button id="btnCancel" type="button" class="btn btn-danger">취소</button>
                 {% endif %}
             </div>
         </form>
@@ -79,23 +79,14 @@
             }
 
             $('#btnComplete').click(function() {
-                completeSchedule();
+                if (confirm('이 스케줄을 완료시키겠습니까?')) {
+                    completeSchedule();
+                }
             });
 
-            $('#btnDelete').click(function() {
-                if (confirm('삭제하시겠습니까?')) {
-                    $.ajax({
-                         type: "DELETE",
-                         url: window.location.pathname,
-                         success: function () {
-                            alert('삭제되었습니다.');
-                             location.href='/admin/schedules/1';
-                         },
-                         error: function(request, status, error) {
-                            var parsedBody = $.parseJSON(request.responseText);
-                            alert(parsedBody['message']);
-                         }
-                    });
+            $('#btnCancel').click(function() {
+                if (confirm('이 스케줄을 취소시키겠습니까?')) {
+                    cancelSchedule();
                 }
             });
         });
@@ -130,6 +121,21 @@
                  success: function () {
                     alert('완료되었습니다.');
                      location.reload();
+                 },
+                 error: function(request, status, error) {
+                    var parsedBody = $.parseJSON(request.responseText);
+                    alert(parsedBody['message']);
+                 }
+            });
+        }
+
+        function cancelSchedule() {
+            $.ajax({
+                 type: "DELETE",
+                 url: window.location.pathname,
+                 success: function () {
+                    alert('취소시켰습니다.');
+                     location.href='/admin/schedules/1';
                  },
                  error: function(request, status, error) {
                     var parsedBody = $.parseJSON(request.responseText);
