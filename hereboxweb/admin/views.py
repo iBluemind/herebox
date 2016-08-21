@@ -110,6 +110,7 @@ def goods_detail(goods_id):
         name = request.form.get('name')
         memo = request.form.get('memo')
         started_at = request.form.get('started_at')
+        expired_at = request.form.get('expired_at')
 
         if goods_type and goods.goods_type != goods_type:
             goods.goods_type = goods_type
@@ -123,6 +124,12 @@ def goods_detail(goods_id):
             goods.memo = memo
         if started_at and goods.started_at != started_at:
             goods.started_at = started_at
+        if expired_at and goods.expired_at != expired_at:
+            expired_at = datetime.datetime.strptime(expired_at, '%Y-%m-%d').date()
+            extended_period = (expired_at - goods.expired_at) / 30
+            extend_period_history = ExtendPeriod(extended_period, goods.id, ExtendPeriodStatus.ACCEPTED)
+            goods.expired_at = expired_at
+            database.session.add(extend_period_history)
 
         incoming_history = Incoming(goods.id)
         database.session.add(incoming_history)
