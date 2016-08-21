@@ -210,7 +210,7 @@ def review(template):
                  address='%s %s' % (user_order.address1, user_order.address2),
                  visit_date=user_order.visit_date,
                  visit_time=visit_time,
-                 revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
+                 revisit_option=True if user_order.revisit_option == RevisitOption.LATER else False,
                  revisit_date=user_order.revisit_date,
                  revisit_time=revisit_time,
                  user_memo=user_order.user_memo))
@@ -376,7 +376,7 @@ def pickup_review():
                          phone_number=user_order.phone_number,
                          address=u'%s %s' % (user_order.address1, user_order.address2),
                          visit_date_time=u'%s %s' % (user_order.visit_date, visit_time),
-                         revisit_option=1 if user_order.revisit_option == RevisitOption.LATER else 0,
+                         revisit_option=True if user_order.revisit_option == RevisitOption.LATER else False,
                          revisit_date_time=u'%s %s' % (user_order.revisit_date, revisit_time),
                          user_memo=user_order.user_memo,
                          total_price=u'{:,d}원'.format(total_price))
@@ -494,7 +494,7 @@ def reservation_receipt(template, reservation_id):
                            address='%s %s' % (reservation.user.address1, reservation.user.address2),
                            visit_date=reservation.delivery_date,
                            visit_time=visit_time,
-                           revisit_option=1 if reservation.revisit_option == RevisitOption.LATER else 0,
+                           revisit_option=True if reservation.revisit_option == RevisitOption.LATER else False,
                            revisit_date=reservation.recovery_date,
                            revisit_time=revisit_time,
                            user_memo=reservation.user_memo)
@@ -557,7 +557,7 @@ def pickup_receipt(template, reservation_id):
              address='%s %s' % (reservation.user.address1, reservation.user.address2),
              visit_date=reservation.delivery_date,
              visit_time=visit_time,
-             revisit_option=1 if reservation.revisit_option == RevisitOption.LATER else 0,
+             revisit_option=True if reservation.revisit_option == RevisitOption.LATER else False,
              revisit_date=reservation.recovery_date,
              revisit_time=revisit_time,
              user_memo=reservation.user_memo)
