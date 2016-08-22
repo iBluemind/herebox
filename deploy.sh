@@ -26,7 +26,7 @@ cd $ROOT_DIR/app
 $GIT_PATH pull origin master
 
 $BOWER_PATH install
-$PIP_PATH -r requirements.txt
+$PIP_PATH install -r requirements.txt
 build_forge_min_js
 
 /bin/chown -R www-data:www-data $ROOT_DIR
