@@ -38,7 +38,7 @@
         <ul class="nav navbar-nav navbar-right">
           <li {% if active_menu == 'introduce' %}class="active"{% endif %}><a href="/introduce">소개</a></li>
           <li {% if active_menu == 'faq' %}class="active"{% endif %}><a href="/faq">자주하는 질문<span class="sr-only">(current)</span></a></li>
-          <li {% if active_menu == 'event' %}class="active"{% endif %}><a href="/event">이벤트</a></li>
+{#          <li {% if active_menu == 'event' %}class="active"{% endif %}><a href="/event">이벤트</a></li>#}
           <li {% if active_menu == 'reservation' %}class="active"{% endif %}><a href="/reservation/estimate">지금 예약하기</a></li>
           {% if current_user.is_authenticated %}
             <li class="dropdown">
@@ -148,7 +148,8 @@
             </div>
             <div class="copyright">
                 주식회사 히어박스 ©2016 Herebox.Inc. All Rights Reserved.<br>
-                대표 : 구본준 개인정보 책임자 : 강대형 사업자번호 : 188-81-00390 주소 : 서울특별시 중구 퇴계로36길 2 동국대학교충무로영상센터
+                대표 : 구본준 개인정보 &nbsp;&nbsp;&nbsp;책임자 : 강대형 &nbsp;&nbsp;&nbsp;사업자번호 : 188-81-00390
+                &nbsp;&nbsp;&nbsp;주소 : 서울특별시 중구 퇴계로36길 2 동국대학교충무로영상센터
             </div>
         </div>
     </footer>

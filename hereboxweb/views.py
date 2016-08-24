@@ -37,13 +37,15 @@ def event(template):
 
 
 @app.route('/privacy', methods=['GET'])
-def privacy():
-    return render_template('privacy.html')
+@mobile_template('{mobile/}privacy.html')
+def privacy(template):
+    return render_template(template, active_menu='privacy')
 
 
 @app.route('/terms', methods=['GET'])
-def terms():
-    return render_template('terms.html')
+@mobile_template('{mobile/}terms.html')
+def terms(template):
+    return render_template(template, active_menu='terms')
 
 
 @app.route('/alert_new_area', methods=['POST'])
