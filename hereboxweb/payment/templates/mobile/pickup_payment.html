@@ -1,10 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "mobile/base.html" %}
+{% block content %}
 
-</body>
-</html>
+    <div class="container">
+        <div style="margin: 40px 0 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/4-step-3.png') }}">
+        </div>
+        mobile
+        <div class="row" style="margin-top: 90px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-pay.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">결제 방법</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        원하시는 결제 방법을 선택하세요
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div style="float: right;">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="optionsPayType" id="optionsVisit" value="visit" checked>
+                            직원 방문 시 결제 (현금/카드)
+                        </label>
+                    </div>
+
+                    <div class="radio" style="margin-top: 30px;">
+                        <label>
+                            <input type="radio" name="optionsPayType" id="optionsCard" value="card" disabled>
+                            신용/체크 카드 (준비 중)
+                        </label>
+                    </div>
+
+                    <div class="radio" style="margin-top: 30px;">
+                        <label>
+                            <input type="radio" name="optionsPayType" id="optionsPhone" value="phone" disabled>
+                            핸드폰 (준비 중)
+                        </label>
+                    </div>
+
+                    <div class="radio" style="margin-top: 30px;">
+                        <label>
+                            <input type="radio" name="optionsPayType" id="optionsKakao" value="kakao" disabled>
+                            카카오페이 (준비 중)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin: 80px 0 100px 0; text-align: center;">
+            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    {% assets "pickup_payment_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+{% endblock %}

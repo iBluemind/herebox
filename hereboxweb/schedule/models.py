@@ -365,3 +365,15 @@ class ExtendPeriod(database.Model):
         self.status = status
         self.created_at = datetime.datetime.now()
 
+
+class UnavailableSchedule(database.Model):
+
+    __tablename__ = 'unavailable_schedule'
+
+    id = database.Column(database.INTEGER, primary_key=True, autoincrement=True)
+    date = database.Column(database.DATE)
+    schedule_time_id = database.Column(database.INTEGER, database.ForeignKey('visit_time.id'), nullable=False)
+
+    def __init__(self, date, schedule_time_id):
+        self.date = date
+        self.schedule_time_id = schedule_time_id

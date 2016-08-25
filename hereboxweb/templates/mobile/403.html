@@ -1,10 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "mobile/base.html" %}
+{% block content %}
 
-</body>
-</html>
+    <div class="container">
+
+        <p style="margin: 100px; font-size: 20px; text-align: center;">
+            권한이 없습니다.<br>
+            이 페이지에 접근할 수 있는 권한을 가지고 있지 않습니다!
+        </p>
+
+    </div>
+
+{% endblock %}

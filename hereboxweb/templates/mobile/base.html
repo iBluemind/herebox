@@ -59,7 +59,7 @@
           <li><a class="drawer-menu-item" href="/introduce" style="padding-top: 50px;">소개</a></li>
       {% endif %}
         <li><a class="drawer-menu-item" href="/faq">자주하는 질문</a></li>
-        <li><a class="drawer-menu-item" href="/event">이벤트</a></li>
+{#        <li><a class="drawer-menu-item" href="/event">이벤트</a></li>#}
         <li><a class="drawer-menu-item" href="/reservation/estimate">지금 예약하기</a></li>
         <li><div style="height: 1px; border: solid 1px #c4c4c4; margin: 30px 20px 30px 20px;"></div></li>
       {% if current_user.is_authenticated %}
@@ -96,7 +96,6 @@
                                 <img src="{{ url_for('static', filename='assets/img/m-icon-call.png') }}">
                                 1600-2964
                             </span>
-
                             <span>
                                 <a href="http://plus.kakao.com/home/l3tcgmkr" target="_blank">
                                     <img src="{{ url_for('static', filename='assets/img/m-icon-kt.png') }}">

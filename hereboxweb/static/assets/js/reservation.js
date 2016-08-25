@@ -108,15 +108,15 @@ $(document).ready(function() {
     if (orderInfo && orderInfo['optionsRevisit']) {
         var oldOptionsRevisit = orderInfo['optionsRevisit'];
         switch (oldOptionsRevisit) {
-             case 'immediate':
-                 $(":radio[id='optionsImmediate']").attr("checked", true);
-                 $(":radio[id='optionsLater']").attr("checked", false);
-                 break;
-             case 'later':
-                 $(":radio[id='optionsImmediate']").attr("checked", false);
-                 $(":radio[id='optionsLater']").attr("checked", true);
-                 break;
-         }
+            case 'immediate':
+                $(":radio[id='optionsImmediate']").attr("checked", true);
+                $(":radio[id='optionsLater']").attr("checked", false);
+                break;
+            case 'later':
+                $(":radio[id='optionsImmediate']").attr("checked", false);
+                $(":radio[id='optionsLater']").attr("checked", true);
+                break;
+        }
     }
     if (orderInfo && orderInfo['inputRevisitDate']) {
         $('#inputRevisitDate').val(orderInfo['inputRevisitDate']);
@@ -140,6 +140,43 @@ $(window).load(function() {
     location.href = '/';
 });
 
+
+function getAvailableTime(date){
+    var item = $(date);
+    var date = $(date).val(); // 2016-08-29
+    $.ajax({
+        type: "POST",
+        url: "/schedule/available",
+        data: {
+            date: date
+        },
+        success: function (times) {
+            var delivery_times = ['', '10:00-12:00', '12:00-14:00',
+                '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
+            var time_table = item.siblings()[0];
+            var options = $("#"+time_table.id).children(); // options
+
+            if(times=='None'){
+                for(var i=1; i<7; i++){
+                    $(options[i]).text(delivery_times[i])
+                    $(options[i]).removeAttr("disabled")
+                }
+            }else{
+                for(var j=1; j<7; j++){
+                    var obj = JSON.parse(times);
+                    if(obj[j]=='False'){
+                        $(options[j]).attr("disabled", true)
+                        $(options[j]).text(delivery_times[j] + ' : 주문 폭주')
+                    }
+                }
+            }
+        },
+        error: function(request, status, error) {
+        }
+    });
+}
+
+
 function go(dest) {
     var inputPhoneNumber = $('#inputPhoneNumber').val();
     var inputPostCode = $('#inputPostCode').val();
@@ -152,20 +189,20 @@ function go(dest) {
     var inputRevisitTime = $('#inputRevisitTime').val();
     var textareaMemo = $('#textareaMemo').val();
     $.ajax({
-         type: "POST",
-         url: "/reservation/" + dest,
-         data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
+        type: "POST",
+        url: "/reservation/" + dest,
+        data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
             inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputVisitDate: inputVisitDate,
-             inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
-             inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo
-         },
-         success: function () {
+            inputVisitTime: inputVisitTime, optionsRevisit: optionsRevisit, inputRevisitDate: inputRevisitDate,
+            inputRevisitTime: inputRevisitTime, textareaMemo: textareaMemo
+        },
+        success: function () {
             location.href = '/reservation/' + dest;
-         },
-         error: function(request, status, error) {
+        },
+        error: function(request, status, error) {
             var parsedBody = $.parseJSON(request.responseText);
             alert(parsedBody['message']);
-         }
+        }
     });
 }
 
@@ -212,7 +249,7 @@ function execDaumPostcode() {
             }
             // 건물명이 있고, 공동주택일 경우 추가한다.
             if(data.buildingName !== '' && data.apartment === 'Y'){
-               extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
             }
             // 도로명, 지번 조합형 주소가 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
             if(extraRoadAddr !== ''){

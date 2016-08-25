@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
+import json
+
 from flask import request, render_template, redirect, url_for, make_response, session, escape, jsonify
 from flask_login import login_required, current_user
 from flask_mobility.decorators import mobile_template
@@ -99,7 +101,6 @@ def estimate(template):
         return bad_request(error.message)
     except ValueError:
         return bad_request()
-
 
 
 @schedule.route('/reservation/order', methods=['GET', 'POST'])
@@ -561,4 +562,15 @@ def pickup_receipt(template, reservation_id):
              user_memo=reservation.user_memo)
 
 
-
+@schedule.route('/schedule/available', methods=['POST'])
+@login_required
+def schedule_available():
+    date_times = [time.schedule_time_id for time in
+                  UnavailableSchedule.query.filter(UnavailableSchedule.date == request.form['date'])]
+    if len(date_times) == 0:
+        return 'None'
+    else:
+        time_table = {}
+        for i in date_times:
+            time_table[int(i)] = 'False'
+        return json.dumps(time_table, separators=(',', ':'), sort_keys=True)

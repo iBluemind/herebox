@@ -16,7 +16,7 @@ from hereboxweb.book.models import GoodsType, Box, Goods, InStoreStatus, GoodsSt
 from hereboxweb.payment.models import Purchase
 from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleType, ScheduleStatus, NewReservation, \
     ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType, \
-    ExtendPeriod, ExtendPeriodStatus, PromotionCode
+    ExtendPeriod, ExtendPeriodStatus, PromotionCode, UnavailableSchedule
 from hereboxweb.schedule.reservation import RevisitOption
 from hereboxweb.utils import add_months, staff_required
 
@@ -29,6 +29,42 @@ BOXES_PER_PAGE = 15
 GOODS_PER_PAGE = 15
 EXTEND_PERIOD_PER_PAGE = 10
 INCOMINGS_PER_PAGE = 30
+
+
+@admin.route('/schedule_restriction', methods=['GET', 'POST', 'DELETE'])
+@staff_required
+def schedule_restriction():
+    # 스케줄 제한 조회
+    if request.method == 'GET':
+        today = datetime.date.today()
+        u_schedules = UnavailableSchedule.query.filter(UnavailableSchedule.date >= today)
+        return render_template('admin_schedule_restriction.html', u_schedules=u_schedules)
+
+    # 스케줄 제한 추가
+    elif request.method == 'POST':
+        date = request.form.get('date')
+        time = request.form.get('time')
+        u_schedule = UnavailableSchedule(date, time)
+        database.session.add(u_schedule)
+        try:
+            database.session.commit()
+        except:
+            return redirect(url_for('admin.schedule_restriction'))
+        return redirect(url_for('admin.schedule_restriction'))
+
+    # 스케줄 제한 삭제
+    elif request.method == 'DELETE':
+        id = request.form.get('id')
+        print id
+        u_schedule = UnavailableSchedule.query.get(id)
+        database.session.delete(u_schedule)
+        try:
+            print "TRY"
+            database.session.commit()
+            return response_template(u'삭제되었습니다.', status=200)
+        except:
+            print "ERROR"
+            return response_template(u'문제가 발생했습니다.', status=500)
 
 
 @admin.route('/outgoing/<int:page>', methods=['GET'])
@@ -66,9 +102,8 @@ def extend_period(extend_period_id):
     try:
         database.session.commit()
     except:
-        return response_template(u'문제가 발생했습니다.', status=500)
+            return response_template(u'문제가 발생했습니다.', status=500)
     return response_template(u'처리되었습니다', status=200)
-
 
 @admin.route('/extend-periods/<int:page>', methods=['GET'])
 @staff_required
@@ -284,6 +319,8 @@ def schedules(page):
 @staff_required
 def reservation_detail(reservation_id):
     reservation = None
+
+    # 연락처, 주소 변경
     def change_reservation():
         if request.method == 'POST':
             contact = request.form.get('contact')
@@ -299,8 +336,10 @@ def reservation_detail(reservation_id):
             except:
                 return response_template(u'오류가 발생했습니다.', status=500)
 
+    # New
     if reservation_id.startswith(ReservationType.PICKUP_NEW):
-        reservation = NewReservation.query.filter(Reservation.reservation_id==reservation_id).first()
+        # 새로운 예약
+        reservation = NewReservation.query.filter(Reservation.reservation_id == reservation_id).first()
 
         parsed_binding_products = ''
         binding_products = json.loads(reservation.binding_products)
@@ -319,7 +358,7 @@ def reservation_detail(reservation_id):
         if promotion_code:
             reservation.promotion_name = u'%s(%s)' % (promotion_code.promotion.name,
                                                       reservation.promotion)
-
+        # 신규 - 저장
         if request.method == 'POST':
             standard_box_count = request.form.get('standard_box_count')
             nonstandard_goods_count = request.form.get('nonstandard_goods_count')
@@ -331,6 +370,7 @@ def reservation_detail(reservation_id):
 
         change_reservation()
 
+        # 신규 - 삭제
         if request.method == 'DELETE':
             database.session.delete(reservation)
             try:
@@ -342,6 +382,7 @@ def reservation_detail(reservation_id):
         return render_template('admin_new_reservation.html', page_title=u'예약 정보',
                                page_subtitle='Reservation',
                                reservation_detail=reservation)
+    # Pickup_again
     elif reservation_id.startswith(ReservationType.PICKUP_AGAIN):
         reservation = RestoreReservation.query.filter(Reservation.reservation_id==reservation_id).first()
 
@@ -362,6 +403,7 @@ def reservation_detail(reservation_id):
         return render_template('admin_restore_reservation.html', page_title=u'예약 정보',
                                page_subtitle='Reservation',
                                reservation_detail=reservation)
+    # Delivery
     elif reservation_id.startswith(ReservationType.DELIVERY):
         reservation = DeliveryReservation.query.filter(Reservation.reservation_id==reservation_id).first()
 

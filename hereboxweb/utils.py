@@ -55,14 +55,18 @@ def get_or_create(session, model, defaults=None, **kwargs):
         return instance
 
 
+
+
 def initialize_db():
     from hereboxweb import database
-    from hereboxweb.admin.models import VisitTime
-    from hereboxweb.auth.models import User, UserStatus
-    from hereboxweb.schedule.models import PromotionType, PromotionCode, Promotion
-
+    print "Init DB"
+    # from hereboxweb.admin.models import VisitTime
+    # from hereboxweb.auth.models import User, UserStatus
+    # from hereboxweb.schedule.models import PromotionType, PromotionCode, Promotion
+    # from hereboxweb.models import AlertNewArea
     # database.drop_all()
-    # database.create_all()
+    from hereboxweb.schedule.models import UnavailableSchedule
+    database.create_all()
 
     # database.session.add(VisitTime(start_time='10:00', end_time='12:00'))
     # database.session.add(VisitTime(start_time='12:00', end_time='14:00'))
@@ -87,32 +91,32 @@ def initialize_db():
     # database.session.add(promotion_code)
     # database.session.commit()
 
-    promotion = Promotion(u'5천원 할인', u'5천원 할인', PromotionType.ALLOW_TO_ALL, '2016-09-30')
-    database.session.add(promotion)
-    database.session.commit()
-    promotion_code1 = PromotionCode("HBIFG", promotion.id)
-    promotion_code2 = PromotionCode("BJLHJ", promotion.id)
-    promotion_code3 = PromotionCode("PRMHB", promotion.id)
-    promotion_code4 = PromotionCode("HBMBJ", promotion.id)
-    promotion_code5 = PromotionCode("HBMDH", promotion.id)
-    promotion_code6 = PromotionCode("STTMJ", promotion.id)
-    promotion_code7 = PromotionCode("STTJE", promotion.id)
-    promotion_code8 = PromotionCode("KDHLU", promotion.id)
-    promotion_code9 = PromotionCode("ROKAF", promotion.id)
-    promotion_code10 = PromotionCode("GGDGY", promotion.id)
-    promotion_code11 = PromotionCode("BHCJM", promotion.id)
-    database.session.add(promotion_code1)
-    database.session.add(promotion_code2)
-    database.session.add(promotion_code3)
-    database.session.add(promotion_code4)
-    database.session.add(promotion_code5)
-    database.session.add(promotion_code6)
-    database.session.add(promotion_code7)
-    database.session.add(promotion_code8)
-    database.session.add(promotion_code9)
-    database.session.add(promotion_code10)
-    database.session.add(promotion_code11)
-    database.session.commit()
+    # promotion = Promotion(u'5천원 할인', u'5천원 할인', PromotionType.ALLOW_TO_ALL, '2016-09-30')
+    # database.session.add(promotion)
+    # database.session.commit()
+    # promotion_code1 = PromotionCode("HBIFG", promotion.id)
+    # promotion_code2 = PromotionCode("BJLHJ", promotion.id)
+    # promotion_code3 = PromotionCode("PRMHB", promotion.id)
+    # promotion_code4 = PromotionCode("HBMBJ", promotion.id)
+    # promotion_code5 = PromotionCode("HBMDH", promotion.id)
+    # promotion_code6 = PromotionCode("STTMJ", promotion.id)
+    # promotion_code7 = PromotionCode("STTJE", promotion.id)
+    # promotion_code8 = PromotionCode("KDHLU", promotion.id)
+    # promotion_code9 = PromotionCode("ROKAF", promotion.id)
+    # promotion_code10 = PromotionCode("GGDGY", promotion.id)
+    # promotion_code11 = PromotionCode("BHCJM", promotion.id)
+    # database.session.add(promotion_code1)
+    # database.session.add(promotion_code2)
+    # database.session.add(promotion_code3)
+    # database.session.add(promotion_code4)
+    # database.session.add(promotion_code5)
+    # database.session.add(promotion_code6)
+    # database.session.add(promotion_code7)
+    # database.session.add(promotion_code8)
+    # database.session.add(promotion_code9)
+    # database.session.add(promotion_code10)
+    # database.session.add(promotion_code11)
+    # database.session.commit()
 
 
 def staff_required(func):
