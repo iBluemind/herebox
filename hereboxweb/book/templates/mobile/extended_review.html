@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container" style="width: 740px;">
+        <div style="margin: 40px 0 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/4-step-2-2.png') }}">
+        </div>
+
+        <div class="row" style="margin-top: 90px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">확인</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        연장 내용이 정확한지 확인해주세요
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div>
+                    기간 연장 물품
+
+                    <div style="display: table; width: 100%; font-size: 14px;">
+                        {% for stuff in packed_stuffs %}
+                            <div style="display: table-row;">
+                                <div style="display: table-cell;">{{ stuff.name }}</div>
+                                <div style="display: table-cell; text-align: right;">{{ stuff.new_period }}개월</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    프로모션 코드
+                    <p style="font-size: 14px;">
+                        {% if promotion %}
+                            {{ promotion }}
+                        {% else %}
+                            해당사항 없음
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    최종 결제 금액
+                    <p style="font-family: 'Nanum Barun Gothic Bold', sans-serif; color: #ffa000; font-size: 14px;">
+                        {{ total_price }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 50px 0 10px 0;">
+            <div class="checkbox" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">
+                <label>
+                    <input type="checkbox" id="chkAgree">
+                    히어박스의 <a href="/terms" target="_blank" style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
+                </label>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 100px; text-align: center;">
+            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    {% assets "extended_review_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+{% endblock %}
