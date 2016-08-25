@@ -61,6 +61,7 @@
                 <input type="text" class="form-control" onblur="getAvailableTime(this)" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
 
                 <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                    <option value="">시간 선택</option>
                     <option value="1">10:00-12:00</option>
                     <option value="2">12:00-14:00</option>
                     <option value="3">14:00-16:00</option>
@@ -100,6 +101,7 @@
                 <div id="revisitDatetime">
                     <input type="text" class="form-control" onblur="getAvailableTime(this)" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)">
                     <select id="inputRevisitTime" style="margin-top: 20px;" class="form-control">
+                        <option value="">시간 선택</option>
                         <option value="1">10:00-12:00</option>
                         <option value="2">12:00-14:00</option>
                         <option value="3">14:00-16:00</option>
@@ -140,7 +142,9 @@
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
+    <script type="text/javascript" src="/static/assets/js/reservation.js"></script>
+
     {% assets "reservation_js" %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {#        <script type="text/javascript" src="{{ ASSET_URL }}"></script>#}
     {% endassets %}
 {% endblock %}
