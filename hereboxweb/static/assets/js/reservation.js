@@ -154,7 +154,6 @@ function setCalendar(date, name){
             date: date
         },
         success: function (times) {
-            console.log(times);
             var delivery_times = ['', '10:00-12:00', '12:00-14:00',
                 '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
 
@@ -170,7 +169,7 @@ function setCalendar(date, name){
                     var obj = JSON.parse(times);
                     if(obj[j]=='False'){
                         $(options[j]).attr("disabled", true)
-                        $(options[j]).text(delivery_times[j] + ' : 주문 폭주')
+                        $(options[j]).text(delivery_times[j] + ' : 예약 마감')
                     }
                 }
             }
@@ -208,7 +207,7 @@ function getAvailableTime(date){
                     var obj = JSON.parse(times);
                     if(obj[j]=='False'){
                         $(options[j]).attr("disabled", true)
-                        $(options[j]).text(delivery_times[j] + ' : 주문 폭주')
+                        $(options[j]).text(delivery_times[j] + ' : 예약 마감')
                     }
                 }
             }
@@ -230,6 +229,8 @@ function go(dest) {
     var inputRevisitDate = $('#inputRevisitDate').val();
     var inputRevisitTime = $('#inputRevisitTime').val();
     var textareaMemo = $('#textareaMemo').val();
+
+
     $.ajax({
         type: "POST",
         url: "/reservation/" + dest,
@@ -266,9 +267,9 @@ function errorCheck() {
         $('#inputAddress2').addClass('has-error');
         isError = true;
     }
-
-    if ($("#inputVisitTime").val().length == 0) {
+    if ($("#inputVisitTime").val() == '시간 선택') {
         $("#inputVisitTime").addClass('has-error')
+        isError = true;
     }
 
     if (isError) {

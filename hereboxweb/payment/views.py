@@ -400,12 +400,14 @@ def reservation_payment(template):
         user_estimate.binding_product2_count, user_estimate.binding_product3_count
     )
 
+    # 가격이 맞지 않는 경우
     user_total_price = int(request.cookies.get('totalPrice'))
     if user_total_price != total_price:
         if request.method == 'POST':
             return bad_request()
         return redirect(url_for('schedule.estimate'))
 
+    # 다음 단계 누르고 들어온 경우
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
         order_manager = PurchaseStepManager(order_helper, cookie_store_manager)
@@ -419,6 +421,7 @@ def reservation_payment(template):
 
         user_pay_type = request.form.get('optionsPayType')
 
+        # 프로모션
         if len(user_estimate.promotion) > 0:
             promotion_code = PromotionCode.query.join(Promotion).filter(
                                 PromotionCode.code == func.binary(user_estimate.promotion)).first()
@@ -459,6 +462,8 @@ def reservation_payment(template):
                 except:
                     return response_template(u'문제가 발생했습니다.', status=500)
 
+
+        # 새 예약 생성
         new_reservation = NewReservation(
             status=ReservationStatus.WAITING,
             standard_box_count=user_estimate.regular_item_count,
@@ -483,12 +488,12 @@ def reservation_payment(template):
         )
 
         database.session.add(new_reservation)
-
         try:
             database.session.commit()
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
+        print "New visit schedule"
         new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
                                       schedule_type=ScheduleType.PICKUP_DELIVERY,
                                       staff_id=1,
@@ -498,6 +503,7 @@ def reservation_payment(template):
                                       reservation_id=new_reservation.id)
         database.session.add(new_visit_schedule)
 
+        # 재방문 요청 있을 때
         new_revisit_schedule = None
         if user_order.revisit_option == RevisitOption.LATER:
             new_revisit_schedule = Schedule(status=ScheduleStatus.WAITING,
@@ -518,6 +524,7 @@ def reservation_payment(template):
         try:
             database.session.commit()
         except:
+            print "error at revisit schedule"
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
         visit_time = VisitTime.query.get(user_order.visit_time)
