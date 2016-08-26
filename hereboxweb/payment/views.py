@@ -393,6 +393,7 @@ def reservation_payment(template):
     except ValueError:
         return bad_request()
 
+    # 가격 계산
     total_price = calculate_total_price(
         user_estimate.regular_item_count, user_estimate.irregular_item_count,
         user_estimate.period, user_estimate.period_option, user_estimate.promotion,
@@ -407,7 +408,7 @@ def reservation_payment(template):
             return bad_request()
         return redirect(url_for('schedule.estimate'))
 
-    # 다음 단계 누르고 들어온 경우
+    # 결제 - 다음버튼 누르면
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
         order_manager = PurchaseStepManager(order_helper, cookie_store_manager)

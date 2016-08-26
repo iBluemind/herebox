@@ -34,9 +34,7 @@ def my_schedule(template):
     my_pickup_schedules = database.session.query(
         Schedule,
         staff.name.label("staff_name"),
-        customer.name.label("customer_name")).join((staff, Schedule.staff),
-                                                  (customer, Schedule.customer)
-                                                   ).filter(
+        customer.name.label("customer_name")).join((staff, Schedule.staff), (customer, Schedule.customer)).filter(
         Schedule.customer_id == current_user.uid,
         or_(Schedule.schedule_type == ScheduleType.PICKUP_DELIVERY,
             Schedule.schedule_type == ScheduleType.PICKUP_RECOVERY,
