@@ -7,7 +7,7 @@ PROJECT_DIR = '/var/www/herebox'
 APP_DIR = '%s/app' % PROJECT_DIR
 
 env.user = 'ubuntu'
-env.hosts = [HEREBOX_AWS_EC2_01]
+env.hosts = [HEREBOX_AWS_EC2_01 ,HEREBOX_AWS_EC2_02]
 env.key_filename = '/Users/Urang/herebox-web.pem'
 
 

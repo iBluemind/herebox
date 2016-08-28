@@ -10,26 +10,26 @@ ACTIVATE_PATH=$VENV_PATH/bin/activate
 PIP_PATH=$VENV_PATH/bin/pip
 
 
-function build_forge_min_js {
-    local forge_min_js="$ROOT_DIR/app/hereboxweb/static/libs/forge/js/forge.min.js"
-    if [ -f "$forge_min_js" ]
-    then
-        echo "forge_min_js is existed."
-    else
-        cd "$ROOT_DIR/app/hereboxweb/static/libs/forge"
-        npm install
-        npm run minify
-    fi
-}
+#function build_forge_min_js {
+#    local forge_min_js="$ROOT_DIR/app/hereboxweb/static/libs/forge/js/forge.min.js"
+#    if [ -f "$forge_min_js" ]
+#    then
+#        echo "forge_min_js is existed."
+#    else
+#        cd "$ROOT_DIR/app/hereboxweb/static/libs/forge"
+#        npm install
+#        npm run minify
+#    fi
+#}
 
 cd $ROOT_DIR/app
 $GIT_PATH pull origin master
 
-$BOWER_PATH install
-$PIP_PATH install -r requirements.txt
-build_forge_min_js
+#$BOWER_PATH install
+#$PIP_PATH install -r requirements.txt
+#build_forge_min_js
 
-/bin/chown -R www-data:www-data $ROOT_DIR
+#/bin/chown -R www-data:www-data $ROOT_DIR
 
 $PKILL_PATH -f -INT uwsgi
 source $ACTIVATE_PATH
