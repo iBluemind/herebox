@@ -72,15 +72,15 @@ $(document).ready(function() {
     if (orderInfo && orderInfo['optionsDelivery']) {
         var oldOptionsRevisit = orderInfo['optionsDelivery'];
         switch (oldOptionsRevisit) {
-             case 'restore':
-                 $(":radio[id='optionsRestore']").attr("checked", true);
-                 $(":radio[id='optionsExpire']").attr("checked", false);
-                 break;
-             case 'expire':
-                 $(":radio[id='optionsRestore']").attr("checked", false);
-                 $(":radio[id='optionsExpire']").attr("checked", true);
-                 break;
-         }
+            case 'restore':
+                $(":radio[id='optionsRestore']").attr("checked", true);
+                $(":radio[id='optionsExpire']").attr("checked", false);
+                break;
+            case 'expire':
+                $(":radio[id='optionsRestore']").attr("checked", false);
+                $(":radio[id='optionsExpire']").attr("checked", true);
+                break;
+        }
     }
     // if (orderInfo && orderInfo['textareaMemo']) {
     //     $('#textareaMemo').val("{{ user_memo }}");
@@ -95,18 +95,18 @@ $(document).ready(function() {
         }
 
         $.ajax({
-             type: "POST",
-             url: "/authentication_code",
-             data: {phone: newUserPhone
-             },
-             success: function () {
+            type: "POST",
+            url: "/authentication_code",
+            data: {phone: newUserPhone
+            },
+            success: function () {
                 alert("인증번호를 발송했습니다.");
                 isBtnAuthCode = true;
-             },
-             error: function(request, status, error) {
+            },
+            error: function(request, status, error) {
                 var parsedBody = $.parseJSON(request.responseText);
                 alert(parsedBody['message']);
-             }
+            }
         });
     });
 
@@ -126,20 +126,61 @@ $(document).ready(function() {
         }
 
         $.ajax({
-             type: "GET",
-             url: "/authentication_code",
-             data: {authCode: userAuthCode
-             },
-             success: function () {
+            type: "GET",
+            url: "/authentication_code",
+            data: {authCode: userAuthCode
+            },
+            success: function () {
                 alert("인증에 성공했습니다.");
-             },
-             error: function(request, status, error) {
+            },
+            error: function(request, status, error) {
                 var parsedBody = $.parseJSON(request.responseText);
                 alert(parsedBody['message']);
-             }
+            }
         });
     });
 });
+
+
+$(window).load(function() {
+    setCalendar($("#inputDeliveryDate").val(),'inputDeliveryTime');
+});
+
+
+function setCalendar(date, name){
+    $.ajax({
+        type: "POST",
+        url: "/schedule/available",
+        data: {
+            date: date
+        },
+        success: function (times) {
+            var delivery_times = ['', '10:00-12:00', '12:00-14:00',
+                '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
+
+            var options = $("#"+name).children(); // options
+
+            if(times=='None'){
+                for(var i=1; i<7; i++){
+                    $(options[i]).text(delivery_times[i])
+                    $(options[i]).removeAttr("disabled")
+                }
+            }else{
+                for(var j=1; j<7; j++){
+                    var obj = JSON.parse(times);
+                    if(obj[j]=='False'){
+                        $(options[j]).attr("disabled", true)
+                        $(options[j]).text(delivery_times[j] + ' : 예약 마감')
+                    }
+                }
+            }
+        },
+        error: function(request, status, error) {
+            console.log("error")
+        }
+    });
+}
+
 
 function go(dest) {
     var inputPhoneNumber = $('#inputPhoneNumber').val();
@@ -151,20 +192,57 @@ function go(dest) {
     var optionsDelivery= $(":radio[name='optionsDelivery']:checked").val();
     var textareaMemo = $('#textareaMemo').val();
     $.ajax({
-         type: "POST",
-         url: "/delivery/" + dest,
-         data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
+        type: "POST",
+        url: "/delivery/" + dest,
+        data: {inputPhoneNumber: inputPhoneNumber, inputPostCode: inputPostCode,
             inputAddress1: inputAddress1, inputAddress2: inputAddress2, inputDeliveryDate: inputDeliveryDate,
-             inputDeliveryTime: inputDeliveryTime, optionsDelivery: optionsDelivery, textareaMemo: textareaMemo
-         },
-         success: function () {
+            inputDeliveryTime: inputDeliveryTime, optionsDelivery: optionsDelivery, textareaMemo: textareaMemo
+        },
+        success: function () {
 
             location.href = '/delivery/' + dest;
-         },
-         error: function(request, status, error) {
+        },
+        error: function(request, status, error) {
             var parsedBody = $.parseJSON(request.responseText);
             alert(parsedBody['message']);
-         }
+        }
+    });
+}
+
+function getAvailableTime(date){
+    var item = $(date);
+    var date = $(date).val(); // 2016-08-29
+    $.ajax({
+        type: "POST",
+        url: "/schedule/available",
+        data: {
+            date: date
+        },
+        success: function (times) {
+            var delivery_times = ['', '10:00-12:00', '12:00-14:00',
+                '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
+            var time_table = item.siblings()[0];
+            var options = $("#"+time_table.id).children(); // options
+
+            if(times=='None'){
+                for(var i=1; i<7; i++){
+                    $(options[i]).text(delivery_times[i])
+                    $(options[i]).removeAttr("disabled")
+                }
+            }else{
+                for(var j=1; j<7; j++){
+                    $(options[j]).text(delivery_times[j])
+                    $(options[j]).removeAttr("disabled")
+                    var obj = JSON.parse(times);
+                    if(obj[j]=='False'){
+                        $(options[j]).attr("disabled", true)
+                        $(options[j]).text(delivery_times[j] + ' : 예약 마감')
+                    }
+                }
+            }
+        },
+        error: function(request, status, error) {
+        }
     });
 }
 
@@ -186,6 +264,12 @@ function errorCheck() {
         $('#inputAddress2').addClass('has-error');
         isError = true;
     }
+
+    if ($("#inputDeliveryTime").val() == '시간 선택') {
+        $("#inputDeliveryTime").addClass('has-error')
+        isError = true;
+    }
+
 
     if (isError) {
         $("html, body").animate({ scrollTop: 0 }, "slow");
@@ -211,7 +295,7 @@ function execDaumPostcode() {
             }
             // 건물명이 있고, 공동주택일 경우 추가한다.
             if(data.buildingName !== '' && data.apartment === 'Y'){
-               extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                extraRoadAddr += (extraRoadAddr !== '' ? ', ' + data.buildingName : data.buildingName);
             }
             // 도로명, 지번 조합형 주소가 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
             if(extraRoadAddr !== ''){
