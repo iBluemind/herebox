@@ -135,7 +135,7 @@ def pickup_payment():
 
         mail_msg_body = u"""
             재보관 주문 정보입니다.
-            http://www.herebox.kr/admin/reservation/%s
+            http://admin.herebox.kr/admin/reservation/%s
 
             스케줄번호: %s   회원: %s
             주소: %s   연락처: %s
@@ -158,7 +158,7 @@ def pickup_payment():
 
             mail_msg_body = u"""
                 [재방문] 재보관 주문 정보입니다.
-                http://www.herebox.kr/admin/reservation/%s
+                http://admin.herebox.kr/admin/reservation/%s
 
                 스케줄번호: %s   회원: %s
                 주소: %s   연락처: %s
@@ -269,7 +269,7 @@ def delivery_payment(template):
 
         mail_msg_body = u"""
             배송 주문 정보입니다.
-            http://www.herebox.kr/admin/reservation/%s
+            http://admin.herebox.kr/admin/reservation/%s
 
             스케줄번호: %s   회원: %s
             주소: %s   연락처: %s
@@ -539,7 +539,7 @@ def reservation_payment(template):
 
         mail_msg_body = u"""
         신규 주문 정보입니다.
-        http://www.herebox.kr/admin/reservation/%s
+        http://admin.herebox.kr/admin/reservation/%s
 
         스케줄번호: %s   회원: %s
         주소: %s   연락처: %s
@@ -566,7 +566,7 @@ def reservation_payment(template):
 
             mail_msg_body = u"""
                 [재방문] 신규 주문 정보입니다.
-                http://www.herebox.kr/admin/reservation/%s
+                http://admin.herebox.kr/admin/reservation/%s
 
                 스케줄번호: %s   회원: %s
                 주소: %s   연락처: %s
