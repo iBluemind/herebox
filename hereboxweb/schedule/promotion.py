@@ -7,10 +7,16 @@ from hereboxweb.schedule.price import IRREGULAR_ITEM_PRICE, REGULAR_ITEM_PRICE
 
 
 class ApplyPromotion(object):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
     def storage_price(self, regular_item_count, irregular_item_count, period):
+        raise NotImplementedError()
+
+    def binding_products_price(self, binding_product0_count, binding_product1_count, binding_product2_count,
+                               binding_product3_count):
+        raise NotImplementedError()
+
+    def total_price(self, regular_item_count, irregular_item_count, period, binding_product0_count,
+                    binding_product1_count, binding_product2_count,
+                    binding_product3_count):
         raise NotImplementedError()
 
 
