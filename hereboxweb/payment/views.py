@@ -5,7 +5,7 @@ from flask import request, render_template, redirect, url_for
 from flask_login import login_required, current_user
 from flask_mobility.decorators import mobile_template
 from sqlalchemy import func
-from hereboxweb import response_template, bad_request, forbidden
+from hereboxweb import response_template, bad_request, forbidden, logger
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.book.models import Goods
@@ -494,7 +494,7 @@ def reservation_payment(template):
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
-        print "New visit schedule"
+        logger.debug("New visit schedule")
         new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
                                       schedule_type=ScheduleType.PICKUP_DELIVERY,
                                       staff_id=1,
@@ -525,7 +525,7 @@ def reservation_payment(template):
         try:
             database.session.commit()
         except:
-            print "error at revisit schedule"
+            logger.debug("error at revisit schedule")
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
         visit_time = VisitTime.query.get(user_order.visit_time)

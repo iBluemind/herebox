@@ -6,7 +6,7 @@ from flask import request, render_template, make_response, url_for, redirect, fl
 from flask_login import login_user
 from sqlalchemy import or_
 from config import RSA_PUBLIC_KEY_BASE64
-from hereboxweb import database, response_template, app
+from hereboxweb import database, response_template, app, logger
 from hereboxweb.admin import admin
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.forms import LoginForm
@@ -59,15 +59,15 @@ def schedule_restriction():
     # 스케줄 제한 삭제
     elif request.method == 'DELETE':
         id = request.form.get('id')
-        print id
+        logger.debug(id)
         u_schedule = UnavailableSchedule.query.get(id)
         database.session.delete(u_schedule)
         try:
-            print "TRY"
+            logger.debug("TRY")
             database.session.commit()
             return response_template(u'삭제되었습니다.', status=200)
         except:
-            print "ERROR"
+            logger.debug("ERROR")
             return response_template(u'문제가 발생했습니다.', status=500)
 
 
