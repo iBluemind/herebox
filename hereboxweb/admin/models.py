@@ -19,5 +19,4 @@ class VisitTime(database.Model, JsonSerializable):
         self.end_time = end_time
 
     def __str__(self):
-        return '%s - %s' % (self.start_time.strftime('%H:%M'), self.end_time
-                                                                .strftime('%H:%M'))
+        return '%s - %s' % (self.start_time.strftime('%H:%M'), self.end_time.strftime('%H:%M'))

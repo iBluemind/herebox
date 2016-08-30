@@ -51,7 +51,8 @@ def my_stuff(template):
 
 @book.route('/extended/estimate', methods=['GET', 'POST'])
 @login_required
-def extended_estimate():
+@mobile_template('{mobile/}extended_estimate.html')
+def extended_estimate(template):
     if request.method == 'POST':
         return save_stuffs('/extended/')
 
@@ -59,13 +60,14 @@ def extended_estimate():
     if not packed_stuffs or len(packed_stuffs) == 0:
         return redirect(url_for('book.my_stuff'))
 
-    return render_template('extended_estimate.html', active_menu='reservation',
+    return render_template(template, active_menu='reservation',
                            packed_stuffs=packed_stuffs)
 
 
 @book.route('/extended/review', methods=['GET', 'POST'])
 @login_required
-def extended_review():
+@mobile_template('{mobile/}extended_review.html')
+def extended_review(template):
     if request.method == 'POST':
         new_estimate_info = request.form.get('estimate')
         old_estimate_info = request.cookies.get('estimate')
@@ -129,13 +131,14 @@ def extended_review():
     if len(packed_stuffs) == 0:
         return redirect(url_for('book.my_stuff'))
 
-    return render_template('extended_review.html', active_menu='reservation',
+    return render_template(template, active_menu='reservation',
                            packed_stuffs=packed_stuffs,
                            total_price=u'{:,d}원'.format(order_info['total_price']))
 
 
 @book.route('/extended/completion', methods=['GET'])
 @login_required
-def extended_completion():
-    return render_template('extended_completion.html', active_menu='reservation')
+@mobile_template('{mobile/extended_completion.html}')
+def extended_completion(template):
+    return render_template(template, active_menu='reservation')
 

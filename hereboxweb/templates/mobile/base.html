@@ -13,7 +13,8 @@
     <link href="{{ url_for('static', filename='assets/css/ie10-viewport-bug-workaround.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='libs/NanumBarunGothic/nanumbarungothic.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/drawer/dist/css/drawer.min.css') }}">
-    {% assets "herebox_mobile_css" %}
+{#      <link rel="stylesheet" href="/static/assets/css/herebox_mobile.css">#}
+      {% assets "herebox_mobile_css" %}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets %}
 

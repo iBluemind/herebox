@@ -1,13 +1,12 @@
 {% extends "mobile/base.html" %}
 {% block content %}
-
     <div class="container">
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/4-step-2-2.png') }}">
+            <img style="width: 290px" src="{{ url_for('static', filename='assets/img/m-4-step-2.png') }}">
         </div>
 
-        <div class="row" style="margin-top: 90px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-confirm.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">확인</div>
@@ -17,10 +16,9 @@
                 </div>
             </div>
 
-            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+            <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; margin-top: 30px;">
                 <div>
                     기간 연장 물품
-
                     <div style="display: table; width: 100%; font-size: 14px;">
                         {% for stuff in packed_stuffs %}
                             <div style="display: table-row;">
@@ -51,18 +49,18 @@
             </div>
         </div>
 
-        <div style="text-align: center; margin: 50px 0 10px 0;">
+        <div style="text-align: center; margin: 50px 0 20px 0;">
             <div class="checkbox" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 12px; color: #727272;">
-                <label>
+                <label style="width: 100%;">
                     <input type="checkbox" id="chkAgree">
                     히어박스의 <a href="/terms" target="_blank" style="color: #ffa000;">이용약관</a>을 확인하였으며 동의합니다
                 </label>
             </div>
         </div>
 
-        <div style="margin-bottom: 100px; text-align: center;">
-            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
-            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        <div style="margin-bottom: 60px; text-align: center;">
+            <button id="btnNextStep" class="btn btn-hbprimary" style="width: 90%;">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;width: 90%">이전 단계</button>
         </div>
     </div>
 

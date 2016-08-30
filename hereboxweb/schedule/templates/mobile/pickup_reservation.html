@@ -1,0 +1,157 @@
+{% extends "mobile/base.html" %}
+{% block content %}
+
+    <div class="container" style="width: 740px;">
+
+        <div style="margin: 40px 0 40px; text-align: center;">
+            <img src="{{ url_for('static', filename='assets/img/4-step-1.png') }}">
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-phone.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">핸드폰 번호</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        보관한 물품을 찾으실 때 필요하므로 정확하게<br>
+                        입력해주세요
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6" style="margin-top: 10px;">
+                {% if phone_number  %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
+                {% else %}
+                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-address.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">주소</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        픽업맨이 방문할 주소를 입력해주세요<br>
+                        * 현재 서울시만 서비스 가능
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div>
+                    <div style="float: left; width: 68%;">
+                        <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요">
+                    </div>
+                    <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">우편번호 찾기</button>
+                </div>
+                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" value="{{ address1 }}">
+                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" value="{{ address2 }}">
+            </div>
+        </div>
+
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-calendar.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">방문일시</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        방문을 희망하는 날짜와 시간을 선택해주세요<br>
+                        (월요일-일요일, 10am-10pm, 공휴일 휴무)<br>
+                        * 희망 날짜 1일 전 17시까지 신청
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
+
+                <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                    <option value="1">10:00-12:00</option>
+                    <option value="2">12:00-14:00</option>
+                    <option value="3">14:00-16:00</option>
+                    <option value="4">16:00-18:00</option>
+                    <option value="5">18:00-20:00</option>
+                    <option value="6">20:00-22:00</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-truck.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">픽업 준비</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        보관하실 물품을 정리하여 픽업맨에게 전달하려<br>
+                        면 시간이 얼마나 필요하신가요?
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="radio" style="float:left; display:inline-block;">
+                    <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                        <input type="radio" name="optionsRevisit" id="optionsImmediate" value="immediate" checked>
+                        바로 가능
+                        <p class="estimate-month-item-desc">
+                            픽업맨 방문 후 30분 내 준비가 가능할 경우
+                        </p>
+                    </label>
+                    <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                        <input type="radio" name="optionsRevisit" id="optionsLater" value="later">
+                        재방문 신청
+                        <p class="estimate-month-item-desc">
+                            재방문 날짜를 선택하면 픽업맨이 다시 방문
+                        </p>
+                    </label>
+                </div>
+                <div id="revisitDatetime">
+                    <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)">
+                    <select id="inputRevisitTime" style="margin-top: 20px;" class="form-control">
+                        <option value="1">10:00-12:00</option>
+                        <option value="2">12:00-14:00</option>
+                        <option value="3">14:00-16:00</option>
+                        <option value="4">16:00-18:00</option>
+                        <option value="5">18:00-20:00</option>
+                        <option value="6">20:00-22:00</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 80px;">
+            <div class="col-xs-6">
+                <img src="{{ url_for('static', filename='assets/img/icon-memo.png') }}">
+                <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">남기실 말씀</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
+                        히어박스에 남기실 말씀을 적어주세요<br>
+                        * 핸드폰 번호와 연락받을 연락처가 다를 경우 입<br>
+                        력해주세요
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요">{{ user_memo }}</textarea>
+            </div>
+        </div>
+
+        <div style="margin: 80px 0 100px 0; text-align: center;">
+            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
+        </div>
+    </div>
+
+{% endblock %}
+{% block jscript %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
+    <script type="text/javascript" src="http://dmaps.daum.net/map_js_init/postcode.v2.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/moment.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
+    {% assets "pickup_reservation_js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+
+{% endblock %}

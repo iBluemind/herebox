@@ -1,16 +1,16 @@
 {% extends "admin_base.html" %}
 {% block content %}
-    <div class="col-xs-6">
+    <div class="col-xs-12">
         <div style="margin-left: auto; margin-right: auto;">
             <form method="post">
                 <div class="form-group">
-                    <label>안되는 날짜</label>
-                    <input class="form-control" type="date" name="date" style="width: 300px" required>
+                    <label>제한 날짜</label>
+                    <input class="form-control" type="date" name="date" style="width: 80%" required>
                 </div>
                 <div class="form-group">
-                    <label>안되는 시간대</label>
+                    <label>제한 시간</label>
                     <select name="time">
-                        <option value="1">10:00-12:00</option >
+                        <option value="1">10:00-12:00</option>
                         <option value="2">12:00-14:00</option>
                         <option value="3">14:00-16:00</option>
                         <option value="4">16:00-18:00</option>
@@ -24,35 +24,21 @@
             </form>
         </div>
     </div>
-    <div class="col-xs-6">
-        시간 보는 방법 - (곧 보기 편하게 해줄게요...)
-        <ul>
-            <li>1 - 10:00 - 12:00</li>
-            <li>2 - 12:00 - 14:00</li>
-            <li>3 - 14:00 - 16:00</li>
-            <li>4 - 16:00 - 18:00</li>
-            <li>5 - 18:00 - 20:00</li>
-            <li>6 - 20:00 - 22:00</li>
-        </ul>
-    </div>
-    <hr>
     <div class="row">
         <div class="table">
             <table class="table table-bordered table-hover table-striped">
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>날짜</th>
                     <th>시간</th>
                     <th>취소</th>
                 </tr>
                 </thead>
                 <tbody>
-                {% for s in u_schedules %}
+                {% for s, time in u_schedules %}
                     <tr>
-                        <td>{{ s.id }}</td>
                         <td>{{ s.date }}</td>
-                        <td>{{ s.schedule_time_id }}</td>
+                        <td>{{ time }}</td>
                         <td>
                             <button onclick='uScheduleDelete({{ s.id }})' type="button" class="btn btn-danger">취소</button>
                         </td>

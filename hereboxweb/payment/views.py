@@ -294,7 +294,8 @@ def delivery_payment(template):
 
 @payment.route('/extended/payment', methods=['GET', 'POST'])
 @login_required
-def extended_payment():
+@mobile_template('{mobile/}extended_payment.html')
+def extended_payment(template):
     def calculate_total_price():
         total_price = 0
         for goods_id in estimate_info.keys():
@@ -375,7 +376,7 @@ def extended_payment():
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', status=500)
         return response_template(u'정상 처리되었습니다', status=200)
-    return render_template('extended_payment.html', active_menu='reservation')
+    return render_template(template, active_menu='reservation')
 
 
 @payment.route('/reservation/payment', methods=['GET', 'POST'])
@@ -407,8 +408,7 @@ def reservation_payment(template):
         if request.method == 'POST':
             return bad_request()
         return redirect(url_for('schedule.estimate'))
-
-    # 결제 - 다음버튼 누르면
+    # 결제 - 다음버튼 누
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
         order_manager = PurchaseStepManager(order_helper, cookie_store_manager)

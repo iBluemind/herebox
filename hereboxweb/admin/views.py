@@ -6,7 +6,7 @@ from flask import request, render_template, make_response, url_for, redirect, fl
 from flask_login import login_user
 from sqlalchemy import or_
 from config import RSA_PUBLIC_KEY_BASE64
-from hereboxweb import database, response_template
+from hereboxweb import database, response_template, app
 from hereboxweb.admin import admin
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.forms import LoginForm
@@ -19,7 +19,7 @@ from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleT
     ExtendPeriod, ExtendPeriodStatus, PromotionCode, UnavailableSchedule
 from hereboxweb.schedule.reservation import RevisitOption
 from hereboxweb.utils import add_months, staff_required
-
+from hereboxweb.admin import custom_filter
 
 USERS_PER_PAGE = 15
 RESERVATIONS_PER_PAGE = 15
@@ -37,8 +37,12 @@ def schedule_restriction():
     # 스케줄 제한 조회
     if request.method == 'GET':
         today = datetime.date.today()
-        u_schedules = UnavailableSchedule.query.filter(UnavailableSchedule.date >= today)
-        return render_template('admin_schedule_restriction.html', u_schedules=u_schedules)
+        u_schedules = database.session.query(UnavailableSchedule, VisitTime) \
+            .filter(UnavailableSchedule.schedule_time_id == VisitTime.id).filter(UnavailableSchedule.date >= today) \
+            .order_by(UnavailableSchedule.date)
+
+        return render_template('admin_schedule_restriction.html', u_schedules=u_schedules,
+                               page_title=u'예약 제한', page_subtitle='Schedule Restriction')
 
     # 스케줄 제한 추가
     elif request.method == 'POST':
@@ -70,7 +74,7 @@ def schedule_restriction():
 @admin.route('/outgoing/<int:page>', methods=['GET'])
 @staff_required
 def outgoing_history(page=1):
-    paginate = Outgoing.query.join(Goods)  \
+    paginate = Outgoing.query.join(Goods) \
         .order_by(Outgoing.created_at.desc()) \
         .paginate(page, INCOMINGS_PER_PAGE, False)
 
@@ -94,7 +98,7 @@ def incoming_history(page=1):
 @admin.route('/extend-period/<int:extend_period_id>', methods=['PUT'])
 @staff_required
 def extend_period(extend_period_id):
-    extend_period = ExtendPeriod.query.filter(ExtendPeriod.id==extend_period_id).first()
+    extend_period = ExtendPeriod.query.filter(ExtendPeriod.id == extend_period_id).first()
 
     extend_period.status = ExtendPeriodStatus.ACCEPTED
     extend_period.goods.expired_at = add_months(extend_period.goods.expired_at, extend_period.amount)
@@ -102,33 +106,33 @@ def extend_period(extend_period_id):
     try:
         database.session.commit()
     except:
-            return response_template(u'문제가 발생했습니다.', status=500)
+        return response_template(u'문제가 발생했습니다.', status=500)
     return response_template(u'처리되었습니다', status=200)
+
 
 @admin.route('/extend-periods/<int:page>', methods=['GET'])
 @staff_required
 def extend_period_list(page):
-    paginate = ExtendPeriod.query.filter(ExtendPeriod.status==ExtendPeriodStatus.WAITING)\
-        .order_by(ExtendPeriod.created_at.desc())\
+    paginate = ExtendPeriod.query.filter(ExtendPeriod.status == ExtendPeriodStatus.WAITING) \
+        .order_by(ExtendPeriod.created_at.desc()) \
         .paginate(page, EXTEND_PERIOD_PER_PAGE, False)
 
     return render_template('admin_extend_period_list.html', page_title=u'기간연장',
-                                                    page_subtitle='Extend Period',
-                                            pagination=paginate
-    )
+                           page_subtitle='Extend Period',
+                           pagination=paginate)
 
 
 @admin.route('/old-extend-periods/<int:page>', methods=['GET'])
 @staff_required
 def old_extend_period_list(page):
-    paginate = ExtendPeriod.query.filter(ExtendPeriod.status==ExtendPeriodStatus.ACCEPTED)\
-        .order_by(ExtendPeriod.created_at.desc())\
+    paginate = ExtendPeriod.query.filter(ExtendPeriod.status==ExtendPeriodStatus.ACCEPTED) \
+        .order_by(ExtendPeriod.created_at.desc()) \
         .paginate(page, EXTEND_PERIOD_PER_PAGE, False)
 
     return render_template('admin_old_extend_period_list.html', page_title=u'지난 기간연장',
-                                                    page_subtitle='Old Extend Period',
-                                            pagination=paginate
-    )
+                           page_subtitle='Old Extend Period',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/goods/<goods_id>', methods=['GET', 'POST', 'DELETE'])
@@ -189,7 +193,7 @@ def goods_detail(goods_id):
             return response_template(u'문제가 발생했습니다.', status=500)
 
     return render_template('admin_goods.html', page_title=u'물품',
-                               page_subtitle='Goods',
+                           page_subtitle='Goods',
                            goods_detail=goods)
 
 
@@ -198,7 +202,6 @@ def goods_detail(goods_id):
 def schedule_detail(schedule_id):
     schedule = Schedule.query.filter(Schedule.schedule_id==schedule_id).first()
     schedule.parsed_schedule_time = VisitTime.query.get(schedule.schedule_time_id)
-
     if request.method == 'POST':
         visit_date = request.form.get('visit_date')
         if visit_date and schedule.schedule_date != visit_date:
@@ -223,32 +226,32 @@ def schedule_detail(schedule_id):
                                    schedule_detail=schedule,
                                    register_goods_popup=True)
     return render_template('admin_schedule.html', page_title=u'스케줄',
-                               page_subtitle='Schedule',
-                               schedule_detail=schedule)
+                           page_subtitle='Schedule',
+                           schedule_detail=schedule)
 
 
 @admin.route('/goods_list/<int:page>', methods=['GET'])
 @staff_required
 def goods_list(page):
-    paginate = Goods.query.order_by(Goods.created_at.desc())\
+    paginate = Goods.query.order_by(Goods.created_at.desc()) \
         .paginate(page, GOODS_PER_PAGE, False)
 
     return render_template('admin_goods_list.html', page_title=u'물품조회',
-                                                    page_subtitle='Goods',
-                                            pagination=paginate
-    )
+                           page_subtitle='Goods',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/boxes/<int:page>', methods=['GET'])
 @staff_required
 def boxes(page):
-    paginate = Box.query.order_by(Box.created_at.desc())\
+    paginate = Box.query.order_by(Box.created_at.desc()) \
         .paginate(page, BOXES_PER_PAGE, False)
 
     return render_template('admin_boxes.html', page_title=u'박스현황',
-                                                    page_subtitle='Boxes',
-                                            pagination=paginate
-    )
+                           page_subtitle='Boxes',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/old_schedules/<int:page>', methods=['GET'])
@@ -257,16 +260,16 @@ def old_schedules(page):
     paginate = Schedule.query.filter(
         or_(Schedule.status == ScheduleStatus.CANCELED,
             Schedule.status == ScheduleStatus.COMPLETE,)
-    ).order_by(Schedule.created_at.desc())\
+    ).order_by(Schedule.created_at.desc()) \
         .paginate(page, SCHEDULES_PER_PAGE, False)
 
     for item in paginate.items:
         item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
 
     return render_template('admin_old_schedules.html', page_title=u'지난 스케줄',
-                                                    page_subtitle='Old Schedules',
-                                            pagination=paginate
-    )
+                           page_subtitle='Old Schedules',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/old_reservations/<int:page>', methods=['GET'])
@@ -274,28 +277,28 @@ def old_schedules(page):
 def old_reservations(page):
     paginate = Reservation.query.filter(
         Reservation.status == ReservationStatus.ACCEPTED,
-    ).order_by(Reservation.created_at.desc())\
+        ).order_by(Reservation.created_at.desc()) \
         .paginate(page, RESERVATIONS_PER_PAGE, False)
 
     for item in paginate.items:
         item.parsed_delivery_time = VisitTime.query.get(item.delivery_time)
 
     return render_template('admin_old_reservations.html', page_title=u'지난 주문',
-                                                    page_subtitle='Old Reservations',
-                                            pagination=paginate
-    )
+                           page_subtitle='Old Reservations',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/purchases/<int:page>', methods=['GET'])
 @staff_required
 def purchases(page):
-    paginate = Purchase.query.order_by(Purchase.created_at.desc())\
+    paginate = Purchase.query.order_by(Purchase.created_at.desc()) \
         .paginate(page, PURCHASES_PER_PAGE, False)
 
     return render_template('admin_purchases.html', page_title=u'구매 히스토리',
-                                                    page_subtitle='Purchase',
-                                            pagination=paginate
-    )
+                           page_subtitle='Purchase',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/schedules/<int:page>', methods=['GET'])
@@ -303,16 +306,16 @@ def purchases(page):
 def schedules(page):
     paginate = Schedule.query.join(Schedule.customer).filter(
         Schedule.status == ScheduleStatus.WAITING
-    ).order_by(Schedule.created_at.desc())\
+    ).order_by(Schedule.created_at.desc()) \
         .paginate(page, SCHEDULES_PER_PAGE, False)
 
     for item in paginate.items:
         item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
 
     return render_template('admin_schedules.html', page_title=u'스케줄',
-                                                    page_subtitle='Schedules',
-                                            pagination=paginate
-    )
+                           page_subtitle='Schedules',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/reservation/<reservation_id>', methods=['GET', 'POST', 'DELETE'])
@@ -447,8 +450,8 @@ def user_detail(user_id):
             user.status = status
         database.session.commit()
     return render_template('admin_user.html', page_title=u'회원 정보',
-                                        page_subtitle='User',
-                                       user_detail=user)
+                           page_subtitle='User',
+                           user_detail=user)
 
 
 @admin.route('/delivery_reservations/<int:page>', methods=['GET'])
@@ -456,7 +459,7 @@ def user_detail(user_id):
 def delivery_reservations(page):
     paginate = DeliveryReservation.query.filter(
         DeliveryReservation.status == ReservationStatus.WAITING
-    ).order_by(DeliveryReservation.created_at.desc())\
+    ).order_by(DeliveryReservation.created_at.desc()) \
         .paginate(page, RESERVATIONS_PER_PAGE, False)
 
     for item in paginate.items:
@@ -464,9 +467,9 @@ def delivery_reservations(page):
         item.parsed_delivery_option = 'Y' if item.delivery_option == ReservationDeliveryType.RESTORE else 'N'
 
     return render_template('admin_delivery_reservations.html', page_title=u'배송',
-                                                    page_subtitle='Delivery Reservations',
-                                            pagination=paginate
-    )
+                           page_subtitle='Delivery Reservations',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/restore_reservations/<int:page>', methods=['GET'])
@@ -474,7 +477,7 @@ def delivery_reservations(page):
 def restore_reservations(page):
     paginate = RestoreReservation.query.filter(
         RestoreReservation.status == ReservationStatus.WAITING
-    ).order_by(RestoreReservation.created_at.desc())\
+    ).order_by(RestoreReservation.created_at.desc()) \
         .paginate(page, RESERVATIONS_PER_PAGE, False)
 
     for item in paginate.items:
@@ -482,9 +485,9 @@ def restore_reservations(page):
         item.parsed_revisit_option = 'Y' if item.revisit_option == RevisitOption.LATER else 'N'
 
     return render_template('admin_restore_reservations.html', page_title=u'재보관',
-                                                    page_subtitle='Restore Reservations',
-                                            pagination=paginate
-    )
+                           page_subtitle='Restore Reservations',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/new_reservations/<int:page>', methods=['GET'])
@@ -492,7 +495,7 @@ def restore_reservations(page):
 def new_reservations(page):
     paginate = NewReservation.query.filter(
         NewReservation.status == ReservationStatus.WAITING
-    ).order_by(NewReservation.created_at.desc())\
+    ).order_by(NewReservation.created_at.desc()) \
         .paginate(page, RESERVATIONS_PER_PAGE, False)
 
     for item in paginate.items:
@@ -505,9 +508,9 @@ def new_reservations(page):
         item.parsed_revisit_option = 'Y' if item.revisit_option == RevisitOption.LATER else 'N'
 
     return render_template('admin_new_reservations.html', page_title=u'신규픽업',
-                                                    page_subtitle='New Reservations',
-                                            pagination=paginate
-    )
+                           page_subtitle='New Reservations',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/', methods=['GET'])
@@ -545,7 +548,7 @@ def admin_index():
         })
 
     return render_template('admin_dashboard.html', page_title=u'대시보드',
-                                                    page_subtitle='Overview',
+                           page_subtitle='Overview',
                            reservations_today=reservations_today,
                            goods_expired_today=goods_expired_today,
                            user_join_today=user_join_today,
@@ -559,9 +562,9 @@ def admin_users(page):
     paginate = User.query.order_by(User.created_at.desc()).paginate(page, USERS_PER_PAGE, False)
 
     return render_template('admin_users.html', page_title=u'회원정보',
-                                                    page_subtitle='Users',
-                                            pagination=paginate
-    )
+                           page_subtitle='Users',
+                           pagination=paginate
+                           )
 
 
 @admin.route('/login', methods=['GET', 'POST'])
@@ -698,7 +701,7 @@ def complete_schedule():
     if reservation.reservation_id.startswith(ReservationType.PICKUP_NEW):
         if (reservation.revisit_option == ReservationRevisitType.IMMEDIATE) or \
                 (reservation.revisit_option == ReservationRevisitType.LATER and
-                    schedule.schedule_id.endswith('_1')):
+                     schedule.schedule_id.endswith('_1')):
             goods_count = len(reservation.goods)
             if goods_count == 0:
                 return response_template(u'%s 주문에 등록된 물품이 없습니다!' % reservation.reservation_id, status=400)

@@ -123,7 +123,7 @@ fieldset[disabled] .btn-hbprimary.active {
   border-color: #C4C4C4;
 
   font-size: 14px;
-  padding: 12px 160px 12px 160px;
+  padding: 12px 80px 12px 80px;
 }
 
 .btn-hbsub:hover,
@@ -779,6 +779,7 @@ dl, ul, ol, menu, li {
 }
 
 .estimate-title {
+  padding-left: 20px;
   font-family: 'Nanum Barun Gothic Light', sans-serif;
   font-size: 20px;
   color: #212121;
@@ -902,4 +903,37 @@ dl, ul, ol, menu, li {
 .schedule-id {
   cursor: pointer;
   text-decoration: underline;
+}
+
+
+.item {
+  padding-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  text-align: center;
+}
+
+.item .item-box {
+  height: 430px;
+  padding: 26px;
+  border: solid 1px #c4c4c4;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.item-box img {
+  max-width:100%;
+}
+
+.item .item-box h2 {
+  font-size: 20px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
+}
+
+.item .item-box p {
+  text-align: left;
+  font-size: 14px;
+  color: #212121;
+  font-family: 'Nanum Barun Gothic Light', 'sans-serif';
 }

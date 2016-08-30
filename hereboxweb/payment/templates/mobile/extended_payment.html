@@ -3,11 +3,11 @@
 
     <div class="container">
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/4-step-2-3.png') }}">
+            <img style="width: 290px" src="{{ url_for('static', filename='assets/img/m-4-step-3.png') }}">
         </div>
 
-        <div class="row" style="margin-top: 90px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-pay.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">결제 방법 Mobile</div>
@@ -17,32 +17,32 @@
                 </div>
             </div>
 
-            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                <div style="margin-left: 100px;">
+            <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div style="padding-left: 15px">
                     <div class="radio" style="margin-top: 30px;">
-                        <label>
+                        <label style="font-size: 15px">
                             <input type="radio" name="optionsPayType" id="optionsAccount" value="account">
                             무통장입금
-                            <p style="font-size: 16px;">국민은행 263137-04-006421 (주)히어박스</p>
+                            <p style="font-size: 12px;">국민은행 263137-04-006421 (주)히어박스</p>
                         </label>
                     </div>
 
-                    <div class="radio" style="margin-top: 30px;">
-                        <label>
+                    <div class="radio" style="margin-top: 15px;">
+                        <label style="font-size: 15px">
                             <input type="radio" name="optionsPayType" id="optionsCard" value="card" disabled>
                             신용/체크 카드 (준비 중)
                         </label>
                     </div>
 
                     <div class="radio" style="margin-top: 30px;">
-                        <label>
+                        <label style="font-size: 15px">
                             <input type="radio" name="optionsPayType" id="optionsPhone" value="phone" disabled>
                             핸드폰 (준비 중)
                         </label>
                     </div>
 
                     <div class="radio" style="margin-top: 30px;">
-                        <label>
+                        <label style="font-size: 15px">
                             <input type="radio" name="optionsPayType" id="optionsKakao" value="kakao" disabled>
                             카카오페이 (준비 중)
                         </label>
@@ -51,9 +51,9 @@
             </div>
         </div>
 
-        <div style="margin: 80px 0 100px 0; text-align: center;">
-            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
-            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        <div style="margin: 50px 0;text-align: center;">
+            <button id="btnNextStep" style="width: 90%;" class="btn btn-hbprimary">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="width: 90%;margin-top: 20px;">이전 단계</button>
         </div>
     </div>
 

@@ -2,38 +2,33 @@
 {% block content %}
 
 
-{##}
-{#    <div class="container" style="padding: auto auto 100px;">#}
-{#        <div style="margin: 0 auto;">#}
-{#            <div class="row my-index-menu">#}
-{#                <div class="col-xs-4 text-center {% if active_my_index == 'my_stuff' %}active{% endif %}">#}
-{#                    <a href="/my_stuff">보관 중인 물품</a></div>#}
-{#                <div class="col-xs-4 text-center {% if active_my_index == 'my_schedule' %}active{% endif %}">#}
-{#                    <a href="/my_schedule">내 스케줄</a></div>#}
-{#                <div class="col-xs-4 text-center {% if active_my_index == 'my_info' %}active{% endif %}">#}
-{#                    <a href="/my_info">내 정보</a></div>#}
-{#            </div>#}
-{#            <div>#}
-{#                {% block my_index_body %}#}
-{#                {% endblock %}#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+    {##}
+    {#    <div class="container" style="padding: auto auto 100px;">#}
+    {#        <div style="margin: 0 auto;">#}
+    {#            <div class="row my-index-menu">#}
+    {#                <div class="col-xs-4 text-center {% if active_my_index == 'my_stuff' %}active{% endif %}">#}
+    {#                    <a href="/my_stuff">보관 중인 물품</a></div>#}
+    {#                <div class="col-xs-4 text-center {% if active_my_index == 'my_schedule' %}active{% endif %}">#}
+    {#                    <a href="/my_schedule">내 스케줄</a></div>#}
+    {#                <div class="col-xs-4 text-center {% if active_my_index == 'my_info' %}active{% endif %}">#}
+    {#                    <a href="/my_info">내 정보</a></div>#}
+    {#            </div>#}
+    {#            <div>#}
+    {#                {% block my_index_body %}#}
+    {#                {% endblock %}#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
 
     <div class="container">
         <div style="margin: 40px 0; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/m-4-step-1.png') }}">
+            <img style="width: 290px" src="{{ url_for('static', filename='assets/img/m-4-step-1.png') }}">
         </div>
-        <div class="row">
-            <div class="col-xs-12 estimate-title">기간 연장할 물품 ({{ packed_stuffs | length }})</div>
-            <div class="my-stuff-items">
-                <div class="my-stuff-items-row">
+        <div>
+            <div class="estimate-title">기간 연장할 물품 ({{ packed_stuffs | length }})</div>
+            <div>
+                <div>
                     {% for my_stuff in packed_stuffs %}
-                        {% if loop.index % 3 == 1 %}
-                            </div>
-                            <div class="my-stuff-items-row">
-                        {% endif %}
-
                         <div class="item">
                             <div class="item-box" style="height: 370px;">
                                 <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
@@ -64,48 +59,47 @@
             </div>
         </div>
 
-        <div>
-            <div class="row vertical-align" style="margin-top: 80px;">
-                <div class="col-xs-4">
-                    <div style="white-space: nowrap;">
-                        <img src="{{ url_for('static', filename='assets/img/icon-promo.png') }}">
-                        <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
-                            <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">프로모션 코드</div>
-                            <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
-                                프로모션 코드를 가지고 계시다면 입력해주세요<br>
-                                할인 혜택을 받을 수 있습니다
-                                <p>
-                                    <a style="color: #ffa000; cursor: pointer;" href="/event" target="_blank">진행 중인 이벤트 확인하기 ></a>
-                                </p>
-                            </div>
+        <div class="row" style="margin: 80px 0 0 0; padding: 0 10px;">
+            <div>
+                <div style="white-space: nowrap; overflow-x: hidden;">
+                    <img src="{{ url_for('static', filename='assets/img/icon-promo.png') }}">
+                    <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
+                        <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">프로모션 코드</div>
+                        <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121; white-space: normal;">
+                            프로모션 코드를 가지고 계시다면<br>
+                            입력해주세요 할인 혜택을 받을 수 있습니다.
+                            <p>
+                                <a style="color: #ffa000; cursor: pointer;" href="/event" target="_blank">진행 중인 이벤트 확인하기 ></a>
+                            </p>
                         </div>
                     </div>
                 </div>
-                <div class="col-xs-6">
-                    <div class="col-xs-6">
-                        <input type="text" class="form-control" id="inputPromotion" placeholder="프로모션 코드를 입력하세요">
-                    </div>
-                    <button id="btnCheckPromotion" type="button" class="col-xs-2 btn btn-hbprimary" style="font-size: 14px; padding: 9px 4px;">확인</button>
+            </div>
+            <div style="text-align: center; padding: 5px;">
+                <div class="col-xs-10">
+                    <input type="text" class="form-control" id="inputPromotion" placeholder="프로모션 코드를 입력하세요">
+                </div>
+                <button id="btnCheckPromotion" type="button" class="col-xs-2 btn btn-hbprimary" style="height: 34px; font-size: 14px; padding: 6px 4px;">확인</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; text-align: center;">
+            예상 결제 비용
+            <div>
+                <div id="totalPrice" style="display: inline-block; margin: 10px 0; padding: 15px 33%;
+                font-family: 'Nanum Barun Gothic Bold', sans-serif; font-size: 26px; color: #ffc107;
+                border-radius: 4px; background-color: #ffffff; border: solid 1px #ffc107;">
+                    0
                 </div>
             </div>
 
-            <div style="margin-top: 80px; font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121; text-align: center;">
-                예상 결제 비용
-                <div>
-                    <div id="totalPrice" style="display: inline-block; margin: 10px 0; padding: 15px 120px; font-family: 'Nanum Barun Gothic Bold', sans-serif; font-size: 26px; color: #ffc107; border-radius: 4px; background-color: #ffffff; border: solid 1px #ffc107;">
-                        0
-                    </div>
-                </div>
+            <div style="font-size: 14px; color: #727272;">
+                총 연장 비용 : <span id="totalExtendPrice"></span><br>
 
-                <div style="font-size: 14px; color: #727272;">
-                    총 연장 비용 : <span id="totalExtendPrice"></span><br>
-
-                    <br>
-                    <p><a style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#discountManual">할인 정책 알아보기 ></a></p>
-                </div>
-
-                <button id="btnNextStep" class="btn btn-hbprimary" style="margin: 80px 0 100px 0;">다음 단계</button>
+                <br>
+                <p><a style="font-size: 14px; color: #ffa000; cursor: pointer;" data-toggle="modal" data-target="#discountManual">할인 정책 알아보기 ></a></p>
             </div>
+            <button id="btnNextStep" class="btn btn-hbprimary" style="width: 90%; margin: 40px 0;">다음 단계</button>
         </div>
     </div>
 
