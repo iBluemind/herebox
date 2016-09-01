@@ -49,7 +49,7 @@
                 <p><b>추가된 물품</b></p>
                 {% for goods in schedule_detail.reservation.goods %}
                     {% if goods.photo %}
-                        <img src="http://d327muphmkh1ps.cloudfront.net/{{ goods.photo }}" style="width: 100px;">
+                        <img src="http://static.herebox.kr/{{ goods.photo }}" style="width: 100px;">
                     {% else %}
                         <img src="{{ url_for('static', filename='assets/img/img-box.png') }}" style="width: 100px;">
                     {% endif %}
