@@ -102,6 +102,8 @@
         });
 
         function addGoods() {
+            $('#ajaxLoader').css({ visibility: 'visible' });
+            $('#frmAddNewGoods').css({ visibility: 'hidden' });
             var formData = new FormData();
             formData.append('schedule_id', $('#inputScheduleId').val());
             formData.append('goods_type', $('#goods_type').val());
@@ -119,9 +121,11 @@
                  contentType: false,
                  success: function () {
                     alert('추가되었습니다.');
-                     location.reload();
+                    location.reload();
                  },
                  error: function(request, status, error) {
+                    $('#ajaxLoader').css({ visibility: 'hidden' });
+                    $('#frmAddNewGoods').css({ visibility: 'visible' });
                     var parsedBody = $.parseJSON(request.responseText);
                     alert(parsedBody['message']);
                  }

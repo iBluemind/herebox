@@ -6,7 +6,8 @@
             <h4 class="modal-title">물품등록</h4>
           </div>
           <div class="modal-body">
-            <form class="form-horizontal" style="width: 80%; margin-left: auto; margin-right: auto; margin-top: 30px; text-align: center;">
+            <img id="ajaxLoader" src="{{ url_for('static', filename='assets/img/ajax-loader.gif') }}" style="text-align: center; visibility: hidden"/>
+            <form id="frmAddNewGoods" class="form-horizontal" style="width: 80%; margin-left: auto; margin-right: auto; margin-top: 30px; text-align: center;">
                 <div class="form-group">
                     <label for="goods_type" class="col-xs-4 control-label" style="text-align: left;">물품종류</label>
                     <div class="col-xs-8">
