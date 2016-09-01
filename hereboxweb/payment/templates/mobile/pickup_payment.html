@@ -1,13 +1,11 @@
 {% extends "mobile/base.html" %}
 {% block content %}
-
     <div class="container">
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/4-step-3.png') }}">
+            <img style="width: 290px;" src="{{ url_for('static', filename='assets/img/m-4-step-3.png') }}">
         </div>
-        mobile
-        <div class="row" style="margin-top: 90px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-pay.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">결제 방법</div>
@@ -17,8 +15,8 @@
                 </div>
             </div>
 
-            <div class="col-xs-6" style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
-                <div style="float: right;">
+            <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
+                <div style="padding-left: 15px; font-size: 14px;">
                     <div class="radio">
                         <label>
                             <input type="radio" name="optionsPayType" id="optionsVisit" value="visit" checked>
@@ -49,13 +47,11 @@
                 </div>
             </div>
         </div>
-
-        <div style="margin: 80px 0 100px 0; text-align: center;">
-            <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
-            <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
+        <div style="margin: 60px 0 40px 0; text-align: center;">
+            <button id="btnNextStep" class="btn btn-hbprimary" style="width: 90%;">다음 단계</button>
+            <button id="btnPrevStep" class="btn btn-hbsub" style="width: 90%;margin-top: 20px;">이전 단계</button>
         </div>
     </div>
-
 {% endblock %}
 {% block jscript %}
 

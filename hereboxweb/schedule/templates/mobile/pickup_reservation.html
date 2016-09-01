@@ -1,34 +1,36 @@
 {% extends "mobile/base.html" %}
 {% block content %}
 
-    <div class="container" style="width: 740px;">
+    <div class="container">
 
         <div style="margin: 40px 0 40px; text-align: center;">
-            <img src="{{ url_for('static', filename='assets/img/4-step-1.png') }}">
+            <img style="width: 290px" src="{{ url_for('static', filename='assets/img/m-4-step-1.png') }}">
         </div>
 
-        <div class="row" style="margin-top: 80px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-phone.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
-                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">핸드폰 번호</div>
+                    <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">휴대폰 번호</div>
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 14px; color: #212121;">
-                        보관한 물품을 찾으실 때 필요하므로 정확하게<br>
-                        입력해주세요
+                        보관한 물품을 찾으실 때 필요하므로 <br>
+                        정확하게 입력해주세요
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6" style="margin-top: 10px;">
+            <div style="margin-top: 10px;">
                 {% if phone_number  %}
-                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
+                    <input type="text" style="width: 90%;margin: 0 auto; margin-top: 20px;"
+                           class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요" value="{{ phone_number }}" disabled>
                 {% else %}
-                    <input type="text" class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
+                    <input type="text" style="width: 90%;margin: 0 auto; margin-top: 20px;"
+                           class="form-control" id="inputPhoneNumber" placeholder="‘-‘ 없이 핸드폰 번호를 입력하세요">
                 {% endif %}
             </div>
         </div>
 
-        <div class="row" style="margin-top: 80px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-address.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">주소</div>
@@ -38,21 +40,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6">
-                <div>
+            <div>
+                <div style="width: 90%; margin: 0 auto;margin-top: 20px">
                     <div style="float: left; width: 68%;">
                         <input type="text" class="form-control" id="inputPostCode" placeholder="우편번호 찾기 버튼을 누르세요">
                     </div>
                     <button onclick="execDaumPostcode()" type="button" class="btn btn-hbprimary" style="float: left; margin-left: 5px; width: 30%; font-size: 14px; padding: 9px 4px;">우편번호 찾기</button>
+                    <input style="display: inline-block; margin-top: 10px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" value="{{ address1 }}">
+                    <input style="margin-top: 10px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" value="{{ address2 }}">
                 </div>
-                <input style="display: inline-block; margin-top: 20px;" type="text" class="form-control" id="inputAddress1" placeholder="주소를 입력하세요" value="{{ address1 }}">
-                <input style="margin-top: 20px;" type="text" class="form-control" id="inputAddress2" placeholder="상세 주소를 입력하세요" value="{{ address2 }}">
             </div>
         </div>
 
 
-        <div class="row" style="margin-top: 80px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-calendar.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">방문일시</div>
@@ -63,10 +65,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6">
+            <div style="width: 90%; margin: 0 auto;margin-top: 20px">
                 <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
-
-                <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                <select id="inputVisitTime" style="margin-top: 10px;" class="form-control">
                     <option value="1">10:00-12:00</option>
                     <option value="2">12:00-14:00</option>
                     <option value="3">14:00-16:00</option>
@@ -77,8 +78,8 @@
             </div>
         </div>
 
-        <div class="row" style="margin-top: 80px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-truck.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">픽업 준비</div>
@@ -88,8 +89,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6">
-                <div class="radio" style="float:left; display:inline-block;">
+            <div>
+                <div class="radio" style="float:left; display:inline-block;padding-left: 20px">
                     <label style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">
                         <input type="radio" name="optionsRevisit" id="optionsImmediate" value="immediate" checked>
                         바로 가능
@@ -119,8 +120,8 @@
             </div>
         </div>
 
-        <div class="row" style="margin-top: 80px;">
-            <div class="col-xs-6">
+        <div style="margin-top: 60px;">
+            <div>
                 <img src="{{ url_for('static', filename='assets/img/icon-memo.png') }}">
                 <div style="margin-left: 16px; display: inline-block; vertical-align: top;">
                     <div style="font-family: 'Nanum Barun Gothic Light', sans-serif; font-size: 20px; color: #212121;">남기실 말씀</div>
@@ -131,12 +132,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-6">
+            <div style="margin: 0 auto; width: 90%; margin-top: 20px;">
                 <textarea id="textareaMemo" class="form-control" rows="6" placeholder="ex) 도착해서 전화주세요">{{ user_memo }}</textarea>
             </div>
         </div>
 
-        <div style="margin: 80px 0 100px 0; text-align: center;">
+        <div style="margin: 80px 0 60px 0; text-align: center;">
             <button id="btnNextStep" class="btn btn-hbprimary">다음 단계</button>
         </div>
     </div>

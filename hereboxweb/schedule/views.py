@@ -31,6 +31,7 @@ def my_schedule(template):
     staff = aliased(User, name="staff")
     customer = aliased(User, name="customer")
 
+    # 픽업 스케줄
     my_pickup_schedules = database.session.query(
         Schedule,
         staff.name.label("staff_name"),
@@ -41,12 +42,13 @@ def my_schedule(template):
             Schedule.schedule_type == ScheduleType.RESTORE_DELIVERY,
             Schedule.schedule_type == ScheduleType.RESTORE_RECOVERY,),
         Schedule.status == ScheduleStatus.WAITING
-    ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
+    ).order_by(Schedule.updated_at.desc()).all()
 
     packed_my_pickup = []
     for item in my_pickup_schedules:
         packed_my_pickup.append(item[0])
 
+    # 배송 스케줄
     my_delivery_schedules = database.session.query(
         Schedule,
         staff.name.label("staff_name"),
@@ -56,7 +58,7 @@ def my_schedule(template):
         Schedule.customer_id == current_user.uid,
         Schedule.schedule_type == ScheduleType.DELIVERY,
         Schedule.status == ScheduleStatus.WAITING
-    ).order_by(Schedule.updated_at.desc()).limit(SCHEDULE_LIST_MAX_COUNT).all()
+    ).order_by(Schedule.updated_at.desc()).all()
 
     packed_my_delivery = []
     for item in my_delivery_schedules:
@@ -310,7 +312,8 @@ def delivery_completion(template):
 
 @schedule.route('/pickup/order', methods=['GET', 'POST'])
 @login_required
-def pickup_order():
+@mobile_template('{mobile/}pickup_reservation.html')
+def pickup_order(template):
     if request.method == 'POST':
         return save_stuffs('/pickup/')
 
@@ -326,10 +329,10 @@ def pickup_order():
         if not user_order:
             session['start_time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             return make_response(
-                render_template('pickup_reservation.html', active_menu='reservation',
+                render_template(template, active_menu='reservation',
                                                     phone_number=current_user.phone))
         return make_response(
-            render_template('pickup_reservation.html', active_menu='reservation',
+            render_template(template, active_menu='reservation',
                             phone_number=current_user.phone,
                             address1=user_order.address1,
                             address2=user_order.address2,
@@ -342,7 +345,8 @@ def pickup_order():
 
 @schedule.route('/pickup/review', methods=['GET', 'POST'])
 @login_required
-def pickup_review():
+@mobile_template('{mobile/}pickup_review.html')
+def pickup_review(template):
     cookie_store_manager = CookieSerializableStoreManager()
     if request.method == 'POST':
         order_helper = ReservationSerializableFactory.serializable('order')
@@ -370,7 +374,7 @@ def pickup_review():
     if user_order.revisit_option == RevisitOption.LATER:
         revisit_time = VisitTime.query.get(user_order.revisit_time)
     total_price = calculate_total_delivery_price(packed_stuffs)
-    response = make_response(render_template('pickup_review.html', active_menu='reservation',
+    response = make_response(render_template(template, active_menu='reservation',
                          packed_stuffs=packed_stuffs,
                          phone_number=user_order.phone_number,
                          address=u'%s %s' % (user_order.address1, user_order.address2),
@@ -386,8 +390,9 @@ def pickup_review():
 
 @schedule.route('/pickup/completion', methods=['GET'])
 @login_required
-def pickup_completion():
-    return render_template('completion.html', active_menu='reservation')
+@mobile_template('{mobile/}pickup_completion.html')
+def pickup_completion(template):
+    return render_template(template, active_menu='reservation')
 
 
 @schedule.route('/schedule/cancel', methods=['DELETE'])
@@ -460,8 +465,10 @@ def reservation_receipt(template, reservation_id):
         return render_template('404.html')
 
     entity = with_polymorphic(Reservation, NewReservation)
+
     reservation = database.session.query(entity).join(Purchase, User). \
         filter(Reservation.reservation_id == reservation_id).first()
+
     if (not reservation) or (current_user.uid != reservation.user.uid):
         return render_template('404.html')
 

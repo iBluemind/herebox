@@ -630,7 +630,7 @@ def register_goods():
         return response_template(u'%s 스케줄을 찾을 수 없습니다.' % schedule_id, status=400)
 
     reservation = schedule.reservation
-    goods_type = request.form.get('goods_type')
+    goods_type = request.form.get('goods_type')  # A or B
     name = request.form.get('name')
     box_id = request.form.get('box_id')
     memo = request.form.get('memo')

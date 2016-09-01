@@ -36,7 +36,8 @@ pay_types = {
 
 @payment.route('/pickup/payment', methods=['GET', 'POST'])
 @login_required
-def pickup_payment():
+@mobile_template('{mobile/pickup_payment.html}')
+def pickup_payment(template):
     packed_stuffs = get_stuffs()
     if not packed_stuffs or len(packed_stuffs) == 0:
         if request.method == 'POST':
@@ -177,7 +178,7 @@ def pickup_payment():
                                         mail_msg_body, 'contact@herebox.kr'])
 
         return response_template(u'정상 처리되었습니다', 200)
-    return render_template('pickup_payment.html', active_menu='reservation')
+    return render_template(template, active_menu='reservation')
 
 
 @payment.route('/delivery/payment', methods=['GET', 'POST'])

@@ -18,25 +18,30 @@ STUFF_LIST_MAX_COUNT = 10
 @mobile_template('{mobile/}my_stuff.html')
 @login_required
 def my_stuff(template):
+    # 창고 보관 중인 물품,
     my_herebox_stuffs = Goods.query.filter(
         Goods.user_id == current_user.uid,
         Goods.in_store == InStoreStatus.IN_STORE,
         Goods.status == GoodsStatus.ACTIVE
-    ).order_by(Goods.created_at.desc()).limit(STUFF_LIST_MAX_COUNT).all()
+    ).order_by(Goods.created_at.desc()).all()
 
     packed_my_herebox_stuffs = []
+
+    # 보관 물건, 남은 날짜 처리
     for item in my_herebox_stuffs:
         today = datetime.date.today()
         remaining_day = item.expired_at - today
         item.remaining_day = remaining_day.days
         packed_my_herebox_stuffs.append(item)
 
+    # 내가 보관 중인 물품,
     my_stuffs = Goods.query.filter(
         Goods.user_id == current_user.uid,
         Goods.in_store == InStoreStatus.OUT_OF_STORE,
         Goods.status == GoodsStatus.ACTIVE
-    ).order_by(Goods.created_at.desc()).limit(STUFF_LIST_MAX_COUNT).all()
+    ).order_by(Goods.created_at.desc()).all()
 
+    # 본인 보관 물품, 남은 날짜 처리
     packed_my_stuffs = []
     for item in my_stuffs:
         today = datetime.date.today()
