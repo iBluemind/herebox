@@ -8,33 +8,39 @@
           <div class="modal-body">
             <form class="form-horizontal" style="width: 80%; margin-left: auto; margin-right: auto; margin-top: 30px; text-align: center;">
                 <div class="form-group">
-                    <label for="area" class="col-xs-4 control-label" style="text-align: left;">물품종류</label>
+                    <label for="goods_type" class="col-xs-4 control-label" style="text-align: left;">물품종류</label>
                     <div class="col-xs-8">
                         <input type="text" class="form-control" id="goods_type" placeholder="A 또는 B 입력">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="area" class="col-xs-4 control-label" style="text-align: left;">이름</label>
+                    <label for="goods_name" class="col-xs-4 control-label" style="text-align: left;">이름</label>
                     <div class="col-xs-8">
                         <input type="text" class="form-control" id="goods_name">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="area" class="col-xs-4 control-label" style="text-align: left;">박스번호</label>
+                    <label for="goods_box_id" class="col-xs-4 control-label" style="text-align: left;">박스번호</label>
                     <div class="col-xs-8">
                         <input type="text" class="form-control" id="goods_box_id" placeholder="규격물품일 경우에만 입력">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="area" class="col-xs-4 control-label" style="text-align: left;">메모</label>
+                    <label for="goods_memo" class="col-xs-4 control-label" style="text-align: left;">메모</label>
                     <div class="col-xs-8">
                         <input type="text" class="form-control" id="goods_memo">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="contact" class="col-xs-4 control-label" style="text-align: left;">보관 시작일</label>
+                    <label for="goods_memo" class="col-xs-4 control-label" style="text-align: left;">보관 시작일</label>
                     <div class="col-xs-8">
                         <input type="text" class="form-control" id="goods_started_at" placeholder="2016-01-01 형식으로 입력">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="goods_photo" class="col-xs-4 control-label" style="text-align: left;">사진 업로드</label>
+                    <div class="col-xs-8">
+                         <input id="goods_photo" type="file">
                     </div>
                 </div>
                 <button id="btnRegisterGoods" type="button" class="btn btn-primary" style="margin-top: 60px;">등록</button>

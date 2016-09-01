@@ -45,8 +45,10 @@
                 <input class="form-control" name="expired_at" value="{{ goods_detail.expired_at }}" placeholder="YYYY-mm-dd">
             </div>
             <div class="form-group col-lg-12">
-                <label>사진</label>
-                <input class="form-control" value="{{ goods_detail.photo or '' }}" disabled>
+                <p><b>사진</b></p>
+                {% if goods_detail.photo %}
+                    <img src="http://d327muphmkh1ps.cloudfront.net/{{ goods_detail.photo }}">
+                {% endif %}
             </div>
             {% if goods_detail.goods_id.startswith('A') %}
             <div class="form-group col-lg-12">

@@ -45,6 +45,16 @@
                 <label>담당직원</label>
                 <input class="form-control" value="{{ schedule_detail.staff[0].name }}" disabled>
             </div>
+            <div class="col-lg-12" style="margin-bottom: 30px;">
+                <p><b>추가된 물품</b></p>
+                {% for goods in schedule_detail.reservation.goods %}
+                    {% if goods.photo %}
+                        <img src="http://d327muphmkh1ps.cloudfront.net/{{ goods.photo }}" style="width: 100px;">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='assets/img/img-box.png') }}" style="width: 100px;">
+                    {% endif %}
+                {% endfor %}
+            </div>
 
             <div class="form-group">
                 {% if schedule_detail.status == 0 %}
@@ -92,16 +102,21 @@
         });
 
         function addGoods() {
+            var formData = new FormData();
+            formData.append('schedule_id', $('#inputScheduleId').val());
+            formData.append('goods_type', $('#goods_type').val());
+            formData.append('name', $('#goods_name').val());
+            formData.append('box_id', $('#goods_box_id').val());
+            formData.append('memo', $('#goods_memo').val());
+            formData.append('started_at', $('#goods_started_at').val());
+            formData.append('goods_photo', $('#goods_photo')[0].files[0]);
+
             $.ajax({
                  type: "POST",
                  url: "/admin/schedule/register/goods",
-                 data: {schedule_id: $('#inputScheduleId').val(),
-                     goods_type: $('#goods_type').val(),
-                     name: $('#goods_name').val(),
-                     box_id: $('#goods_box_id').val(),
-                     memo: $('#goods_memo').val(),
-                     started_at: $('#goods_started_at').val()
-                 },
+                 data: formData,
+                 processData: false,
+                 contentType: false,
                  success: function () {
                     alert('추가되었습니다.');
                      location.reload();

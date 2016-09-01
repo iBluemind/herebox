@@ -248,7 +248,6 @@ class Schedule(database.Model, JsonSerializable):
     schedule_type = database.Column(database.SmallInteger)
     staff_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=True)
     customer_id = database.Column(database.Integer, database.ForeignKey('user.uid'), nullable=False)
-    goods_id = database.Column(database.Integer, database.ForeignKey('goods.id'), nullable=True)
     schedule_date = database.Column(database.Date)
     schedule_time_id = database.Column(database.Integer, database.ForeignKey('visit_time.id'), nullable=False)
     reservation_id = database.Column(database.Integer,

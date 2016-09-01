@@ -34,7 +34,11 @@
 
                                 <div class="item">
                                     <div class="item-box">
-                                        <img src="{{ url_for('static', filename='assets/img/img-box.png') }}">
+                                        {% if my_stuff.photo %}
+                                            <div style="width: 226px; height: 177px; background: url('http://d327muphmkh1ps.cloudfront.net/{{ my_stuff.photo }}') no-repeat center; background-size:contain;"></div>
+                                        {% else %}
+                                            <div style="width: 226px; height: 177px; background: url('{{ url_for('static', filename='assets/img/img-box.png') }}') no-repeat; background-size:contain;"></div>
+                                        {% endif %}
                                         <h2>{{ my_stuff.name }}</h2>
                                         <p>
                                             관리번호: <span id="goodsId">{{ my_stuff.goods_id }}</span>

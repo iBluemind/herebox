@@ -2,9 +2,16 @@
 
 
 import datetime
+import mimetypes
+import urllib2
+
+import boto
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
 from flask import request, render_template, make_response, url_for, redirect, flash, json
 from flask_login import login_user
 from sqlalchemy import or_, and_
+from werkzeug.utils import secure_filename
 from config import RSA_PUBLIC_KEY_BASE64
 from hereboxweb import database, response_template, app, logger
 from hereboxweb.admin import admin
@@ -758,6 +765,22 @@ def register_goods():
     box_id = request.form.get('box_id')
     memo = request.form.get('memo')
     started_at = request.form.get('started_at')
+    attached_photo = request.files.get('goods_photo')
+
+    attached_filepath = None
+    if attached_photo:
+        filename = secure_filename(attached_photo.filename)
+        aws_s3 = boto.s3.connect_to_region(app.config['FLASKS3_REGION'],
+                                           aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
+                                           aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'])
+        s3_bucket = aws_s3.get_bucket(app.config['FLASKS3_BUCKET_NAME'])
+        s3_key = Key(s3_bucket)
+        attached_filepath = '%s/%s' % ('goods', filename)
+        s3_key.key = attached_filepath
+        mime = mimetypes.read_mime_types(filename)
+        s3_key.set_metadata('Content-Type', mime)
+        s3_key.set_contents_from_file(attached_photo)
+        s3_key.make_public()
 
     box = None
     if goods_type not in (GoodsType.STANDARD_BOX, GoodsType.NONSTANDARD_GOODS):
@@ -788,6 +811,7 @@ def register_goods():
                       started_at=started_at,
                       expired_at=expired_at,
                       fixed_rate=fixed_rate,
+                      photo=attached_filepath,
                       status=GoodsStatus.ACTIVE)
 
     database.session.add(new_goods)

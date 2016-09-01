@@ -100,7 +100,7 @@ class Goods(database.Model, JsonSerializable):
     outgoings = database.relationship('Outgoing', backref='goods', lazy='dynamic')
 
     def __init__(self, goods_type, name, memo, in_store, status, user_id, fixed_rate,
-                                started_at=None, expired_at=None, box_id=None):
+                                started_at=None, expired_at=None, box_id=None, photo=None):
         self.goods_id = self._generate_goods_id(goods_type)
         self.goods_type = goods_type
         self.name = name
@@ -110,6 +110,7 @@ class Goods(database.Model, JsonSerializable):
         self.status = status
         self.user_id = user_id
         self.fixed_rate = fixed_rate
+        self.photo = photo
         self.started_at = started_at
         self.expired_at = expired_at
         self.created_at = datetime.datetime.now()
