@@ -58,15 +58,15 @@ def get_or_create(session, model, defaults=None, **kwargs):
 
 
 def initialize_db():
-    from hereboxweb import database
-    print "Init DB"
+    from hereboxweb import database, logger
+    logger.debug("Init DB")
     # from hereboxweb.admin.models import VisitTime
     # from hereboxweb.auth.models import User, UserStatus
     # from hereboxweb.schedule.models import PromotionType, PromotionCode, Promotion
     # from hereboxweb.models import AlertNewArea
     # database.drop_all()
-    from hereboxweb.schedule.models import UnavailableSchedule
-    database.create_all()
+    # from hereboxweb.schedule.models import UnavailableSchedule
+    # database.create_all()
 
     # database.session.add(VisitTime(start_time='10:00', end_time='12:00'))
     # database.session.add(VisitTime(start_time='12:00', end_time='14:00'))
@@ -304,4 +304,20 @@ class RedisSessionInterface(SessionInterface):
                             expires=self.get_expiration_time(app, session),
                             httponly=True, domain=domain)
 
+
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import ClauseElement
+from sqlalchemy import literal
+
+class Match(ClauseElement):
+    def __init__(self, columns, value):
+        self.columns = columns
+        self.value = literal(value)
+
+@compiles(Match)
+def _match(element, compiler, **kw):
+    return "MATCH (%s) AGAINST (%s)" % (
+        ", ".join(compiler.process(c, **kw) for c in element.columns),
+        compiler.process(element.value)
+    )
 

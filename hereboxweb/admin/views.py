@@ -4,9 +4,9 @@
 import datetime
 from flask import request, render_template, make_response, url_for, redirect, flash, json
 from flask_login import login_user
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from config import RSA_PUBLIC_KEY_BASE64
-from hereboxweb import database, response_template, app
+from hereboxweb import database, response_template, app, logger
 from hereboxweb.admin import admin
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.forms import LoginForm
@@ -18,7 +18,7 @@ from hereboxweb.schedule.models import Reservation, ReservationStatus, ScheduleT
     ReservationType, RestoreReservation, DeliveryReservation, ReservationDeliveryType, Schedule, ReservationRevisitType, \
     ExtendPeriod, ExtendPeriodStatus, PromotionCode, UnavailableSchedule
 from hereboxweb.schedule.reservation import RevisitOption
-from hereboxweb.utils import add_months, staff_required
+from hereboxweb.utils import add_months, staff_required, Match
 from hereboxweb.admin import custom_filter
 
 USERS_PER_PAGE = 15
@@ -59,15 +59,15 @@ def schedule_restriction():
     # 스케줄 제한 삭제
     elif request.method == 'DELETE':
         id = request.form.get('id')
-        print id
+        logger.debug(id)
         u_schedule = UnavailableSchedule.query.get(id)
         database.session.delete(u_schedule)
         try:
-            print "TRY"
+            logger.debug("TRY")
             database.session.commit()
             return response_template(u'삭제되었습니다.', status=200)
         except:
-            print "ERROR"
+            logger.debug("ERROR")
             return response_template(u'문제가 발생했습니다.', status=500)
 
 
@@ -230,6 +230,20 @@ def schedule_detail(schedule_id):
                            schedule_detail=schedule)
 
 
+@admin.route('/goods/<string:keyword>/<int:page>', methods=['GET'])
+@staff_required
+def search_goods(keyword, page):
+    paginate = Goods.query.filter(
+        Match([Goods.goods_id, Goods.name, Goods.memo], keyword))\
+        .order_by(Goods.created_at.desc()) \
+        .paginate(page, GOODS_PER_PAGE, False)
+    return render_template('admin_goods_list.html', page_title=u'물품조회',
+                           page_subtitle='Goods',
+                           pagination=paginate,
+                           search_keyword=keyword
+                           )
+
+
 @admin.route('/goods_list/<int:page>', methods=['GET'])
 @staff_required
 def goods_list(page):
@@ -238,6 +252,20 @@ def goods_list(page):
 
     return render_template('admin_goods_list.html', page_title=u'물품조회',
                            page_subtitle='Goods',
+                           pagination=paginate
+                           )
+
+
+@admin.route('/box/<string:keyword>/<int:page>', methods=['GET'])
+@staff_required
+def search_box(keyword, page):
+    paginate = Box.query.filter(
+        Match([Box.box_id], keyword)
+    ).order_by(Box.created_at.desc()) \
+        .paginate(page, BOXES_PER_PAGE, False)
+
+    return render_template('admin_boxes.html', page_title=u'박스현황',
+                           page_subtitle='Boxes',
                            pagination=paginate
                            )
 
@@ -272,6 +300,30 @@ def old_schedules(page):
                            )
 
 
+@admin.route('/old_reservation/<string:keyword>/<int:page>', methods=['GET'])
+@staff_required
+def search_old_reservation(keyword, page):
+    paginate = Reservation.query.join(Schedule)\
+        .join(User, Reservation.user_id == User.uid).filter(
+        and_(Reservation.status == ReservationStatus.ACCEPTED,
+             or_(
+                 Match([Schedule.schedule_id], keyword),
+                 Match([Reservation.reservation_id, Reservation.address,
+                        Reservation.contact, Reservation.user_memo], keyword),
+                 Match([User.name, User.address1, User.address2], keyword)
+             ))
+    ).order_by(Reservation.created_at.desc()) \
+        .paginate(page, RESERVATIONS_PER_PAGE, False)
+
+    for item in paginate.items:
+        item.parsed_delivery_time = VisitTime.query.get(item.delivery_time)
+
+    return render_template('admin_old_reservations.html', page_title=u'지난 주문',
+                           page_subtitle='Old Reservations',
+                           pagination=paginate
+                           )
+
+
 @admin.route('/old_reservations/<int:page>', methods=['GET'])
 @staff_required
 def old_reservations(page):
@@ -301,9 +353,66 @@ def purchases(page):
                            )
 
 
+@admin.route('/schedule/<string:keyword>/<int:page>', methods=['GET'])
+@staff_required
+def search_schedule(keyword, page):
+    schedule_status = request.args.get('status')
+    if schedule_status not in ('waiting', 'old'):
+        return redirect(url_for('admin.schedules', page=1))
+
+    if schedule_status == 'waiting':
+        paginate = Schedule.query.join(Schedule.customer) \
+            .join(Reservation) \
+            .filter(
+            and_(
+                Schedule.status == ScheduleStatus.WAITING,
+                or_(Match([Schedule.schedule_id], keyword),
+                    Match([Reservation.reservation_id, Reservation.address,
+                           Reservation.contact, Reservation.user_memo], keyword),
+                    Match([User.name, User.address1, User.address2], keyword))
+            )
+        ).order_by(Schedule.created_at.desc()) \
+            .paginate(page, SCHEDULES_PER_PAGE, False)
+
+        for item in paginate.items:
+            item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
+
+        return render_template('admin_schedules.html', page_title=u'스케줄',
+                               page_subtitle='Schedules',
+                               pagination=paginate,
+                               search_keyword=keyword
+                               )
+
+    elif schedule_status == 'old':
+        paginate = Schedule.query.join(Schedule.customer) \
+            .join(Reservation) \
+            .filter(
+            and_(
+                or_(
+                    Schedule.status == ScheduleStatus.CANCELED,
+                    Schedule.status == ScheduleStatus.COMPLETE
+                ),
+                or_(Match([Schedule.schedule_id], keyword),
+                    Match([Reservation.reservation_id, Reservation.address,
+                           Reservation.contact, Reservation.user_memo], keyword),
+                    Match([User.name, User.address1, User.address2], keyword))
+            )
+        ).order_by(Schedule.created_at.desc()) \
+            .paginate(page, SCHEDULES_PER_PAGE, False)
+
+        for item in paginate.items:
+            item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
+
+        return render_template('admin_old_schedules.html', page_title=u'지난 스케줄',
+                               page_subtitle='Old Schedules',
+                               pagination=paginate,
+                               search_keyword=keyword
+                               )
+
+
 @admin.route('/schedules/<int:page>', methods=['GET'])
 @staff_required
-def schedules(page):
+def schedules(page=1):
     paginate = Schedule.query.join(Schedule.customer).filter(
         Schedule.status == ScheduleStatus.WAITING
     ).order_by(Schedule.created_at.desc()) \
@@ -554,6 +663,20 @@ def admin_index():
                            user_join_today=user_join_today,
                            used_box_today=used_box_today,
                            reservation_statistics=json.dumps(reservation_statistics_data))
+
+
+@admin.route('/users/<string:keyword>/<int:page>', methods=['GET'])
+@staff_required
+def search_user(keyword, page):
+    paginate = User.query.filter(
+        Match([User.name, User.address1, User.address2], keyword)
+    ).order_by(User.created_at.desc()).paginate(page, USERS_PER_PAGE, False)
+
+    return render_template('admin_users.html', page_title=u'회원정보',
+                           page_subtitle='Users',
+                           pagination=paginate,
+                           search_keyword=keyword
+                           )
 
 
 @admin.route('/users/<int:page>', methods=['GET'])

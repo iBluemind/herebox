@@ -33,10 +33,20 @@
             </table>
         </div>
 
+        {% include "admin_search.html" %}
         <nav class="text-center">
             {% from "admin_pagination.html" import render_pagination %}
             {{ render_pagination(pagination, 'admin.admin_users') }}
         </nav>
+
     </div>
 
+{% endblock %}
+{% block jscript %}
+    <script>
+        $("#btnSearch").click(function() {
+            var keyword = $("#searchKeyword").val();
+            location.href = "/admin/users/" + keyword + "/1";
+        });
+    </script>
 {% endblock %}

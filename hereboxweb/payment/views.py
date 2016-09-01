@@ -5,7 +5,7 @@ from flask import request, render_template, redirect, url_for
 from flask_login import login_required, current_user
 from flask_mobility.decorators import mobile_template
 from sqlalchemy import func
-from hereboxweb import response_template, bad_request, forbidden
+from hereboxweb import response_template, bad_request, forbidden, logger
 from hereboxweb.admin.models import VisitTime
 from hereboxweb.auth.models import User
 from hereboxweb.book.models import Goods
@@ -136,7 +136,7 @@ def pickup_payment(template):
 
         mail_msg_body = u"""
             재보관 주문 정보입니다.
-            http://www.herebox.kr/admin/reservation/%s
+            http://admin.herebox.kr/admin/reservation/%s
 
             스케줄번호: %s   회원: %s
             주소: %s   연락처: %s
@@ -159,7 +159,7 @@ def pickup_payment(template):
 
             mail_msg_body = u"""
                 [재방문] 재보관 주문 정보입니다.
-                http://www.herebox.kr/admin/reservation/%s
+                http://admin.herebox.kr/admin/reservation/%s
 
                 스케줄번호: %s   회원: %s
                 주소: %s   연락처: %s
@@ -270,7 +270,7 @@ def delivery_payment(template):
 
         mail_msg_body = u"""
             배송 주문 정보입니다.
-            http://www.herebox.kr/admin/reservation/%s
+            http://admin.herebox.kr/admin/reservation/%s
 
             스케줄번호: %s   회원: %s
             주소: %s   연락처: %s
@@ -495,7 +495,7 @@ def reservation_payment(template):
         except:
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
-        print "New visit schedule"
+        logger.debug("New visit schedule")
         new_visit_schedule = Schedule(status=ScheduleStatus.WAITING,
                                       schedule_type=ScheduleType.PICKUP_DELIVERY,
                                       staff_id=1,
@@ -526,7 +526,7 @@ def reservation_payment(template):
         try:
             database.session.commit()
         except:
-            print "error at revisit schedule"
+            logger.debug("error at revisit schedule")
             return response_template(u'문제가 발생했습니다. 나중에 다시 시도해주세요.', 500)
 
         visit_time = VisitTime.query.get(user_order.visit_time)
@@ -540,7 +540,7 @@ def reservation_payment(template):
 
         mail_msg_body = u"""
         신규 주문 정보입니다.
-        http://www.herebox.kr/admin/reservation/%s
+        http://admin.herebox.kr/admin/reservation/%s
 
         스케줄번호: %s   회원: %s
         주소: %s   연락처: %s
@@ -567,7 +567,7 @@ def reservation_payment(template):
 
             mail_msg_body = u"""
                 [재방문] 신규 주문 정보입니다.
-                http://www.herebox.kr/admin/reservation/%s
+                http://admin.herebox.kr/admin/reservation/%s
 
                 스케줄번호: %s   회원: %s
                 주소: %s   연락처: %s
