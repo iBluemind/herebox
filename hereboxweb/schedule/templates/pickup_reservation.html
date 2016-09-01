@@ -64,9 +64,11 @@
                 </div>
             </div>
             <div class="col-xs-6">
-                <input type="text" class="form-control" id="inputVisitDate" placeholder="날짜를 선택하세요 (2주 이내)">
+                <input type="text" class="form-control" id="inputVisitDate" onblur="getAvailableTime(this)"
+                       placeholder="날짜를 선택하세요 (2주 이내)">
 
                 <select id="inputVisitTime" style="margin-top: 20px;" class="form-control">
+                    <option>시간 선택</option>
                     <option value="1">10:00-12:00</option>
                     <option value="2">12:00-14:00</option>
                     <option value="3">14:00-16:00</option>
@@ -106,8 +108,10 @@
                     </label>
                 </div>
                 <div id="revisitDatetime">
-                    <input type="text" class="form-control" id="inputRevisitDate" placeholder="재방문 날짜를 선택하세요 (1주 이내)">
+                    <input type="text" class="form-control" id="inputRevisitDate" onblur="getAvailableTime(this)"
+                           placeholder="재방문 날짜를 선택하세요 (1주 이내)">
                     <select id="inputRevisitTime" style="margin-top: 20px;" class="form-control">
+                        <option value="1">시간 선택</option>
                         <option value="1">10:00-12:00</option>
                         <option value="2">12:00-14:00</option>
                         <option value="3">14:00-16:00</option>

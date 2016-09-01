@@ -129,6 +129,9 @@ $(document).ready(function() {
 });
 
 $(window).load(function() {
+    setCalendar($("#inputVisitDate").val(),'inputVisitTime');
+    setCalendar($("#inputRevisitDate").val(),'inputRevisitTime');
+
     var estimateInfo = Cookies.get('estimate');
     if (estimateInfo) {
         return ;
@@ -187,12 +190,91 @@ function errorCheck() {
         isError = true;
     }
 
+    if ($("#inputVisitTime").val() == '시간 선택') {
+        $("#inputVisitTime").addClass('has-error');
+        isError = true;
+    }
+
+
     if (isError) {
         $("html, body").animate({ scrollTop: 0 }, "slow");
     }
 
     return isError;
 }
+
+
+function setCalendar(date, name){
+    $.ajax({
+        type: "POST",
+        url: "/schedule/available",
+        data: {
+            date: date
+        },
+        success: function (times) {
+            var delivery_times = ['', '10:00-12:00', '12:00-14:00',
+                '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
+
+            var options = $("#"+name).children(); // options
+
+            if(times=='None'){
+                for(var i=1; i<7; i++){
+                    $(options[i]).text(delivery_times[i])
+                    $(options[i]).removeAttr("disabled")
+                }
+            }else{
+                for(var j=1; j<7; j++){
+                    var obj = JSON.parse(times);
+                    if(obj[j]=='False'){
+                        $(options[j]).attr("disabled", true)
+                        $(options[j]).text(delivery_times[j] + ' : 예약 마감')
+                    }
+                }
+            }
+        },
+        error: function(request, status, error) {
+            console.log("error")
+        }
+    });
+}
+
+function getAvailableTime(date){
+    var item = $(date);
+    var date = $(date).val(); // 2016-08-29
+    $.ajax({
+        type: "POST",
+        url: "/schedule/available",
+        data: {
+            date: date
+        },
+        success: function (times) {
+            var delivery_times = ['', '10:00-12:00', '12:00-14:00',
+                '14:00-16:00', '16:00-18:00', '18:00-20:00', '20:00-22:00'];
+            var time_table = item.siblings()[0];
+            var options = $("#"+time_table.id).children(); // options
+
+            if(times=='None'){
+                for(var i=1; i<7; i++){
+                    $(options[i]).text(delivery_times[i])
+                    $(options[i]).removeAttr("disabled")
+                }
+            }else{
+                for(var j=1; j<7; j++){
+                    $(options[j]).text(delivery_times[j])
+                    $(options[j]).removeAttr("disabled")
+                    var obj = JSON.parse(times);
+                    if(obj[j]=='False'){
+                        $(options[j]).attr("disabled", true)
+                        $(options[j]).text(delivery_times[j] + ' : 예약 마감')
+                    }
+                }
+            }
+        },
+        error: function(request, status, error) {
+        }
+    });
+}
+
 
 function execDaumPostcode() {
     new daum.Postcode({
