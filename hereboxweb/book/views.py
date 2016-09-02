@@ -143,7 +143,7 @@ def extended_review(template):
 
 @book.route('/extended/completion', methods=['GET'])
 @login_required
-@mobile_template('{mobile/extended_completion.html}')
+@mobile_template('{mobile/}extended_completion.html')
 def extended_completion(template):
     return render_template(template, active_menu='reservation')
 
