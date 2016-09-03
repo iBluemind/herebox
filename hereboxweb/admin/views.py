@@ -38,6 +38,19 @@ EXTEND_PERIOD_PER_PAGE = 10
 INCOMINGS_PER_PAGE = 30
 
 
+def sync_upload_to_s3(filename, filepath, file):
+    aws_s3 = boto.s3.connect_to_region(app.config['FLASKS3_REGION'],
+                                       aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
+                                       aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'])
+    s3_bucket = aws_s3.get_bucket(app.config['FLASKS3_BUCKET_NAME'])
+    s3_key = Key(s3_bucket)
+    s3_key.key = filepath
+    mime = mimetypes.read_mime_types(filename)
+    s3_key.set_metadata('Content-Type', mime)
+    s3_key.set_contents_from_file(file)
+    s3_key.make_public()
+
+
 @admin.route('/schedule_restriction', methods=['GET', 'POST', 'DELETE'])
 @staff_required
 def schedule_restriction():
@@ -157,6 +170,7 @@ def goods_detail(goods_id):
         memo = request.form.get('memo')
         started_at = request.form.get('started_at')
         expired_at = request.form.get('expired_at')
+        goods_photo = request.files.get('goods_photo')
 
         if goods_type and goods.goods_type != goods_type:
             goods.goods_type = goods_type
@@ -176,9 +190,15 @@ def goods_detail(goods_id):
             extend_period_history = ExtendPeriod(extended_period, goods.id, ExtendPeriodStatus.ACCEPTED)
             goods.expired_at = expired_at
             database.session.add(extend_period_history)
-
-        incoming_history = Incoming(goods.id)
-        database.session.add(incoming_history)
+        attached_filepath = None
+        if goods_photo:
+            src_filename = goods_photo.filename
+            last_filename = src_filename[src_filename.rindex('.') + 1:]
+            reservation = Reservation.query.filter(Reservation.goods.any(id=goods.id)).first()
+            filename = '%s_%s.%s' % (reservation.user_id, reservation.reservation_id, last_filename)
+            attached_filepath = '%s/%s' % ('goods', filename)
+            sync_upload_to_s3(filename, attached_filepath, goods_photo)
+            goods.photo = attached_filepath
 
         try:
             database.session.commit()
@@ -765,22 +785,7 @@ def register_goods():
     box_id = request.form.get('box_id')
     memo = request.form.get('memo')
     started_at = request.form.get('started_at')
-    attached_photo = request.files.get('goods_photo')
-
-    attached_filepath = None
-    if attached_photo:
-        filename = secure_filename(attached_photo.filename)
-        aws_s3 = boto.s3.connect_to_region(app.config['FLASKS3_REGION'],
-                                           aws_access_key_id=app.config['AWS_ACCESS_KEY_ID'],
-                                           aws_secret_access_key=app.config['AWS_SECRET_ACCESS_KEY'])
-        s3_bucket = aws_s3.get_bucket(app.config['FLASKS3_BUCKET_NAME'])
-        s3_key = Key(s3_bucket)
-        attached_filepath = '%s/%s' % ('goods', filename)
-        s3_key.key = attached_filepath
-        mime = mimetypes.read_mime_types(filename)
-        s3_key.set_metadata('Content-Type', mime)
-        s3_key.set_contents_from_file(attached_photo)
-        s3_key.make_public()
+    goods_photo = request.files.get('goods_photo')
 
     box = None
     if goods_type not in (GoodsType.STANDARD_BOX, GoodsType.NONSTANDARD_GOODS):
@@ -801,6 +806,14 @@ def register_goods():
     user_id = reservation.user_id
     expired_at = add_months(started_at, reservation.period)
     fixed_rate = reservation.fixed_rate
+
+    attached_filepath = None
+    if goods_photo:
+        src_filename = goods_photo.filename
+        last_filename = src_filename[src_filename.rindex('.') + 1:]
+        filename = '%s_%s.%s' % (reservation.user_id, reservation.reservation_id, last_filename)
+        attached_filepath = '%s/%s' % ('goods', filename)
+        sync_upload_to_s3(filename, attached_filepath, goods_photo)
 
     new_goods = Goods(goods_type=goods_type,
                       name=name,

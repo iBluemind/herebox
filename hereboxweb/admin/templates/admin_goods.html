@@ -46,9 +46,16 @@
             </div>
             <div class="form-group col-lg-12">
                 <p><b>사진</b></p>
-                {% if goods_detail.photo %}
-                    <img src="http://static.herebox.kr/{{ goods_detail.photo }}">
-                {% endif %}
+                <div style="display: inline-block;">
+                    {% if goods_detail.photo %}
+                        <img src="http://static.herebox.kr/{{ goods_detail.photo }}" style="width: 100px;">
+                    {% else %}
+                            <img src="{{ url_for('static', filename='assets/img/img-box.png') }}" style="width: 100px;">
+                    {% endif %}
+                </div>
+                <button id="btnChangePhoto" type="button" class="btn btn-xs btn-default">사진 변경</button>
+                <img id="ajaxLoader" src="{{ url_for('static', filename='assets/img/ajax-loader.gif') }}" style="text-align: center; visibility: hidden"/>
+                <input id="goods_photo" type="file" style="display: inline-block;">
             </div>
             {% if goods_detail.goods_id.startswith('A') %}
             <div class="form-group col-lg-12">
@@ -83,6 +90,36 @@
                          }
                     });
                 }
+            });
+
+            $("#btnChangePhoto").click(function() {
+                var attachedFile = $('#goods_photo')[0].files[0];
+                if (!attachedFile) {
+                    alert("변경하려는 파일을 먼저 선택해주세요.");
+                    return ;
+                }
+                $('#ajaxLoader').css({ visibility: 'visible' });
+                $('#btnChangePhoto').css({ visibility: 'hidden' });
+                var formData = new FormData();
+                formData.append('goods_photo', attachedFile);
+
+                $.ajax({
+                     type: "POST",
+                     url: window.location.pathname,
+                     data: formData,
+                     processData: false,
+                     contentType: false,
+                     success: function () {
+                        alert('변경되었습니다.');
+                        location.reload();
+                     },
+                     error: function(request, status, error) {
+                        $('#ajaxLoader').css({ visibility: 'hidden' });
+                        $('#btnChangePhoto').css({ visibility: 'visible' });
+                        var parsedBody = $.parseJSON(request.responseText);
+                        alert(parsedBody['message']);
+                     }
+                });
             });
         });
 
