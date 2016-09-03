@@ -141,6 +141,14 @@
             <button id="btnPrevStep" class="btn btn-hbsub" style="margin-top: 20px;">이전 단계</button>
         </div>
     </div>
+    <!-- 전환페이지 설정 -->
+    <script type="text/javascript" src="http://wcs.naver.net/wcslog.js"></script>
+    <script type="text/javascript">
+        var _nasa={};
+        _nasa["cnv"] = wcs.cnv("3","10"); // 전환유형, 전환가치 설정해야함.
+    </script>
+
+
 {% endblock %}
 {% block jscript %}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>
@@ -149,7 +157,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='libs/moment/min/locales.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='libs/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css') }}" />
-{#    <script type="text/javascript" src="/static/assets/js/reservation.js"></script>#}
+    {#    <script type="text/javascript" src="/static/assets/js/reservation.js"></script>#}
     {% assets "reservation_js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}

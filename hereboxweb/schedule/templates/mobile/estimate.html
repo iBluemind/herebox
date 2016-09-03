@@ -211,6 +211,13 @@
     {% include "dialog_binding_product.html" %}
     {% include "dialog_box_size.html" %}
 
+    <!-- 전환페이지 설정 -->
+    <script type="text/javascript" src="http://wcs.naver.net/wcslog.js"></script>
+    <script type="text/javascript">
+        var _nasa={};
+        _nasa["cnv"] = wcs.cnv("2","10"); // 전환유형, 전환가치 설정해야함.
+    </script>
+
 {% endblock %}
 {% block jscript %}
     <script type="text/javascript" src="{{ url_for('static', filename='libs/js-cookie/src/js.cookie.js') }}"></script>

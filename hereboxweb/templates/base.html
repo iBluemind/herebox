@@ -164,6 +164,7 @@
 {% endassets %}
 {% block jscript %}{% endblock %}
 
+{# Google Analytics #}
 <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MM59LG"
                   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -172,6 +173,7 @@
         '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-MM59LG');</script>
 
+{# FaceBook #}
 <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
@@ -185,6 +187,7 @@
                src="https://www.facebook.com/tr?id=522496584600031&ev=PageView&noscript=1"
 /></noscript>
 
+{# Channel #}
 <script>
     window.channelPluginSettings = {
         "plugin_id": "64861481-fa1d-4fac-845a-4d01cafe7292"
@@ -208,5 +211,26 @@
         }
     })();
 </script>
+
+
+
+{# Naver 추적 코드 #}
+<!-- 전환페이지 설정 -->
+<script type="text/javascript" src="http://wcs.naver.net/wcslog.js"></script>
+<script type="text/javascript">
+var _nasa={};
+_nasa["cnv"] = wcs.cnv("1","10"); // 전환유형, 전환가치 설정해야함.
+</script>
+
+<!-- 공통 적용 스크립트 , 모든 페이지에 노출되도록 설치. 단 전환페이지 설정값보다 항상 하단에 위치해야함 -->
+<script type="text/javascript" src="http://wcs.naver.net/wcslog.js"> </script>
+<script type="text/javascript">
+    if (!wcs_add) var wcs_add={};
+    wcs_add["wa"] = "s_290fa64e46b6";
+    if (!_nasa) var _nasa={};
+    wcs.inflow();
+    wcs_do(_nasa);
+</script>
+
 </body>
 </html>
