@@ -38,34 +38,6 @@ class Outgoing(database.Model, JsonSerializable):
         self.created_at = datetime.datetime.now()
 
 
-class InStoreStatus(object):
-    IN_STORE = 0        # 보관중
-    OUT_OF_STORE = 1    # 보관 중 아님
-
-
-class BoxStatus(object):
-    AVAILABLE = 0       # 사용가능
-    UNAVAILABLE = 1     # 사용중
-
-
-class Box(database.Model, JsonSerializable):
-
-    __tablename__ = 'box'
-
-    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    box_id = database.Column(database.String(5))
-    in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
-    status = database.Column(database.SmallInteger)     # 박스의 사용여부
-    created_at = database.Column(database.DateTime)
-
-    def __init__(self, box_id, in_store, status):
-        self.box_id = box_id
-        self.in_store = in_store
-        self.status = status
-        self.created_at = datetime.datetime.now()
-        self.updated_at = datetime.datetime.now()
-
-
 class GoodsType(object):
     STANDARD_BOX = 'A'        # 규격박스
     NONSTANDARD_GOODS = 'B'   # 비규격 물품
@@ -128,4 +100,31 @@ class Goods(database.Model, JsonSerializable):
         serial_number = init_number + self._get_today_goods_count()
         return '%c%s00%s' % (first_char, day_number, serial_number)
 
+
+class InStoreStatus(object):
+    IN_STORE = 0        # 보관중
+    OUT_OF_STORE = 1    # 보관 중 아님
+
+
+class BoxStatus(object):
+    AVAILABLE = 0       # 사용가능
+    UNAVAILABLE = 1     # 사용중
+
+
+class Box(database.Model, JsonSerializable):
+
+    __tablename__ = 'box'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    box_id = database.Column(database.String(5))
+    in_store = database.Column(database.SmallInteger)   # 창고에 보관 여부
+    status = database.Column(database.SmallInteger)     # 박스의 사용여부
+    created_at = database.Column(database.DateTime)
+
+    def __init__(self, box_id, in_store, status):
+        self.box_id = box_id
+        self.in_store = in_store
+        self.status = status
+        self.created_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now()
 

@@ -22,7 +22,7 @@
                         <td><a href="/admin/schedule/{{ item.schedule_id }}">{{ item.schedule_id }}</a></td>
                         <td><a href="/admin/reservation/{{ item.reservation.reservation_id }}">{{ item.reservation.reservation_id }}</a></td>
                         <td>{{ item.schedule_date }}</td>
-                        <td>{{ item.parsed_schedule_time }}</td>
+                        <td>{{ item.schedule_time }}</td>
                         <td>
                             {{ '완료' if item.status == 1 }}
                             {{ '취소' if item.status == 2 }}

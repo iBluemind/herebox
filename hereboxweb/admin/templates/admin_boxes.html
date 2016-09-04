@@ -10,6 +10,7 @@
                         <th>박스번호</th>
                         <th>사용중</th>
                         <th>보관중</th>
+                        <th>물품 관리번호</th>
                         <th>등록일</th>
                     </tr>
                 </thead>
@@ -26,7 +27,10 @@
                             {{ 'Y' if item.in_store == 0 }}
                             {{ 'N' if item.in_store == 1 }}
                         </td>
-                        <td>{{ item.created_at }}</td>
+                        <td>
+                            <a href="/admin/goods/{{ item.goods.goods_id }}">{{ item.goods.goods_id }}</a>
+                        </td>
+                        <td>{{ item.created_at if item.created_at else '' }}</td>
                      </tr>
                      {% endfor %}
                 </tbody>

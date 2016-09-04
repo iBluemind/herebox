@@ -227,8 +227,8 @@ def goods_detail(goods_id):
 @admin.route('/schedule/<schedule_id>', methods=['GET', 'POST', 'DELETE'])
 @staff_required
 def schedule_detail(schedule_id):
-    schedule = Schedule.query.filter(Schedule.schedule_id==schedule_id).first()
-    schedule.parsed_schedule_time = VisitTime.query.get(schedule.schedule_time_id)
+    schedule = Schedule.query.join(VisitTime, Schedule.schedule_time_id == VisitTime.id)\
+        .filter(Schedule.schedule_id==schedule_id).first()
     if request.method == 'POST':
         visit_date = request.form.get('visit_date')
         if visit_date and schedule.schedule_date != visit_date:
@@ -260,8 +260,11 @@ def schedule_detail(schedule_id):
 @admin.route('/goods/<string:keyword>/<int:page>', methods=['GET'])
 @staff_required
 def search_goods(keyword, page):
-    paginate = Goods.query.filter(
-        Match([Goods.goods_id, Goods.name, Goods.memo], keyword))\
+    paginate = Goods.query.join(Box).join(User).filter(
+        or_(Match([Goods.goods_id, Goods.name, Goods.memo], keyword),
+            Match([User.name, User.address1, User.address2], keyword),
+            Match([Box.box_id], keyword))
+        )\
         .order_by(Goods.created_at.desc()) \
         .paginate(page, GOODS_PER_PAGE, False)
     return render_template('admin_goods_list.html', page_title=u'물품조회',
@@ -297,9 +300,12 @@ def goods_list(page):
 @staff_required
 def search_box(keyword, page):
     paginate = Box.query.filter(
-        Match([Box.box_id], keyword)
+        or_(Match([Box.box_id], keyword),)
     ).order_by(Box.created_at.desc()) \
         .paginate(page, BOXES_PER_PAGE, False)
+
+    for item in paginate.items:
+        item.goods = Goods.query.filter(Goods.box_id == item.id).first()
 
     return render_template('admin_boxes.html', page_title=u'박스현황',
                            page_subtitle='Boxes',
@@ -314,6 +320,9 @@ def boxes(page):
     paginate = Box.query.order_by(Box.created_at.desc()) \
         .paginate(page, BOXES_PER_PAGE, False)
 
+    for item in paginate.items:
+        item.goods = Goods.query.filter(Goods.box_id == item.id).first()
+
     return render_template('admin_boxes.html', page_title=u'박스현황',
                            page_subtitle='Boxes',
                            pagination=paginate
@@ -323,14 +332,11 @@ def boxes(page):
 @admin.route('/old_schedules/<int:page>', methods=['GET'])
 @staff_required
 def old_schedules(page):
-    paginate = Schedule.query.filter(
+    paginate = Schedule.query.join(VisitTime, Schedule.schedule_time_id == VisitTime.id).filter(
         or_(Schedule.status == ScheduleStatus.CANCELED,
             Schedule.status == ScheduleStatus.COMPLETE,)
     ).order_by(Schedule.created_at.desc()) \
         .paginate(page, SCHEDULES_PER_PAGE, False)
-
-    for item in paginate.items:
-        item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
 
     return render_template('admin_old_schedules.html', page_title=u'지난 스케줄',
                            page_subtitle='Old Schedules',
@@ -401,6 +407,7 @@ def search_schedule(keyword, page):
     if schedule_status == 'waiting':
         paginate = Schedule.query.join(Schedule.customer) \
             .join(Reservation) \
+            .join(VisitTime, Schedule.schedule_time_id == VisitTime.id) \
             .filter(
             and_(
                 Schedule.status == ScheduleStatus.WAITING,
@@ -412,9 +419,6 @@ def search_schedule(keyword, page):
         ).order_by(Schedule.created_at.desc()) \
             .paginate(page, SCHEDULES_PER_PAGE, False)
 
-        for item in paginate.items:
-            item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
-
         return render_template('admin_schedules.html', page_title=u'스케줄',
                                page_subtitle='Schedules',
                                pagination=paginate,
@@ -424,6 +428,7 @@ def search_schedule(keyword, page):
     elif schedule_status == 'old':
         paginate = Schedule.query.join(Schedule.customer) \
             .join(Reservation) \
+            .join(VisitTime, Schedule.schedule_time_id == VisitTime.id) \
             .filter(
             and_(
                 or_(
@@ -438,9 +443,6 @@ def search_schedule(keyword, page):
         ).order_by(Schedule.created_at.desc()) \
             .paginate(page, SCHEDULES_PER_PAGE, False)
 
-        for item in paginate.items:
-            item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
-
         return render_template('admin_old_schedules.html', page_title=u'지난 스케줄',
                                page_subtitle='Old Schedules',
                                pagination=paginate,
@@ -451,13 +453,11 @@ def search_schedule(keyword, page):
 @admin.route('/schedules/<int:page>', methods=['GET'])
 @staff_required
 def schedules(page=1):
-    paginate = Schedule.query.join(Schedule.customer).filter(
+    paginate = Schedule.query.join(Schedule.customer).join(VisitTime, Schedule.schedule_time_id == VisitTime.id)\
+        .filter(
         Schedule.status == ScheduleStatus.WAITING
     ).order_by(Schedule.created_at.desc()) \
         .paginate(page, SCHEDULES_PER_PAGE, False)
-
-    for item in paginate.items:
-        item.parsed_schedule_time = VisitTime.query.get(item.schedule_time_id)
 
     return render_template('admin_schedules.html', page_title=u'스케줄',
                            page_subtitle='Schedules',
