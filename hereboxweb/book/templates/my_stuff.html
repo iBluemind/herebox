@@ -37,7 +37,7 @@
                                         {% if my_stuff.photo %}
                                             <div style="width: 226px; height: 177px; background: url('http://static.herebox.kr/{{ my_stuff.photo }}') no-repeat center; background-size:contain;"></div>
                                         {% else %}
-                                            <div style="width: 226px; height: 177px; background: url('{{ url_for('static', filename='assets/img/img-box.png') }}') no-repeat; background-size:contain;"></div>
+                                            <div style="width: 226px; height: 177px; background: url('{{ url_for('static', filename='assets/img/img-box.png') }}') no-repeat center; background-size:contain;"></div>
                                         {% endif %}
                                         <h2>{{ my_stuff.name }}</h2>
                                         <p>
@@ -114,9 +114,9 @@
                             <div class="item">
                                 <div class="item-box">
                                     {% if my_stuff.photo %}
-                                            <div style="width: 226px; height: 177px; background: url('http://static.herebox.kr/{{ my_stuff.photo }}') no-repeat center; background-size:contain;"></div>
+                                        <div style="width: 226px; height: 177px; background: url('http://static.herebox.kr/{{ my_stuff.photo }}') no-repeat center; background-size:contain;"></div>
                                     {% else %}
-                                        <div style="width: 226px; height: 177px; background: url('{{ url_for('static', filename='assets/img/img-box.png') }}') no-repeat; background-size:contain;"></div>
+                                        <div style="width: 226px; height: 177px; background: url('{{ url_for('static', filename='assets/img/img-box.png') }}') no-repeat center; background-size:contain;"></div>
                                     {% endif %}
                                     <h2>{{ my_stuff.name }}</h2>
                                     <p>
