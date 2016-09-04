@@ -259,10 +259,12 @@ class RedisSession(CallbackDict, SessionMixin):
 
 
 class RedisSessionInterface(SessionInterface):
+
+    SESSION_EXPIRATION_DAYS = 31
+
     def __init__(self):
         sessions_redis_helper = RedisConnectHelper(RedisType.AUTH_SESSIONS_REDIS)
         self.store = sessions_redis_helper.get_redis()
-        self.timeout = 3600
 
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
@@ -290,7 +292,7 @@ class RedisSessionInterface(SessionInterface):
         if self.get_expiration_time(app, session):
             expiration = self.get_expiration_time(app, session)
         else:
-            expiration = datetime.utcnow() + timedelta(hours=1)
+            expiration = datetime.utcnow() + timedelta(days=self.SESSION_EXPIRATION_DAYS)
 
         ssd = {
             'sid': session.sid,
@@ -298,11 +300,21 @@ class RedisSessionInterface(SessionInterface):
             'expiration': expiration
         }
         ssstr = cPickle.dumps(ssd)
-        self.store.setex(session.sid, self.timeout, ssstr)
+        self.store.setex(session.sid,
+                         self.total_seconds(self.get_redis_expiration_time(app, session)),
+                         ssstr)
 
         response.set_cookie(app.session_cookie_name, session.sid,
                             expires=self.get_expiration_time(app, session),
                             httponly=True, domain=domain)
+
+    def get_redis_expiration_time(self, app, session):
+        if session.permanent:
+            return app.permanent_session_lifetime
+        return timedelta(days=self.SESSION_EXPIRATION_DAYS)
+
+    def total_seconds(self, td):
+        return td.days * 60 * 60 * 24 + td.seconds
 
 
 from sqlalchemy.ext.compiler import compiles
