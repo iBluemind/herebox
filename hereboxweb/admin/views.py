@@ -676,12 +676,12 @@ def admin_index():
         """
         SELECT CONCAT(
                   DATE_FORMAT(
-                     DATE_SUB(created_at, INTERVAL (DAYOFWEEK(created_at) - 1) DAY),
-                     "%%Y/%%m/%%d"),
+                     DATE_SUB(`created_at`, INTERVAL (DAYOFWEEK(`created_at`) - 1) DAY),
+                     "%%m.%%d"),
                   ' ~ ',
                   DATE_FORMAT(
-                     DATE_SUB(created_at, INTERVAL (DAYOFWEEK(created_at) - 7) DAY),
-                     "%%Y/%%m/%%d"))
+                     DATE_SUB(`created_at`, INTERVAL (DAYOFWEEK(`created_at`) - 7) DAY),
+                     "%%m.%%d"))
                   AS `date`,
                COUNT(*) AS `count`
           FROM `reservation`

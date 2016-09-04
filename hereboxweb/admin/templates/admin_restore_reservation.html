@@ -61,7 +61,7 @@
                 <input class="form-control" value="{% for goods in reservation_detail.goods %}{{ goods.goods_id }} {% endfor %}" disabled>
             </div>
 
-            <div class="form-group">
+            <div class="form-group col-lg-12">
                 {% if reservation_detail.status == 0 %}
                     <button id="btnAccept" type="button" class="btn btn-primary">접수</button>
                 {% endif %}

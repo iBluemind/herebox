@@ -3,27 +3,19 @@
 
     <div style="margin-left: auto; margin-right: auto;">
         <form method="post">
-            <div class="form-group">
+            <div class="form-group col-lg-6">
                 <label>전화번호</label>
                 <input class="form-control" value="{{ user_detail.phone or '' }}" disabled>
             </div>
-            <div class="form-group">
+            <div class="form-group col-lg-6">
                 <label>이름</label>
                 <input class="form-control" name="name" value="{{ user_detail.name }}">
             </div>
-            <div class="form-group">
+            <div class="form-group col-lg-6">
                 <label>이메일</label>
                 <input class="form-control" name="email" value="{{ user_detail.email or '' }}">
             </div>
-            <div class="form-group">
-                <label>주소</label>
-                <input class="form-control" name="address1" value="{{ user_detail.address1 or '' }}">
-            </div>
-            <div class="form-group">
-                <label>상세주소</label>
-                <input class="form-control" name="address2" value="{{ user_detail.address2 or '' }}">
-            </div>
-            <div class="form-group">
+            <div class="form-group col-lg-6">
                 <label>상태</label>
                 <select class="form-control" name="status">
                     <option value="0" {{ 'selected' if user_detail.status == 0 else '' }}>탈퇴</option>
@@ -32,15 +24,27 @@
                     <option value="3" {{ 'selected' if user_detail.status == 3 else '' }}>최고관리자</option>
                 </select>
             </div>
-            <div class="form-group">
+            <div class="form-group col-lg-12">
+                <label>주소</label>
+                <input class="form-control" name="address1" value="{{ user_detail.address1 or '' }}">
+            </div>
+            <div class="form-group col-lg-12">
+                <label>상세주소</label>
+                <input class="form-control" name="address2" value="{{ user_detail.address2 or '' }}">
+            </div>
+            <div class="form-group col-lg-6">
                 <label>가입일</label>
                 <input class="form-control" value="{{ user_detail.created_at }}" disabled>
             </div>
-            <div class="form-group">
+            {% if user_detail.fb_user_id %}
+            <div class="form-group col-lg-6">
                 <label>페이스북아이디</label>
-                <input class="form-control" value="{{ user_detail.fb_user_id or '' }}" disabled>
+                <p class="form-control" disabled>
+                    <a href="http://facebook.com/{{ user_detail.fb_user_id}}" target="_blank">{{ user_detail.fb_user_id}}</a>
+                </p>
             </div>
-            <div class="form-group">
+            {% endif %}
+            <div class="form-group col-lg-12">
                 <button type="submit" class="btn btn-danger">변경</button>
             </div>
         </form>
