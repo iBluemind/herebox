@@ -31,7 +31,7 @@ from hereboxweb.admin import custom_filter
 USERS_PER_PAGE = 15
 RESERVATIONS_PER_PAGE = 15
 SCHEDULES_PER_PAGE = 15
-PURCHASES_PER_PAGE = 10
+PURCHASES_PER_PAGE = 30
 BOXES_PER_PAGE = 15
 GOODS_PER_PAGE = 15
 EXTEND_PERIOD_PER_PAGE = 10
@@ -274,8 +274,18 @@ def search_goods(keyword, page):
 @admin.route('/goods_list/<int:page>', methods=['GET'])
 @staff_required
 def goods_list(page):
-    paginate = Goods.query.order_by(Goods.created_at.desc()) \
-        .paginate(page, GOODS_PER_PAGE, False)
+    filtered_by = request.args.get('status')
+    if filtered_by and filtered_by == 'must_be_expired':
+        paginate = Goods.query.filter(
+            and_(
+                Goods.expired_at <= datetime.date.today(),
+                Goods.status == GoodsStatus.ACTIVE
+            )
+        ).order_by(Goods.created_at.desc()) \
+            .paginate(page, GOODS_PER_PAGE, False)
+    else:
+        paginate = Goods.query.order_by(Goods.created_at.desc()) \
+            .paginate(page, GOODS_PER_PAGE, False)
 
     return render_template('admin_goods_list.html', page_title=u'물품조회',
                            page_subtitle='Goods',
@@ -655,8 +665,10 @@ def new_reservations(page):
 @staff_required
 def admin_index():
     today = datetime.date.today()
-    reservations_today = Reservation.query.filter(Reservation.created_at >= today).count()
-    goods_expired_today = Goods.query.filter(Goods.expired_at <= today).count()
+    reservations_today = Reservation.query.filter(and_(Reservation.created_at >= today
+                                                    , Reservation.status == ReservationStatus.WAITING)).count()
+    goods_expired_today = Goods.query.filter(and_(Goods.expired_at <= today,
+                                                Goods.status == GoodsStatus.ACTIVE)).count()
     user_join_today = User.query.filter(User.created_at >= today).count()
     used_box_today = Box.query.filter(Box.status == BoxStatus.UNAVAILABLE).count()
 
@@ -670,11 +682,11 @@ def admin_index():
                   DATE_FORMAT(
                      DATE_SUB(created_at, INTERVAL (DAYOFWEEK(created_at) - 7) DAY),
                      "%%Y/%%m/%%d"))
-                  AS date,
-               COUNT(*) AS count
+                  AS `date`,
+               COUNT(*) AS `count`
           FROM `reservation`
-        GROUP BY date
-        ORDER BY `date` DESC
+        GROUP BY `date`
+        ORDER BY `date`
         """
     )
 
