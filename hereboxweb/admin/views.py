@@ -513,7 +513,7 @@ def reservation_detail(reservation_id):
             parsed_binding_products += '%s ' % binding_products[key]
         reservation.parsed_binding_products = parsed_binding_products
 
-        reservation.parsed_revisit_option = 'Y' if reservation.revisit_option == RevisitOption.LATER else 'N'
+        reservation.parsed_revisit_option = 'Y' if reservation.revisit_option == ReservationRevisitType.LATER else 'N'
         reservation.parsed_fixed_rate = 'Y' if reservation.fixed_rate == 1 else 'N'
 
         reservation.parsed_delivery_time = VisitTime.query.get(reservation.delivery_time)
@@ -547,7 +547,7 @@ def reservation_detail(reservation_id):
         reservation = RestoreReservation.query.filter(Reservation.reservation_id==reservation_id).first()
         reservation.parsed_delivery_time = VisitTime.query.get(reservation.delivery_time)
         reservation.parsed_recovery_time = VisitTime.query.get(reservation.recovery_time)
-        reservation.parsed_revisit_option = 'Y' if reservation.revisit_option == RevisitOption.LATER else 'N'
+        reservation.parsed_revisit_option = 'Y' if reservation.revisit_option == ReservationRevisitType.LATER else 'N'
 
         if request.method == 'POST':
             change_reservation()
