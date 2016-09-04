@@ -208,8 +208,8 @@ def goods_detail(goods_id):
     if request.method == 'DELETE':
         if goods.box_id != None:
             box = Box.query.get(goods.box_id)
-            box.goods_id = None
             box.status = BoxStatus.AVAILABLE
+            goods.box_id = None
         goods.status = GoodsStatus.EXPIRED
         outgoing_history = Outgoing(goods.id)
         database.session.add(outgoing_history)
@@ -479,8 +479,8 @@ def reservation_detail(reservation_id):
         for goods in reservation.goods:
             if goods.box_id != None:
                 box = Box.query.get(goods.box_id)
-                box.goods_id = None
                 box.status = BoxStatus.AVAILABLE
+                goods.box_id = None
             goods.status = GoodsStatus.EXPIRED
         for schedule in reservation.schedules:
             schedule.status = ScheduleStatus.CANCELED
@@ -838,7 +838,7 @@ def register_goods():
         return response_template(u'오류가 발생했습니다.', status=500)
 
     if goods_type == GoodsType.STANDARD_BOX:
-        box.goods_id = new_goods.id
+        new_goods.box_id = box.id
 
     try:
         database.session.commit()
@@ -895,8 +895,8 @@ def complete_schedule():
             if reservation.delivery_option == ReservationDeliveryType.EXPIRE:
                 if goods.box_id != None:
                     box = Box.query.get(goods.box_id)
-                    box.goods_id = None
                     box.status = BoxStatus.AVAILABLE
+                    goods.box_id = None
                 goods.status = GoodsStatus.EXPIRED
             else:
                 goods.in_store = InStoreStatus.OUT_OF_STORE
