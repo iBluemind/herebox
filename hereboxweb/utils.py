@@ -328,7 +328,7 @@ class Match(ClauseElement):
 
 @compiles(Match)
 def _match(element, compiler, **kw):
-    return "MATCH (%s) AGAINST (%s)" % (
+    return "MATCH (%s) AGAINST (\"%s*\" IN BOOLEAN MODE)" % (
         ", ".join(compiler.process(c, **kw) for c in element.columns),
         compiler.process(element.value)
     )

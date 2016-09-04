@@ -37,9 +37,15 @@
 {% endblock %}
 {% block jscript %}
     <script>
-        $("#btnSearch").click(function() {
+        function search() {
             var keyword = $("#searchKeyword").val();
             location.href = "/admin/old_reservation/" + keyword + "/1";
+        }
+        $("#btnSearch").click(search);
+        $("#searchKeyword").keyup(function(e) {
+            if (e.keyCode == 13) {
+                search();
+            }
         });
     </script>
 {% endblock %}

@@ -293,7 +293,8 @@ def search_box(keyword, page):
 
     return render_template('admin_boxes.html', page_title=u'박스현황',
                            page_subtitle='Boxes',
-                           pagination=paginate
+                           pagination=paginate,
+                           search_keyword=keyword
                            )
 
 
