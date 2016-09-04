@@ -48,9 +48,11 @@
                 <p><b>사진</b></p>
                 <div style="display: inline-block;">
                     {% if goods_detail.photo %}
-                        <img src="http://static.herebox.kr/{{ goods_detail.photo }}" style="width: 100px;">
+                        <a href="http://static.herebox.kr/{{ goods_detail.photo }}" target="_blank">
+                            <img src="http://static.herebox.kr/{{ goods_detail.photo }}" style="width: 100px;">
+                        </a>
                     {% else %}
-                            <img src="{{ url_for('static', filename='assets/img/img-box.png') }}" style="width: 100px;">
+                        <img src="{{ url_for('static', filename='assets/img/img-box.png') }}" style="width: 100px;">
                     {% endif %}
                 </div>
                 <button id="btnChangePhoto" type="button" class="btn btn-xs btn-default">사진 변경</button>
